@@ -1,0 +1,7 @@
+glob:*/bin/*
+glob:*/obj/*
+glob:*.suo
+glob:*.csproj.user
+glob:build*.log
+syntax: glob
+*.Publish.xml
