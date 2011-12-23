@@ -13,11 +13,19 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameEngine"/> class.
         /// </summary>
-        public GameEngine()
+        public GameEngine(Size size, IEnumerable<Type> chickenTypes)
         {
-            // TODO: Obtain chickens and size
-            this.Board = new GameBoard(Enumerable.Empty<Type>(), new Size(20, 20));
-            this.IsTurnFinished = true;
+            this.Board = new GameBoard(size, chickenTypes);
+            this.IsNextTurn = true;
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="GameEngine"/> class.
+        /// </summary>
+        public GameEngine(Size size, params Type[] chickenTypes)
+            : this(size, (IEnumerable<Type>)chickenTypes)
+        {
+            // Nothing to do
         }
 
         #endregion
@@ -39,7 +47,7 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public bool IsTurnFinished
+        public bool IsNextTurn
         {
             get;
             private set;
@@ -66,6 +74,15 @@ namespace SharpestBeak.Common
             if (this.IsGameFinished)
             {
                 return;
+            }
+
+            if (this.IsNextTurn)
+            {
+                foreach (var aliveChicken in this.Board.AliveChickens)
+                {
+                    aliveChicken.CurrentMove = null;
+                    aliveChicken.IsPecked = false;
+                }
             }
 
             var chicken = this.Board.AliveChickens[this.PlayerIndex];
@@ -135,9 +152,9 @@ namespace SharpestBeak.Common
             }
 
             this.PlayerIndex++;
-            this.IsTurnFinished = this.PlayerIndex >= this.Board.AliveChickens.Count;
+            this.IsNextTurn = this.PlayerIndex >= this.Board.AliveChickens.Count;
 
-            if (this.IsTurnFinished)
+            if (this.IsNextTurn)
             {
                 this.PlayerIndex = 0;
 

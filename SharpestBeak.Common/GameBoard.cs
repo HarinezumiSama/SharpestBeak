@@ -37,10 +37,16 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameBoard"/> class.
         /// </summary>
-        public GameBoard(IEnumerable<Type> chickenTypes, Size size)
+        public GameBoard(Size size, IEnumerable<Type> chickenTypes)
         {
             #region Argument Check
 
+            if (size.Width < MinSizeDimension || size.Height < MinSizeDimension)
+            {
+                throw new ArgumentException(
+                    string.Format("The size dimension must be at least {0}.", MinSizeDimension),
+                    "size");
+            }
             if (chickenTypes == null)
             {
                 throw new ArgumentNullException("chickenTypes");
@@ -57,12 +63,6 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentException("Invalid chicken type.", "chickenTypes");
             }
-            if (size.Width < MinSizeDimension || size.Height < MinSizeDimension)
-            {
-                throw new ArgumentException(
-                    string.Format("The size dimension must be at least {0}.", MinSizeDimension),
-                    "size");
-            }
 
             #endregion
 
@@ -73,6 +73,15 @@ namespace SharpestBeak.Common
             this.AllChickens = chickenTypes.Select(item => CreateChicken(item)).ToList().AsReadOnly();
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="GameBoard"/> class.
+        /// </summary>
+        public GameBoard(Size size, params Type[] chickenTypes)
+            : this(size, (IEnumerable<Type>)chickenTypes)
+        {
+            // Nothing to do
         }
 
         #endregion

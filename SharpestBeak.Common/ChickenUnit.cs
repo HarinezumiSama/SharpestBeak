@@ -79,18 +79,20 @@ namespace SharpestBeak.Common
             internal set;
         }
 
+        public MoveInfo CurrentMove
+        {
+            get;
+            internal set;
+        }
+
         #endregion
 
         #region Public Methods
 
         public MoveInfo MakeMove()
         {
-            if (!this.CanPlay)
-            {
-                return null;
-            }
-
-            return OnMakeMove();
+            this.CurrentMove = this.CanPlay ? OnMakeMove() : null;
+            return this.CurrentMove;
         }
 
         #endregion
