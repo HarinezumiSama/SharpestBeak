@@ -3,5 +3,5 @@ glob:*/obj/*
 glob:*.suo
 glob:*.csproj.user
 glob:build*.log
-syntax: glob
-*.Publish.xml
+glob:_ReSharper*
+glob:*.Publish.xml
