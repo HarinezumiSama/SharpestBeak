@@ -21,6 +21,13 @@ namespace SharpestBeak.Common
             new Dictionary<BeakAngle, Point>()
             {
                 { BeakAngle.Up, new Point(0, -1) },
+                { BeakAngle.UpRight, new Point(1, -1) },
+                { BeakAngle.Right, new Point(1, 0) },
+                { BeakAngle.DownRight, new Point(1, 1) },
+                { BeakAngle.Down, new Point(0, 1) },
+                { BeakAngle.DownLeft, new Point(-1, 1) },
+                { BeakAngle.Left, new Point(-1, 0) },
+                { BeakAngle.UpLeft, new Point(-1, -1) }
             };
 
         #endregion
