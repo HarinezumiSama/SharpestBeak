@@ -29,6 +29,12 @@ namespace SharpestBeak.UI.WinForms
 
         protected override MoveInfo OnMakeMove()
         {
+            var attackPoint = this.Board.GetPeckAttackPoint(this);
+            if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
+            {
+                return new MoveInfo(BeakTurn.None, MoveAction.Peck);
+            }
+
             return new MoveInfo(ChooseRandomValue(s_turns), ChooseRandomValue(s_actions));
         }
 

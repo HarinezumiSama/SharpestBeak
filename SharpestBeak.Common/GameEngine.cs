@@ -37,6 +37,21 @@ namespace SharpestBeak.Common
             this.IsGameFinished = true;
         }
 
+        private void OnDiscreteMoveOccurred()
+        {
+            var discreteMoveOccurred = this.DiscreteMoveOccurred;
+            if (discreteMoveOccurred != null)
+            {
+                discreteMoveOccurred(this, EventArgs.Empty);
+            }
+        }
+
+        #endregion
+
+        #region Public Events
+
+        public event EventHandler DiscreteMoveOccurred;
+
         #endregion
 
         #region Public Properties
@@ -60,6 +75,12 @@ namespace SharpestBeak.Common
         }
 
         public bool IsGameFinished
+        {
+            get;
+            private set;
+        }
+
+        public long TurnIndex
         {
             get;
             private set;
@@ -107,6 +128,7 @@ namespace SharpestBeak.Common
                         newBeakAngle = BeakAngle.Min;
                     }
                     chicken.BeakAngle = newBeakAngle;
+                    OnDiscreteMoveOccurred();
                 }
 
                 // Action 2 - Move or peck
@@ -139,6 +161,7 @@ namespace SharpestBeak.Common
                                     target.IsPecked = true;
                                 }
                             }
+                            OnDiscreteMoveOccurred();
                         }
                         break;
                     default:
@@ -148,6 +171,7 @@ namespace SharpestBeak.Common
                 if (newPosition != chicken.Position && this.Board.IsValidMove(newPosition))
                 {
                     chicken.Position = newPosition;
+                    OnDiscreteMoveOccurred();
                 }
             }
 
@@ -164,6 +188,9 @@ namespace SharpestBeak.Common
                     peckedChicken.IsDead = true;
                     this.Board.AliveChickensDirect.Remove(peckedChicken);
                 }
+                OnDiscreteMoveOccurred();
+
+                this.TurnIndex++;
             }
 
             if (this.Board.AliveChickens.Count <= 1)

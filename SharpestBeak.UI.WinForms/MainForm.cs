@@ -16,8 +16,11 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly Size s_cellSize = new Size(16, 16);
+        private static readonly Size s_cellSize = new Size(24, 24);
         private static readonly Size s_fullCellSize = Size.Add(s_cellSize, new Size(1, 1));
+
+        private static readonly Brush s_winBrush = new SolidBrush(Color.Green);
+        private static readonly Brush s_attackBrush = new SolidBrush(Color.Red);
 
         #endregion
 
@@ -27,7 +30,10 @@ namespace SharpestBeak.UI.WinForms
         {
             InitializeComponent();
 
-            this.GameEngine = new GameEngine(new Size(20, 20), typeof(RandomChicken), typeof(RandomChicken));
+            this.GameEngine = new GameEngine(
+                new Size(10, 10),
+                Enumerable.Range(1, 20).Select(item => typeof(RandomChicken)));
+            this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
         }
 
         #endregion
@@ -40,8 +46,9 @@ namespace SharpestBeak.UI.WinForms
 
             var size = this.GameEngine.Board.Size;
             this.ClientSize = new Size(
-                size.Width * s_cellSize.Width + size.Width + 1,
-                size.Height * s_cellSize.Height + size.Height + 1);
+                size.Width * s_cellSize.Width + 1,
+                size.Height * s_cellSize.Height + 1);
+            this.CenterToScreen();
         }
 
         #endregion
@@ -65,33 +72,41 @@ namespace SharpestBeak.UI.WinForms
             {
                 for (int x = 0; x < size.Width; x++)
                 {
-                    var chicken = this.GameEngine.Board.GetChickenAtPoint(new Point(x, y));
-
                     var cellPoint = new Point(s_cellSize.Width * x, s_cellSize.Height * y);
                     var cellRect = new Rectangle(cellPoint, s_fullCellSize);
+                    ControlPaint.DrawFocusRectangle(e.Graphics, cellRect);
 
-                    var borderColor = Color.Black;
+                    var chicken = this.GameEngine.Board.GetChickenAtPoint(new Point(x, y));
                     if (chicken != null)
                     {
+                        Brush backBrush = null;
                         if (this.GameEngine.IsGameFinished)
                         {
-                            borderColor = Color.Green;
+                            backBrush = s_winBrush;
                         }
                         else if (chicken.CurrentMove != null && chicken.CurrentMove.Move == MoveAction.Peck)
                         {
-                            borderColor = Color.Red;
+                            backBrush = s_attackBrush;
+                        }
+
+                        if (backBrush != null)
+                        {
+                            var backRect = cellRect;
+                            backRect.Inflate(-1, -1);
+                            e.Graphics.FillRectangle(backBrush, backRect);
                         }
                     }
-                    ControlPaint.DrawFocusRectangle(e.Graphics, cellRect, borderColor, Color.White);
-
-                    cellPoint.X++;
-                    cellPoint.Y++;
 
                     if (chicken != null)
                     {
+                        cellPoint.Offset(1, 1);
                         using (var image = (Bitmap)Resources.ResourceManager.GetObject(
                             "Chicken" + chicken.BeakAngle.ToString()))
                         {
+                            var offsetX = (s_cellSize.Width - image.Width) / 2;
+                            var offsetY = (s_cellSize.Height - image.Height) / 2;
+                            cellPoint.Offset(offsetX, offsetY);
+
                             e.Graphics.DrawImageUnscaled(image, cellPoint);
                         }
                     }
@@ -118,6 +133,11 @@ namespace SharpestBeak.UI.WinForms
             }
 
             this.GameEngine.MakePrimitiveMove();
+            this.pbGame.Invalidate();
+        }
+
+        private void GameEngine_DiscreteMoveOccurred(object sender, EventArgs e)
+        {
             this.pbGame.Invalidate();
         }
 

@@ -73,6 +73,8 @@ namespace SharpestBeak.Common
             this.AllChickens = chickenTypes.Select(item => CreateChicken(item)).ToList().AsReadOnly();
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
+
+            PositionChickens();
         }
 
         /// <summary>
@@ -97,6 +99,33 @@ namespace SharpestBeak.Common
 
             result.Board = this;
             return result;
+        }
+
+        private void PositionChickens()
+        {
+            if (this.AllChickens.Count >= this.Size.Width * this.Size.Height / 2)
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        "Too many chickens ({0}) for the board of size {1}x{2}.",
+                        this.AllChickens.Count,
+                        this.Size.Width,
+                        this.Size.Height));
+            }
+
+            for (int index = 0; index < this.AllChickens.Count; index++)
+            {
+                var chicken = this.AllChickens[index];
+
+                Point newPosition;
+                do
+                {
+                    newPosition = new Point(s_random.Next(this.Size.Width), s_random.Next(this.Size.Height));
+                }
+                while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
+
+                chicken.Position = newPosition;
+            }
         }
 
         #endregion
