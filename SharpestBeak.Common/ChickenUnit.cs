@@ -32,7 +32,10 @@ namespace SharpestBeak.Common
         protected bool CanPlay
         {
             [DebuggerNonUserCode]
-            get { return this.Board != null && !this.IsDead; }
+            get
+            {
+                return this.Board != null && !this.IsDead;
+            }
         }
 
         #endregion
@@ -67,7 +70,7 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        public bool IsPecked
+        public ChickenUnit PeckedBy
         {
             get;
             internal set;
@@ -80,6 +83,12 @@ namespace SharpestBeak.Common
         }
 
         public MoveInfo CurrentMove
+        {
+            get;
+            internal set;
+        }
+
+        public int KillCount
         {
             get;
             internal set;

@@ -102,7 +102,7 @@ namespace SharpestBeak.Common
                 foreach (var aliveChicken in this.Board.AliveChickens)
                 {
                     aliveChicken.CurrentMove = null;
-                    aliveChicken.IsPecked = false;
+                    aliveChicken.PeckedBy = null;
                 }
             }
 
@@ -156,9 +156,10 @@ namespace SharpestBeak.Common
                             if (attackPoint.HasValue)
                             {
                                 var target = this.Board.GetChickenAtPoint(attackPoint.Value);
-                                if (target != null)
+                                if (target != null && target.PeckedBy == null)
                                 {
-                                    target.IsPecked = true;
+                                    // If both A and B pecked C, first one has priority
+                                    target.PeckedBy = chicken;
                                 }
                             }
                             OnDiscreteMoveOccurred();
@@ -182,10 +183,11 @@ namespace SharpestBeak.Common
             {
                 this.PlayerIndex = 0;
 
-                var peckedChickens = this.Board.AliveChickens.Where(item => item.IsPecked).ToList();
+                var peckedChickens = this.Board.AliveChickens.Where(item => item.PeckedBy != null).ToList();
                 foreach (var peckedChicken in peckedChickens)
                 {
                     peckedChicken.IsDead = true;
+                    peckedChicken.PeckedBy.KillCount++;
                     this.Board.AliveChickensDirect.Remove(peckedChicken);
                 }
                 OnDiscreteMoveOccurred();

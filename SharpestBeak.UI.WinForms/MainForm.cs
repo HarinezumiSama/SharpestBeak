@@ -21,6 +21,8 @@ namespace SharpestBeak.UI.WinForms
 
         private static readonly Brush s_winBrush = new SolidBrush(Color.Green);
         private static readonly Brush s_attackBrush = new SolidBrush(Color.Red);
+        private static readonly Brush s_peckedBrush = new SolidBrush(Color.Yellow);
+        private static readonly Brush s_peckedAttackBrush = new SolidBrush(Color.Orange);
 
         #endregion
 
@@ -86,7 +88,11 @@ namespace SharpestBeak.UI.WinForms
                         }
                         else if (chicken.CurrentMove != null && chicken.CurrentMove.Move == MoveAction.Peck)
                         {
-                            backBrush = s_attackBrush;
+                            backBrush = chicken.PeckedBy != null ? s_peckedAttackBrush : s_attackBrush;
+                        }
+                        else if (chicken.PeckedBy != null)
+                        {
+                            backBrush = s_peckedBrush;
                         }
 
                         if (backBrush != null)
