@@ -70,7 +70,7 @@ namespace SharpestBeak.Common
             this.Size = size;
 
             // Post-initialized properties
-            this.AllChickens = chickenTypes.Select(item => CreateChicken(item)).ToList().AsReadOnly();
+            this.AllChickens = chickenTypes.Select((item, index) => CreateChicken(item, index)).ToList().AsReadOnly();
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
 
@@ -90,14 +90,13 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
-        private ChickenUnit CreateChicken(Type item)
+        private ChickenUnit CreateChicken(Type item, int index)
         {
             var result = (ChickenUnit)Activator.CreateInstance(item);
 
-            // TODO: Improve positioning: 1) not same as any previous; 2) check minimum distance
-            result.Position = new Point(s_random.Next(this.Size.Width), s_random.Next(this.Size.Height));
-
+            result.UniqueIndex = index + 1;
             result.Board = this;
+
             return result;
         }
 
@@ -193,7 +192,7 @@ namespace SharpestBeak.Common
 
         public ChickenUnit GetChickenAtPoint(Point value)
         {
-            return this.AliveChickens.SingleOrDefault(item => item.Position == value);
+            return IsValidPoint(value) ? this.AliveChickens.SingleOrDefault(item => item.Position == value) : null;
         }
 
         #endregion

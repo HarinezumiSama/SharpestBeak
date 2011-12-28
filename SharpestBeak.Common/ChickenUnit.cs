@@ -58,6 +58,12 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
+        public int UniqueIndex
+        {
+            get;
+            internal set;
+        }
+
         public Point Position
         {
             get;

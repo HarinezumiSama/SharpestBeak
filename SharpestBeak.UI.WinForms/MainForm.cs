@@ -33,9 +33,19 @@ namespace SharpestBeak.UI.WinForms
             InitializeComponent();
 
             this.GameEngine = new GameEngine(
-                new Size(10, 10),
+                new Size(20, 20),
                 Enumerable.Range(1, 20).Select(item => typeof(RandomChicken)));
             this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void MakePrimitiveMove()
+        {
+            this.GameEngine.MakePrimitiveMove();
+            this.pbGame.Invalidate();
         }
 
         #endregion
@@ -46,10 +56,14 @@ namespace SharpestBeak.UI.WinForms
         {
             base.OnLoad(e);
 
-            var size = this.GameEngine.Board.Size;
-            this.ClientSize = new Size(
-                size.Width * s_cellSize.Width + 1,
-                size.Height * s_cellSize.Height + 1);
+            statusLabel.Text = string.Empty;
+
+            var boardSize = this.GameEngine.Board.Size;
+            var boxSize = new Size(
+                boardSize.Width * (s_cellSize.Width + 1),
+                boardSize.Height * (s_cellSize.Height + 1));
+            var difference = boxSize - pbGame.ClientSize;
+            this.ClientSize = this.ClientSize + difference;
             this.CenterToScreen();
         }
 
@@ -101,10 +115,7 @@ namespace SharpestBeak.UI.WinForms
                             backRect.Inflate(-1, -1);
                             e.Graphics.FillRectangle(backBrush, backRect);
                         }
-                    }
 
-                    if (chicken != null)
-                    {
                         cellPoint.Offset(1, 1);
                         using (var image = (Bitmap)Resources.ResourceManager.GetObject(
                             "Chicken" + chicken.BeakAngle.ToString()))
@@ -120,7 +131,7 @@ namespace SharpestBeak.UI.WinForms
             }
         }
 
-        private void pbGame_Click(object sender, EventArgs e)
+        private void gameTimer_Tick(object sender, EventArgs e)
         {
             if (this.GameEngine.IsGameFinished)
             {
@@ -128,23 +139,68 @@ namespace SharpestBeak.UI.WinForms
                 return;
             }
 
-            gameTimer.Enabled = !gameTimer.Enabled;
-        }
-
-        private void gameTimer_Tick(object sender, EventArgs e)
-        {
-            if (this.GameEngine.IsGameFinished)
-            {
-                return;
-            }
-
-            this.GameEngine.MakePrimitiveMove();
-            this.pbGame.Invalidate();
+            MakePrimitiveMove();
         }
 
         private void GameEngine_DiscreteMoveOccurred(object sender, EventArgs e)
         {
-            this.pbGame.Invalidate();
+            this.pbGame.Refresh();
+        }
+
+        private void pbGame_MouseMove(object sender, MouseEventArgs e)
+        {
+            var toolTip = string.Empty;
+
+            if (!gameTimer.Enabled)
+            {
+                var mousePosition = e.Location;
+                var size = this.GameEngine.Board.Size;
+                var cellAddress = new Point(mousePosition.X / s_cellSize.Width, mousePosition.Y / s_cellSize.Height);
+
+                var chicken = this.GameEngine.Board.GetChickenAtPoint(cellAddress);
+                if (chicken != null)
+                {
+                    toolTip = string.Format(
+                        "[{0}:{1}] Kills: {2}",
+                        chicken.UniqueIndex,
+                        chicken.GetType().Name,
+                        chicken.KillCount);
+                }
+            }
+
+            statusLabel.Text = toolTip;
+        }
+
+        private void pbGame_MouseLeave(object sender, EventArgs e)
+        {
+            statusLabel.Text = string.Empty;
+        }
+
+        private void pbGame_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.GameEngine.IsGameFinished)
+            {
+                gameTimer.Enabled = false;
+                return;
+            }
+
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    gameTimer.Enabled = !gameTimer.Enabled;
+                    return;
+
+                case MouseButtons.Right:
+                    if (gameTimer.Enabled)
+                    {
+                        gameTimer.Enabled = false;
+                    }
+                    else
+                    {
+                        MakePrimitiveMove();
+                    }
+                    return;
+            }
         }
 
         #endregion
