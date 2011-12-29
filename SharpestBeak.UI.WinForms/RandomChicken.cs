@@ -11,7 +11,11 @@ namespace SharpestBeak.UI.WinForms
         #region Fields
 
         private static readonly BeakTurn[] s_turns = (BeakTurn[])Enum.GetValues(typeof(BeakTurn));
-        private static readonly MoveAction[] s_actions = (MoveAction[])Enum.GetValues(typeof(MoveAction));
+        private static readonly MoveAction[] s_pureMoves = Enum
+            .GetValues(typeof(MoveAction))
+            .Cast<MoveAction>()
+            .Where(item => item != MoveAction.Peck)
+            .ToArray();
         private static readonly Random s_random = new Random();
 
         #endregion
@@ -29,13 +33,22 @@ namespace SharpestBeak.UI.WinForms
 
         protected override MoveInfo OnMakeMove()
         {
-            var attackPoint = this.Board.GetPeckAttackPoint(this);
-            if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
+            var peckPossibilities = new List<MoveInfo>(s_turns.Length);
+            foreach (var beakTurn in s_turns)
             {
-                return new MoveInfo(BeakTurn.None, MoveAction.Peck);
+                var attackPoint = this.Board.GetPeckAttackPoint(this, beakTurn);
+                if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
+                {
+                    peckPossibilities.Add(new MoveInfo(beakTurn, MoveAction.Peck));
+                }
+            }
+            if (peckPossibilities.Count > 0)
+            {
+                var index = s_random.Next(peckPossibilities.Count);
+                return peckPossibilities[index];
             }
 
-            return new MoveInfo(ChooseRandomValue(s_turns), ChooseRandomValue(s_actions));
+            return new MoveInfo(ChooseRandomValue(s_turns), ChooseRandomValue(s_pureMoves));
         }
 
         #endregion

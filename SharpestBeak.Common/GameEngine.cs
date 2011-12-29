@@ -17,6 +17,7 @@ namespace SharpestBeak.Common
         {
             this.Board = new GameBoard(size, chickenTypes);
             this.IsNextTurn = true;
+            this.TurnIndex = 1;
         }
 
         /// <summary>
@@ -111,29 +112,17 @@ namespace SharpestBeak.Common
             if (newMove != null)
             {
                 // Action 1 - Beak turn
-                var beakTurnOffset = (int)newMove.Beak;
-                if (beakTurnOffset != 0)
+                var newBeakAngle = this.Board.GetNewBeakAngle(chicken.BeakAngle, newMove.BeakTurn);
+                var beakTurnOffset = (int)newMove.BeakTurn;
+                if (newBeakAngle != chicken.BeakAngle)
                 {
-                    if (Math.Abs(beakTurnOffset) > 1)
-                    {
-                        throw new InvalidOperationException("Invalid beak turn. Seems that someone tried to cheat!");
-                    }
-                    var newBeakAngle = chicken.BeakAngle + beakTurnOffset;
-                    if (newBeakAngle < BeakAngle.Min)
-                    {
-                        newBeakAngle = BeakAngle.Max;
-                    }
-                    else if (newBeakAngle > BeakAngle.Max)
-                    {
-                        newBeakAngle = BeakAngle.Min;
-                    }
                     chicken.BeakAngle = newBeakAngle;
                     OnDiscreteMoveOccurred();
                 }
 
                 // Action 2 - Move or peck
                 var newPosition = chicken.Position;
-                switch (newMove.Move)
+                switch (newMove.MoveAction)
                 {
                     case MoveAction.None:
                         // Nothing to do

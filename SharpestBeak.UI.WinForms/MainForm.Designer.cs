@@ -33,6 +33,7 @@
             this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.mainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.statusBar = new System.Windows.Forms.StatusStrip();
+            this.turnInfoLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.pbGame)).BeginInit();
             this.statusBar.SuspendLayout();
@@ -66,17 +67,26 @@
             // statusBar
             // 
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.turnInfoLabel,
             this.statusLabel});
-            this.statusBar.Location = new System.Drawing.Point(0, 240);
+            this.statusBar.Location = new System.Drawing.Point(0, 238);
             this.statusBar.Name = "statusBar";
-            this.statusBar.Size = new System.Drawing.Size(284, 22);
+            this.statusBar.ShowItemToolTips = true;
+            this.statusBar.Size = new System.Drawing.Size(284, 24);
+            this.statusBar.SizingGrip = false;
             this.statusBar.TabIndex = 2;
-            this.statusBar.Text = "statusStrip1";
+            // 
+            // turnInfoLabel
+            // 
+            this.turnInfoLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
+            this.turnInfoLabel.Name = "turnInfoLabel";
+            this.turnInfoLabel.Size = new System.Drawing.Size(74, 19);
+            this.turnInfoLabel.Text = "(TurnInfo...)";
             // 
             // statusLabel
             // 
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(56, 17);
+            this.statusLabel.Size = new System.Drawing.Size(56, 19);
             this.statusLabel.Text = "(Status...)";
             // 
             // MainForm
@@ -88,11 +98,13 @@
             this.Controls.Add(this.pbGame);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Sharpest Beak: WinForms UI";
+            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.MainForm_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pbGame)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
@@ -108,6 +120,7 @@
         private System.Windows.Forms.ToolTip mainToolTip;
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel turnInfoLabel;
     }
 }
 

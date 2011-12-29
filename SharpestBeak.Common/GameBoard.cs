@@ -17,17 +17,18 @@ namespace SharpestBeak.Common
         #region Fields
 
         private static readonly Random s_random = new Random();
-        private static readonly Dictionary<BeakAngle, Point> s_beakAngleToOffsetMap =
-            new Dictionary<BeakAngle, Point>()
+        private static readonly BeakAngle[] s_beakAngles = (BeakAngle[])Enum.GetValues(typeof(BeakAngle));
+        private static readonly Dictionary<BeakAngle, Size> s_beakAngleToOffsetMap =
+            new Dictionary<BeakAngle, Size>()
             {
-                { BeakAngle.Up, new Point(0, -1) },
-                { BeakAngle.UpRight, new Point(1, -1) },
-                { BeakAngle.Right, new Point(1, 0) },
-                { BeakAngle.DownRight, new Point(1, 1) },
-                { BeakAngle.Down, new Point(0, 1) },
-                { BeakAngle.DownLeft, new Point(-1, 1) },
-                { BeakAngle.Left, new Point(-1, 0) },
-                { BeakAngle.UpLeft, new Point(-1, -1) }
+                { BeakAngle.Up, new Size(0, -1) },
+                { BeakAngle.UpRight, new Size(1, -1) },
+                { BeakAngle.Right, new Size(1, 0) },
+                { BeakAngle.DownRight, new Size(1, 1) },
+                { BeakAngle.Down, new Size(0, 1) },
+                { BeakAngle.DownLeft, new Size(-1, 1) },
+                { BeakAngle.Left, new Size(-1, 0) },
+                { BeakAngle.UpLeft, new Size(-1, -1) }
             };
 
         #endregion
@@ -102,7 +103,7 @@ namespace SharpestBeak.Common
 
         private void PositionChickens()
         {
-            if (this.AllChickens.Count >= this.Size.Width * this.Size.Height / 2)
+            if (this.AllChickens.Count > this.Size.Width * this.Size.Height / 2)
             {
                 throw new InvalidOperationException(
                     string.Format(
@@ -124,6 +125,7 @@ namespace SharpestBeak.Common
                 while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
 
                 chicken.Position = newPosition;
+                chicken.BeakAngle = s_beakAngles[s_random.Next(s_beakAngles.Length)];
             }
         }
 
@@ -173,7 +175,29 @@ namespace SharpestBeak.Common
             return IsValidPoint(value) && GetChickenAtPoint(value) == null;
         }
 
-        public Point? GetPeckAttackPoint(ChickenUnit chicken)
+        public BeakAngle GetNewBeakAngle(BeakAngle oldBeakAngle, BeakTurn beakTurn)
+        {
+            int beakTurnOffset = (int)beakTurn;
+            if (Math.Abs(beakTurnOffset) > 1)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "beakTurn",
+                    beakTurn,
+                    "Invalid beak turn. Has someone tried to cheat?");
+            }
+            var result = oldBeakAngle + beakTurnOffset;
+            if (result < BeakAngle.Min)
+            {
+                result = BeakAngle.Max;
+            }
+            else if (result > BeakAngle.Max)
+            {
+                result = BeakAngle.Min;
+            }
+            return result;
+        }
+
+        public Point? GetPeckAttackPoint(ChickenUnit chicken, BeakTurn beakTurn = BeakTurn.None)
         {
             #region Argument Check
 
@@ -184,9 +208,9 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var offset = s_beakAngleToOffsetMap[chicken.BeakAngle];
-            var result = chicken.Position;
-            result.Offset(offset);
+            var newBeakAngle = GetNewBeakAngle(chicken.BeakAngle, beakTurn);
+            var offset = s_beakAngleToOffsetMap[newBeakAngle];
+            var result = chicken.Position + offset;
             return IsValidPoint(result) ? result : (Point?)null;
         }
 

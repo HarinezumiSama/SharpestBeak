@@ -104,6 +104,16 @@ namespace SharpestBeak.Common
 
         #region Public Methods
 
+        public override string ToString()
+        {
+            return string.Format(
+                "[#{0} : {1}] Position = {2}, KillCount = {3}",
+                this.UniqueIndex,
+                this.GetType().Name,
+                this.Position,
+                this.KillCount);
+        }
+
         public MoveInfo MakeMove()
         {
             this.CurrentMove = this.CanPlay ? OnMakeMove() : null;

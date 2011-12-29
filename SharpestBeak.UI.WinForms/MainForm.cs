@@ -33,21 +33,69 @@ namespace SharpestBeak.UI.WinForms
         public MainForm()
         {
             InitializeComponent();
-
-            this.GameEngine = new GameEngine(
-                new Size(20, 20),
-                Enumerable.Range(1, 20).Select(item => typeof(RandomChicken)));
-            this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
         }
 
         #endregion
 
         #region Private Methods
 
+        private void InitializeGameEngine()
+        {
+            if (this.GameEngine != null)
+            {
+                this.GameEngine.DiscreteMoveOccurred -= this.GameEngine_DiscreteMoveOccurred;
+            }
+
+            this.GameEngine = new GameEngine(
+                new Size(20, 20),
+                Enumerable.Range(1, 80).Select(item => typeof(RandomChicken)));
+            this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
+
+            var boardSize = this.GameEngine.Board.Size;
+            var boxSize = new Size(
+                boardSize.Width * s_cellSize.Width + 1,
+                boardSize.Height * s_cellSize.Height + 1);
+            var difference = boxSize - pbGame.ClientSize;
+            this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
+            this.CenterToScreen();
+
+            ClearStatusLabel();
+            UpdateTurnInfo();
+
+            this.pbGame.Invalidate();
+        }
+
         private void MakePrimitiveMove()
         {
             this.GameEngine.MakePrimitiveMove();
             this.pbGame.Invalidate();
+        }
+
+        private void UpdateTurnInfo()
+        {
+            var text = string.Empty;
+            if (this.GameEngine != null)
+            {
+                var chicken = this.GameEngine.Board.AliveChickens[this.GameEngine.PlayerIndex];
+                var chickenInfoText = chicken == null
+                    ? "?"
+                    : string.Format(
+                        "{0}/{1} [#{2}] at {3}",
+                        this.GameEngine.PlayerIndex + 1,
+                        this.GameEngine.Board.AliveChickens.Count,
+                        chicken.UniqueIndex,
+                        chicken.Position);
+                text = string.Format(
+                    "Turn: {0}. Chicken: {1}",
+                    this.GameEngine.TurnIndex,
+                    chickenInfoText);
+            }
+            turnInfoLabel.Text = text;
+        }
+
+        private void ClearStatusLabel()
+        {
+            statusLabel.Text = string.Empty;
         }
 
         #endregion
@@ -58,20 +106,10 @@ namespace SharpestBeak.UI.WinForms
         {
             base.OnLoad(e);
 
-            statusLabel.Text = string.Empty;
-        }
+            InitializeGameEngine();
 
-        protected override void OnShown(EventArgs e)
-        {
-            base.OnShown(e);
-
-            var boardSize = this.GameEngine.Board.Size;
-            var boxSize = new Size(
-                boardSize.Width * s_cellSize.Width + 1,
-                boardSize.Height * s_cellSize.Height + 1);
-            var difference = boxSize - pbGame.ClientSize;
-            this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
-            this.CenterToScreen();
+            ClearStatusLabel();
+            UpdateTurnInfo();
         }
 
         #endregion
@@ -108,7 +146,7 @@ namespace SharpestBeak.UI.WinForms
                         {
                             backBrush = s_winBrush;
                         }
-                        else if (chicken.CurrentMove != null && chicken.CurrentMove.Move == MoveAction.Peck)
+                        else if (chicken.CurrentMove != null && chicken.CurrentMove.MoveAction == MoveAction.Peck)
                         {
                             backBrush = chicken.PeckedBy != null ? s_peckedAttackBrush : s_attackBrush;
                         }
@@ -128,9 +166,14 @@ namespace SharpestBeak.UI.WinForms
                     if (chicken != null)
                     {
                         cellPoint.Offset(1, 1);
+
+                        // TODO: Paint chickens using primitive figures
+
                         using (var image = (Bitmap)Resources.ResourceManager.GetObject(
                             "Chicken" + chicken.BeakAngle.ToString()))
                         {
+                            image.MakeTransparent(image.GetPixel(0, 0));  // Workaround
+
                             var offsetX = (s_cellSize.Width - image.Width) / 2;
                             var offsetY = (s_cellSize.Height - image.Height) / 2;
                             cellPoint.Offset(offsetX, offsetY);
@@ -155,6 +198,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void GameEngine_DiscreteMoveOccurred(object sender, EventArgs e)
         {
+            UpdateTurnInfo();
             this.pbGame.Refresh();
         }
 
@@ -184,7 +228,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_MouseLeave(object sender, EventArgs e)
         {
-            statusLabel.Text = string.Empty;
+            ClearStatusLabel();
         }
 
         private void pbGame_MouseClick(object sender, MouseEventArgs e)
@@ -211,6 +255,15 @@ namespace SharpestBeak.UI.WinForms
                         MakePrimitiveMove();
                     }
                     return;
+            }
+        }
+
+        private void MainForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyData == Keys.F8)
+            {
+                gameTimer.Enabled = false;
+                InitializeGameEngine();
             }
         }
 
