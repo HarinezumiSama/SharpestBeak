@@ -104,7 +104,6 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Sharpest Beak: WinForms UI";
-            this.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.MainForm_PreviewKeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.pbGame)).EndInit();
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();

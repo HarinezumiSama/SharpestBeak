@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -71,6 +72,18 @@ namespace SharpestBeak.UI.WinForms
             this.pbGame.Invalidate();
         }
 
+        private void MakeManualPrimitiveMove()
+        {
+            if (this.GameRunning)
+            {
+                StopGameRun();
+            }
+            else
+            {
+                MakePrimitiveMove();
+            }
+        }
+
         private void UpdateTurnInfo()
         {
             var text = string.Empty;
@@ -98,6 +111,22 @@ namespace SharpestBeak.UI.WinForms
             statusLabel.Text = string.Empty;
         }
 
+        private void StopGameRun()
+        {
+            this.GameRunning = false;
+        }
+
+        private void ToggleGameRun()
+        {
+            if (this.GameEngine.IsGameFinished)
+            {
+                StopGameRun();
+                return;
+            }
+
+            this.GameRunning = !this.GameRunning;
+        }
+
         #endregion
 
         #region Protected Methods
@@ -112,6 +141,27 @@ namespace SharpestBeak.UI.WinForms
             UpdateTurnInfo();
         }
 
+        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            switch (e.KeyData)
+            {
+                case Keys.Space:
+                    MakeManualPrimitiveMove();
+                    break;
+
+                case Keys.F5:
+                    ToggleGameRun();
+                    break;
+
+                case Keys.F8:
+                    StopGameRun();
+                    InitializeGameEngine();
+                    break;
+            }
+        }
+
         #endregion
 
         #region Public Properties
@@ -120,6 +170,14 @@ namespace SharpestBeak.UI.WinForms
         {
             get;
             private set;
+        }
+
+        public bool GameRunning
+        {
+            [DebuggerNonUserCode]
+            get { return gameTimer.Enabled; }
+            [DebuggerNonUserCode]
+            set { gameTimer.Enabled = value; }
         }
 
         #endregion
@@ -189,7 +247,7 @@ namespace SharpestBeak.UI.WinForms
         {
             if (this.GameEngine.IsGameFinished)
             {
-                gameTimer.Enabled = false;
+                StopGameRun();
                 return;
             }
 
@@ -206,7 +264,7 @@ namespace SharpestBeak.UI.WinForms
         {
             var toolTip = string.Empty;
 
-            if (!gameTimer.Enabled)
+            if (!this.GameRunning)
             {
                 var mousePosition = e.Location;
                 var size = this.GameEngine.Board.Size;
@@ -216,7 +274,7 @@ namespace SharpestBeak.UI.WinForms
                 if (chicken != null)
                 {
                     toolTip = string.Format(
-                        "[{0}:{1}] Kills: {2}",
+                        "[{0} : {1}] Kills: {2}",
                         chicken.UniqueIndex,
                         chicken.GetType().Name,
                         chicken.KillCount);
@@ -235,35 +293,19 @@ namespace SharpestBeak.UI.WinForms
         {
             if (this.GameEngine.IsGameFinished)
             {
-                gameTimer.Enabled = false;
+                StopGameRun();
                 return;
             }
 
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    gameTimer.Enabled = !gameTimer.Enabled;
+                    ToggleGameRun();
                     return;
 
                 case MouseButtons.Right:
-                    if (gameTimer.Enabled)
-                    {
-                        gameTimer.Enabled = false;
-                    }
-                    else
-                    {
-                        MakePrimitiveMove();
-                    }
+                    MakeManualPrimitiveMove();
                     return;
-            }
-        }
-
-        private void MainForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
-        {
-            if (e.KeyData == Keys.F8)
-            {
-                gameTimer.Enabled = false;
-                InitializeGameEngine();
             }
         }
 
