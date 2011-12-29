@@ -17,8 +17,10 @@ namespace SharpestBeak.UI.WinForms
         #region Fields
 
         private static readonly Size s_cellSize = new Size(24, 24);
-        private static readonly Size s_fullCellSize = Size.Add(s_cellSize, new Size(1, 1));
+        private static readonly Size s_fullCellSize = s_cellSize + new Size(1, 1);
 
+        private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
+        private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
         private static readonly Brush s_winBrush = new SolidBrush(Color.Green);
         private static readonly Brush s_attackBrush = new SolidBrush(Color.Red);
         private static readonly Brush s_peckedBrush = new SolidBrush(Color.Yellow);
@@ -57,13 +59,18 @@ namespace SharpestBeak.UI.WinForms
             base.OnLoad(e);
 
             statusLabel.Text = string.Empty;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
 
             var boardSize = this.GameEngine.Board.Size;
             var boxSize = new Size(
-                boardSize.Width * (s_cellSize.Width + 1),
-                boardSize.Height * (s_cellSize.Height + 1));
+                boardSize.Width * s_cellSize.Width + 1,
+                boardSize.Height * s_cellSize.Height + 1);
             var difference = boxSize - pbGame.ClientSize;
-            this.ClientSize = this.ClientSize + difference;
+            this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
             this.CenterToScreen();
         }
 
@@ -92,10 +99,11 @@ namespace SharpestBeak.UI.WinForms
                     var cellRect = new Rectangle(cellPoint, s_fullCellSize);
                     ControlPaint.DrawFocusRectangle(e.Graphics, cellRect);
 
+                    Brush backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
+
                     var chicken = this.GameEngine.Board.GetChickenAtPoint(new Point(x, y));
                     if (chicken != null)
                     {
-                        Brush backBrush = null;
                         if (this.GameEngine.IsGameFinished)
                         {
                             backBrush = s_winBrush;
@@ -108,14 +116,17 @@ namespace SharpestBeak.UI.WinForms
                         {
                             backBrush = s_peckedBrush;
                         }
+                    }
 
-                        if (backBrush != null)
-                        {
-                            var backRect = cellRect;
-                            backRect.Inflate(-1, -1);
-                            e.Graphics.FillRectangle(backBrush, backRect);
-                        }
+                    if (backBrush != null)
+                    {
+                        var backRect = cellRect;
+                        backRect.Inflate(-1, -1);
+                        e.Graphics.FillRectangle(backBrush, backRect);
+                    }
 
+                    if (chicken != null)
+                    {
                         cellPoint.Offset(1, 1);
                         using (var image = (Bitmap)Resources.ResourceManager.GetObject(
                             "Chicken" + chicken.BeakAngle.ToString()))
