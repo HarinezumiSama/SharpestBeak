@@ -6,7 +6,7 @@ using SharpestBeak.Common;
 
 namespace SharpestBeak.UI.WinForms
 {
-    public sealed class RandomChicken : ChickenUnit
+    public sealed class RandomChickenLogic : ChickenUnitLogic
     {
         #region Fields
 
@@ -22,9 +22,18 @@ namespace SharpestBeak.UI.WinForms
 
         #region Private Methods
 
-        private static T ChooseRandomValue<T>(T[] array)
+        private static T ChooseRandomValue<T>(IList<T> collection)
         {
-            return array[s_random.Next(array.Length)];
+            #region Argument Check
+
+            if (collection == null)
+            {
+                throw new ArgumentNullException("collection");
+            }
+
+            #endregion
+
+            return collection[s_random.Next(collection.Count)];
         }
 
         #endregion
@@ -36,7 +45,7 @@ namespace SharpestBeak.UI.WinForms
             var peckPossibilities = new List<MoveInfo>(s_turns.Length);
             foreach (var beakTurn in s_turns)
             {
-                var attackPoint = this.Board.GetPeckAttackPoint(this, beakTurn);
+                var attackPoint = this.Board.GetPeckAttackPoint(this.Unit, beakTurn);
                 if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
                 {
                     peckPossibilities.Add(new MoveInfo(beakTurn, MoveAction.Peck));

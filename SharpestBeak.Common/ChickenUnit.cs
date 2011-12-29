@@ -7,56 +7,41 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public abstract class ChickenUnit
+    public sealed class ChickenUnit
     {
         #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenUnit"/> class.
         /// </summary>
-        protected ChickenUnit()
+        internal ChickenUnit(ChickenUnitLogic logic)
         {
-            // Nothing to do
-        }
+            #region Argument Check
 
-        #endregion
-
-        #region Protected Properties
-
-        protected internal GameBoard Board
-        {
-            get;
-            internal set;
-        }
-
-        protected bool CanPlay
-        {
-            [DebuggerNonUserCode]
-            get
+            if (logic == null)
             {
-                return this.Board != null && !this.IsDead;
+                throw new ArgumentNullException("logic");
             }
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected List<ChickenUnit> GetOtherChickens()
-        {
-            if (this.Board == null)
+            if (logic.Unit != null)
             {
-                throw new InvalidOperationException();
+                throw new ArgumentException("The specified logic is already assigned to another unit.", "logic");
             }
 
-            return this.Board.AliveChickens.Where(item => item != this).ToList();
-        }
+            #endregion
 
-        protected abstract MoveInfo OnMakeMove();
+            this.Logic = logic;
+            logic.Unit = this;
+        }
 
         #endregion
 
         #region Public Properties
+
+        public ChickenUnitLogic Logic
+        {
+            get;
+            private set;
+        }
 
         public int UniqueIndex
         {
@@ -88,12 +73,6 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        public MoveInfo CurrentMove
-        {
-            get;
-            internal set;
-        }
-
         public int KillCount
         {
             get;
@@ -112,12 +91,6 @@ namespace SharpestBeak.Common
                 this.GetType().Name,
                 this.Position,
                 this.KillCount);
-        }
-
-        public MoveInfo MakeMove()
-        {
-            this.CurrentMove = this.CanPlay ? OnMakeMove() : null;
-            return this.CurrentMove;
         }
 
         #endregion

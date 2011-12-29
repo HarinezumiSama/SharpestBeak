@@ -13,9 +13,9 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameEngine"/> class.
         /// </summary>
-        public GameEngine(Size size, IEnumerable<Type> chickenTypes)
+        public GameEngine(Size size, IEnumerable<Type> chickenLogicTypes)
         {
-            this.Board = new GameBoard(size, chickenTypes);
+            this.Board = new GameBoard(size, chickenLogicTypes);
             this.IsNextTurn = true;
             this.TurnIndex = 1;
         }
@@ -102,13 +102,13 @@ namespace SharpestBeak.Common
             {
                 foreach (var aliveChicken in this.Board.AliveChickens)
                 {
-                    aliveChicken.CurrentMove = null;
+                    aliveChicken.Logic.CurrentMove = null;
                     aliveChicken.PeckedBy = null;
                 }
             }
 
             var chicken = this.Board.AliveChickens[this.PlayerIndex];
-            var newMove = chicken.MakeMove();
+            var newMove = chicken.Logic.MakeMove();
             if (newMove != null)
             {
                 // Action 1 - Beak turn

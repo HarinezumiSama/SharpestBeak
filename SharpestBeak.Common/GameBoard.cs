@@ -38,7 +38,7 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameBoard"/> class.
         /// </summary>
-        public GameBoard(Size size, IEnumerable<Type> chickenTypes)
+        public GameBoard(Size size, IEnumerable<Type> chickenLogicTypes)
         {
             #region Argument Check
 
@@ -48,21 +48,21 @@ namespace SharpestBeak.Common
                     string.Format("The size dimension must be at least {0}.", MinSizeDimension),
                     "size");
             }
-            if (chickenTypes == null)
+            if (chickenLogicTypes == null)
             {
-                throw new ArgumentNullException("chickenTypes");
+                throw new ArgumentNullException("chickenLogicTypes");
             }
-            if (!chickenTypes.Any())
+            if (!chickenLogicTypes.Any())
             {
-                throw new ArgumentException("At least one chicken must be specified.", "chickenTypes");
+                throw new ArgumentException("At least one chicken must be specified.", "chickenLogicTypes");
             }
-            if (chickenTypes.Any(item => item == null))
+            if (chickenLogicTypes.Any(item => item == null))
             {
-                throw new ArgumentException("The collection contains a null element.", "chickenTypes");
+                throw new ArgumentException("The collection contains a null element.", "chickenLogicTypes");
             }
-            if (chickenTypes.Any(item => !typeof(ChickenUnit).IsAssignableFrom(item)))
+            if (chickenLogicTypes.Any(item => !typeof(ChickenUnitLogic).IsAssignableFrom(item)))
             {
-                throw new ArgumentException("Invalid chicken type.", "chickenTypes");
+                throw new ArgumentException("Invalid chicken logic type.", "chickenLogicTypes");
             }
 
             #endregion
@@ -71,7 +71,10 @@ namespace SharpestBeak.Common
             this.Size = size;
 
             // Post-initialized properties
-            this.AllChickens = chickenTypes.Select((item, index) => CreateChicken(item, index)).ToList().AsReadOnly();
+            this.AllChickens = chickenLogicTypes
+                .Select((item, index) => CreateChicken(item, index))
+                .ToList()
+                .AsReadOnly();
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
 
@@ -93,10 +96,11 @@ namespace SharpestBeak.Common
 
         private ChickenUnit CreateChicken(Type item, int index)
         {
-            var result = (ChickenUnit)Activator.CreateInstance(item);
+            var logic = (ChickenUnitLogic)Activator.CreateInstance(item);
+            logic.Board = this;
 
+            var result = new ChickenUnit(logic);
             result.UniqueIndex = index + 1;
-            result.Board = this;
 
             return result;
         }

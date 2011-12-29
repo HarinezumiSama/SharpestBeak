@@ -49,7 +49,7 @@ namespace SharpestBeak.UI.WinForms
 
             this.GameEngine = new GameEngine(
                 new Size(20, 20),
-                Enumerable.Range(1, 80).Select(item => typeof(RandomChicken)));
+                Enumerable.Range(1, 80).Select(item => typeof(RandomChickenLogic)));
             this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
 
             var boardSize = this.GameEngine.Board.Size;
@@ -204,7 +204,8 @@ namespace SharpestBeak.UI.WinForms
                         {
                             backBrush = s_winBrush;
                         }
-                        else if (chicken.CurrentMove != null && chicken.CurrentMove.MoveAction == MoveAction.Peck)
+                        else if (chicken.Logic.CurrentMove != null 
+                            && chicken.Logic.CurrentMove.MoveAction == MoveAction.Peck)
                         {
                             backBrush = chicken.PeckedBy != null ? s_peckedAttackBrush : s_attackBrush;
                         }

@@ -46,6 +46,7 @@
     <Compile Include="BeakAngle.cs" />
     <Compile Include="BeakTurn.cs" />
     <Compile Include="ChickenUnit.cs" />
+    <Compile Include="ChickenUnitLogic.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="MoveInfo.cs" />
     <Compile Include="MoveAction.cs" />
