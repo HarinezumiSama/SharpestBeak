@@ -127,6 +127,18 @@ namespace SharpestBeak.UI.WinForms
             this.GameRunning = !this.GameRunning;
         }
 
+        private void RunTurnTest()
+        {
+            if (this.GameRunning)
+            {
+                StopGameRun();
+            }
+            using (var form = new TurnTestForm())
+            {
+                form.ShowDialog(this);
+            }
+        }
+
         #endregion
 
         #region Protected Methods
@@ -147,6 +159,10 @@ namespace SharpestBeak.UI.WinForms
 
             switch (e.KeyData)
             {
+                case Keys.F1:
+                    RunTurnTest();
+                    break;
+
                 case Keys.Space:
                     MakeManualPrimitiveMove();
                     break;
@@ -204,7 +220,7 @@ namespace SharpestBeak.UI.WinForms
                         {
                             backBrush = s_winBrush;
                         }
-                        else if (chicken.Logic.CurrentMove != null 
+                        else if (chicken.Logic.CurrentMove != null
                             && chicken.Logic.CurrentMove.MoveAction == MoveAction.Peck)
                         {
                             backBrush = chicken.PeckedBy != null ? s_peckedAttackBrush : s_attackBrush;
@@ -302,11 +318,15 @@ namespace SharpestBeak.UI.WinForms
             {
                 case MouseButtons.Left:
                     ToggleGameRun();
-                    return;
+                    break;
 
                 case MouseButtons.Right:
                     MakeManualPrimitiveMove();
-                    return;
+                    break;
+
+                case MouseButtons.Middle:
+                    RunTurnTest();
+                    break;
             }
         }
 

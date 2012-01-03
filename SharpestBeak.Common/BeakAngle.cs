@@ -11,14 +11,14 @@ namespace SharpestBeak.Common
     /// </summary>
     public enum BeakAngle
     {
-        Up,
-        UpRight,
-        Right,
-        DownRight,
-        Down,
-        DownLeft,
-        Left,
-        UpLeft,
+        Up = 0,
+        UpRight = 1,
+        Right = 2,
+        DownRight = 3,
+        Down = 4,
+        DownLeft = 5,
+        Left = 6,
+        UpLeft = 7,
 
         // Hardcoded so far
         Min = Up,
