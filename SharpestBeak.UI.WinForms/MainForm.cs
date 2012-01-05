@@ -40,30 +40,45 @@ namespace SharpestBeak.UI.WinForms
 
         #region Private Methods
 
-        private void InitializeGameEngine()
+        private bool InitializeGameEngine()
         {
-            if (this.GameEngine != null)
+            try
             {
-                this.GameEngine.DiscreteMoveOccurred -= this.GameEngine_DiscreteMoveOccurred;
+                if (this.GameEngine != null)
+                {
+                    this.GameEngine.DiscreteMoveOccurred -= this.GameEngine_DiscreteMoveOccurred;
+                }
+
+                this.GameEngine = new GameEngine(
+                    new Size(20, 20),
+                    Enumerable.Range(1, 80).Select(item => typeof(RandomChickenLogic)));
+                this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
+
+                var boardSize = this.GameEngine.Board.Size;
+                var boxSize = new Size(
+                    boardSize.Width * s_cellSize.Width + 1,
+                    boardSize.Height * s_cellSize.Height + 1);
+                var difference = boxSize - pbGame.ClientSize;
+                this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
+                this.CenterToScreen();
+
+                ClearStatusLabel();
+                UpdateTurnInfo();
+
+                this.pbGame.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    this,
+                    ex.ToString(),
+                    "Game Initialization Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return false;
             }
 
-            this.GameEngine = new GameEngine(
-                new Size(20, 20),
-                Enumerable.Range(1, 80).Select(item => typeof(RandomChickenLogic)));
-            this.GameEngine.DiscreteMoveOccurred += this.GameEngine_DiscreteMoveOccurred;
-
-            var boardSize = this.GameEngine.Board.Size;
-            var boxSize = new Size(
-                boardSize.Width * s_cellSize.Width + 1,
-                boardSize.Height * s_cellSize.Height + 1);
-            var difference = boxSize - pbGame.ClientSize;
-            this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
-            this.CenterToScreen();
-
-            ClearStatusLabel();
-            UpdateTurnInfo();
-
-            this.pbGame.Invalidate();
+            return true;
         }
 
         private void MakePrimitiveMove()
@@ -147,7 +162,11 @@ namespace SharpestBeak.UI.WinForms
         {
             base.OnLoad(e);
 
-            InitializeGameEngine();
+            if (!InitializeGameEngine())
+            {
+                Application.Exit();
+                return;
+            }
 
             ClearStatusLabel();
             UpdateTurnInfo();
@@ -173,7 +192,11 @@ namespace SharpestBeak.UI.WinForms
 
                 case Keys.F8:
                     StopGameRun();
-                    InitializeGameEngine();
+                    if (!InitializeGameEngine())
+                    {
+                        Application.Exit();
+                        return;
+                    }
                     break;
             }
         }
