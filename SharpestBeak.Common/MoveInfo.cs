@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public sealed class MoveInfo
+    public class MoveInfo
     {
         #region Fields
 
@@ -18,13 +18,13 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="MoveInfo"/> class.
         /// </summary>
-        public MoveInfo(MoveDirection moveAction, BeakTurn beakTurn, FireMode fireMode)
+        public MoveInfo(MoveDirection moveDirection, BeakTurn beakTurn, FireMode fireMode)
         {
             #region Argument Check
 
-            if (!Enum.IsDefined(typeof(MoveDirection), moveAction))
+            if (!Enum.IsDefined(typeof(MoveDirection), moveDirection))
             {
-                throw new ArgumentOutOfRangeException("moveAction", moveAction, "Invalid move action.");
+                throw new ArgumentOutOfRangeException("moveDirection", moveDirection, "Invalid move action.");
             }
             if (!Enum.IsDefined(typeof(BeakTurn), beakTurn))
             {
@@ -37,15 +37,15 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            this.MoveAction = moveAction;
+            this.MoveDirection = moveDirection;
             this.BeakTurn = beakTurn;
             this.FireMode = fireMode;
 
             m_asString = string.Format(
-                "{0}. BeakTurn = {1}, MoveAction = {2}, FireMode = {3}",
+                "{0}. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}",
                 GetType().Name,
                 this.BeakTurn,
-                this.MoveAction,
+                this.MoveDirection,
                 this.FireMode);
         }
 
@@ -53,7 +53,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public MoveDirection MoveAction
+        public MoveDirection MoveDirection
         {
             get;
             private set;
@@ -81,6 +81,5 @@ namespace SharpestBeak.Common
         }
 
         #endregion
-
     }
 }

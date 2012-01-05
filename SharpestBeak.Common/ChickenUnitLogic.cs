@@ -34,7 +34,7 @@ namespace SharpestBeak.Common
         protected bool CanPlay
         {
             [DebuggerNonUserCode]
-            get { return this.Board != null && this.Unit != null && !this.IsDead; }
+            get { return this.Unit != null && !this.IsDead; }
         }
 
         #endregion
@@ -47,17 +47,11 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        protected internal GameBoard Board
-        {
-            get;
-            internal set;
-        }
-
         #endregion
 
         #region Protected Methods
 
-        protected abstract MoveInfo OnMakeMove();
+        protected abstract MoveInfo OnMakeMove(GameState state);
 
         #endregion
 
@@ -101,9 +95,9 @@ namespace SharpestBeak.Common
 
         #region Public Methods
 
-        public MoveInfo MakeMove()
+        public MoveInfo MakeMove(GameState state)
         {
-            this.CurrentMove = this.CanPlay ? OnMakeMove() : null;
+            this.CurrentMove = this.CanPlay && state != null ? OnMakeMove(state) : null;
             return this.CurrentMove;
         }
 

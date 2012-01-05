@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SharpestBeak.Common
 {
@@ -31,6 +32,16 @@ namespace SharpestBeak.Common
 
             this.Logic = logic;
             logic.Unit = this;
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal Thread Thread
+        {
+            get;
+            set;
         }
 
         #endregion

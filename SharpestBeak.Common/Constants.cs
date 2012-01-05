@@ -13,12 +13,16 @@ namespace SharpestBeak.Common
         {
             #region Fields
 
-            public static readonly float BodyCircleRadius = NominalCellSize / 4f;
+            public static readonly float BodyCircleRadius = LargeCellSize / 4f;
 
             /// <summary>
             ///     Length of beak overhang, counting from the body circle.
             /// </summary>
-            public static readonly float BeakOverhang = NominalCellSize / 8f;
+            public static readonly float BeakOverhang = LargeCellSize / 8f;
+
+            public static readonly float BeakOffset = BodyCircleRadius + BeakOverhang;
+
+            public static readonly float BeakRayOffset = BodyCircleRadius / 2f;
 
             #endregion
         }
@@ -29,11 +33,11 @@ namespace SharpestBeak.Common
 
         #region Fields
 
-        public static readonly float NominalCellSize = 100f;
+        public static readonly float LargeCellSize = 100f;
 
         public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20);
 
-        public static readonly float NominalMoveSpeed = NominalCellSize;  // Per second
+        public static readonly float NominalMoveSpeed = LargeCellSize;  // Per second
 
         /// <summary>
         ///     Nominal beak angle speed, degrees per second.

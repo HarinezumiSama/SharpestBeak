@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.pbGame = new System.Windows.Forms.PictureBox();
-            this.gameTimer = new System.Windows.Forms.Timer(this.components);
             this.mainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.turnInfoLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -48,14 +47,6 @@
             this.pbGame.TabIndex = 0;
             this.pbGame.TabStop = false;
             this.pbGame.Paint += new System.Windows.Forms.PaintEventHandler(this.pbGame_Paint);
-            this.pbGame.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pbGame_MouseClick);
-            this.pbGame.MouseLeave += new System.EventHandler(this.pbGame_MouseLeave);
-            this.pbGame.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbGame_MouseMove);
-            // 
-            // gameTimer
-            // 
-            this.gameTimer.Interval = 250;
-            this.gameTimer.Tick += new System.EventHandler(this.gameTimer_Tick);
             // 
             // mainToolTip
             // 
@@ -115,7 +106,6 @@
         #endregion
 
         private System.Windows.Forms.PictureBox pbGame;
-        private System.Windows.Forms.Timer gameTimer;
         private System.Windows.Forms.ToolTip mainToolTip;
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;

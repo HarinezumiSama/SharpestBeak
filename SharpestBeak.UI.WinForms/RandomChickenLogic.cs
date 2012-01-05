@@ -39,23 +39,8 @@ namespace SharpestBeak.UI.WinForms
 
         #region Protected Methods
 
-        protected override MoveInfo OnMakeMove()
+        protected override MoveInfo OnMakeMove(GameState state)
         {
-            //var peckPossibilities = new List<MoveInfo>(s_turns.Length);
-            //foreach (var beakTurn in s_turns)
-            //{
-            //    var attackPoint = this.Board.GetPeckAttackPoint(this.Unit, beakTurn);
-            //    if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
-            //    {
-            //        peckPossibilities.Add(new MoveInfo(beakTurn, MoveDirection.Peck));
-            //    }
-            //}
-            //if (peckPossibilities.Count > 0)
-            //{
-            //    var index = s_random.Next(peckPossibilities.Count);
-            //    return peckPossibilities[index];
-            //}
-
             return new MoveInfo(
                 ChooseRandomValue(s_moveDirections),
                 ChooseRandomValue(s_turns),
