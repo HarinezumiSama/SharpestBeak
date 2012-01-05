@@ -43,13 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BeakAngle.cs" />
     <Compile Include="BeakTurn.cs" />
     <Compile Include="ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
+    <Compile Include="FireMode.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="MoveInfo.cs" />
-    <Compile Include="MoveAction.cs" />
+    <Compile Include="MoveDirection.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

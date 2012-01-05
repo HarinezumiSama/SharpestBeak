@@ -8,28 +8,9 @@ namespace SharpestBeak.Common
 {
     public sealed class GameBoard
     {
-        #region Constants
-
-        public const int MinSizeDimension = 2;
-
-        #endregion
-
         #region Fields
 
         private static readonly Random s_random = new Random();
-        private static readonly BeakAngle[] s_beakAngles = (BeakAngle[])Enum.GetValues(typeof(BeakAngle));
-        private static readonly Dictionary<BeakAngle, Size> s_beakAngleToOffsetMap =
-            new Dictionary<BeakAngle, Size>()
-            {
-                { BeakAngle.Up, new Size(0, -1) },
-                { BeakAngle.UpRight, new Size(1, -1) },
-                { BeakAngle.Right, new Size(1, 0) },
-                { BeakAngle.DownRight, new Size(1, 1) },
-                { BeakAngle.Down, new Size(0, 1) },
-                { BeakAngle.DownLeft, new Size(-1, 1) },
-                { BeakAngle.Left, new Size(-1, 0) },
-                { BeakAngle.UpLeft, new Size(-1, -1) }
-            };
 
         #endregion
 
@@ -42,10 +23,10 @@ namespace SharpestBeak.Common
         {
             #region Argument Check
 
-            if (size.Width < MinSizeDimension || size.Height < MinSizeDimension)
+            if (size.Width < Constants.MinNominalCellCount || size.Height < Constants.MinNominalCellCount)
             {
                 throw new ArgumentException(
-                    string.Format("The size dimension must be at least {0}.", MinSizeDimension),
+                    string.Format("The size dimension must be at least {0}.", Constants.MinNominalCellCount),
                     "size");
             }
             if (chickenLogicTypes == null)
@@ -107,30 +88,32 @@ namespace SharpestBeak.Common
 
         private void PositionChickens()
         {
-            if (this.AllChickens.Count > this.Size.Width * this.Size.Height / 2)
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        "Too many chickens ({0}) for the board of size {1}x{2}.",
-                        this.AllChickens.Count,
-                        this.Size.Width,
-                        this.Size.Height));
-            }
+            throw new NotImplementedException();
 
-            for (int index = 0; index < this.AllChickens.Count; index++)
-            {
-                var chicken = this.AllChickens[index];
+            //if (this.AllChickens.Count > this.Size.Width * this.Size.Height / 2)
+            //{
+            //    throw new InvalidOperationException(
+            //        string.Format(
+            //            "Too many chickens ({0}) for the board of size {1}x{2}.",
+            //            this.AllChickens.Count,
+            //            this.Size.Width,
+            //            this.Size.Height));
+            //}
 
-                Point newPosition;
-                do
-                {
-                    newPosition = new Point(s_random.Next(this.Size.Width), s_random.Next(this.Size.Height));
-                }
-                while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
+            //for (int index = 0; index < this.AllChickens.Count; index++)
+            //{
+            //    var chicken = this.AllChickens[index];
 
-                chicken.Position = newPosition;
-                chicken.BeakAngle = s_beakAngles[s_random.Next(s_beakAngles.Length)];
-            }
+            //    Point newPosition;
+            //    do
+            //    {
+            //        newPosition = new Point(s_random.Next(this.Size.Width), s_random.Next(this.Size.Height));
+            //    }
+            //    while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
+
+            //    chicken.Position = newPosition;
+            //    chicken.BeakAngle = s_beakAngles[s_random.Next(s_beakAngles.Length)];
+            //}
         }
 
         #endregion
@@ -143,15 +126,15 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public IList<ChickenUnit> AllChickens
+        internal IList<ChickenUnit> AllChickens
         {
             get;
             private set;
         }
+
+        #endregion
+
+        #region Public Properties
 
         public IList<ChickenUnit> AliveChickens
         {
@@ -169,58 +152,37 @@ namespace SharpestBeak.Common
 
         #region Public Methods
 
-        public bool IsValidPoint(Point value)
-        {
-            return value.X >= 0 && value.X < this.Size.Width && value.Y >= 0 && value.Y < this.Size.Height;
-        }
-
-        public bool IsValidMove(Point value)
-        {
-            return IsValidPoint(value) && GetChickenAtPoint(value) == null;
-        }
-
-        public BeakAngle GetNewBeakAngle(BeakAngle oldBeakAngle, BeakTurn beakTurn)
+        public float GetNewBeakAngle(float oldBeakAngle, BeakTurn beakTurn, float timeDelta)
         {
             int beakTurnOffset = (int)beakTurn;
-            if (Math.Abs(beakTurnOffset) > 1)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "beakTurn",
-                    beakTurn,
-                    "Invalid beak turn. Has someone tried to cheat?");
-            }
-            var result = oldBeakAngle + beakTurnOffset;
-            if (result < BeakAngle.Min)
-            {
-                result = BeakAngle.Max;
-            }
-            else if (result > BeakAngle.Max)
-            {
-                result = BeakAngle.Min;
-            }
-            return result;
-        }
 
-        public Point? GetPeckAttackPoint(ChickenUnit chicken, BeakTurn beakTurn = BeakTurn.None)
-        {
             #region Argument Check
 
-            if (chicken == null)
+            if (oldBeakAngle < 0)
             {
-                throw new ArgumentNullException("chicken");
+                throw new ArgumentOutOfRangeException("oldBeakAngle", oldBeakAngle, "Beak angle cannot be negative.");
+            }
+            if (Math.Abs(beakTurnOffset) > 1)
+            {
+                throw new ArgumentOutOfRangeException("beakTurn", beakTurn, "Invalid beak turn.");
+            }
+            if (timeDelta < 0)
+            {
+                throw new ArgumentOutOfRangeException("timeDelta", timeDelta, "Time delta cannot be negative.");
             }
 
             #endregion
 
-            var newBeakAngle = GetNewBeakAngle(chicken.BeakAngle, beakTurn);
-            var offset = s_beakAngleToOffsetMap[newBeakAngle];
-            var result = chicken.Position + offset;
-            return IsValidPoint(result) ? result : (Point?)null;
-        }
-
-        public ChickenUnit GetChickenAtPoint(Point value)
-        {
-            return IsValidPoint(value) ? this.AliveChickens.SingleOrDefault(item => item.Position == value) : null;
+            var result = (oldBeakAngle + timeDelta * Constants.NominalBeakAngleSpeed * beakTurnOffset) / 360f;
+            if (result < 0f)
+            {
+                result += Constants.FullRotationAngle;
+            }
+            else if (result >= Constants.FullRotationAngle)
+            {
+                result -= Constants.FullRotationAngle;
+            }
+            return result;
         }
 
         #endregion

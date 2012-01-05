@@ -202,62 +202,62 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_Paint(object sender, PaintEventArgs e)
         {
-            var size = this.GameEngine.Board.Size;
-            for (int y = 0; y < size.Height; y++)
-            {
-                for (int x = 0; x < size.Width; x++)
-                {
-                    var cellPoint = new Point(s_cellSize.Width * x, s_cellSize.Height * y);
-                    var cellRect = new Rectangle(cellPoint, s_fullCellSize);
-                    ControlPaint.DrawFocusRectangle(e.Graphics, cellRect);
+            //var size = this.GameEngine.Board.Size;
+            //for (int y = 0; y < size.Height; y++)
+            //{
+            //    for (int x = 0; x < size.Width; x++)
+            //    {
+            //        var cellPoint = new Point(s_cellSize.Width * x, s_cellSize.Height * y);
+            //        var cellRect = new Rectangle(cellPoint, s_fullCellSize);
+            //        ControlPaint.DrawFocusRectangle(e.Graphics, cellRect);
 
-                    Brush backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
+            //        Brush backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
 
-                    var chicken = this.GameEngine.Board.GetChickenAtPoint(new Point(x, y));
-                    if (chicken != null)
-                    {
-                        if (this.GameEngine.IsGameFinished)
-                        {
-                            backBrush = s_winBrush;
-                        }
-                        else if (chicken.Logic.CurrentMove != null
-                            && chicken.Logic.CurrentMove.MoveAction == MoveAction.Peck)
-                        {
-                            backBrush = chicken.PeckedBy != null ? s_peckedAttackBrush : s_attackBrush;
-                        }
-                        else if (chicken.PeckedBy != null)
-                        {
-                            backBrush = s_peckedBrush;
-                        }
-                    }
+            //        var chicken = this.GameEngine.Board.GetChickenAtPoint(new Point(x, y));
+            //        if (chicken != null)
+            //        {
+            //            if (this.GameEngine.IsGameFinished)
+            //            {
+            //                backBrush = s_winBrush;
+            //            }
+            //            else if (chicken.Logic.CurrentMove != null
+            //                && chicken.Logic.CurrentMove.MoveAction == MoveDirection.Peck)
+            //            {
+            //                backBrush = chicken.KilledBy != null ? s_peckedAttackBrush : s_attackBrush;
+            //            }
+            //            else if (chicken.KilledBy != null)
+            //            {
+            //                backBrush = s_peckedBrush;
+            //            }
+            //        }
 
-                    if (backBrush != null)
-                    {
-                        var backRect = cellRect;
-                        backRect.Inflate(-1, -1);
-                        e.Graphics.FillRectangle(backBrush, backRect);
-                    }
+            //        if (backBrush != null)
+            //        {
+            //            var backRect = cellRect;
+            //            backRect.Inflate(-1, -1);
+            //            e.Graphics.FillRectangle(backBrush, backRect);
+            //        }
 
-                    if (chicken != null)
-                    {
-                        cellPoint.Offset(1, 1);
+            //        if (chicken != null)
+            //        {
+            //            cellPoint.Offset(1, 1);
 
-                        // TODO: Paint chickens using primitive figures
+            //            // TODO: Paint chickens using primitive figures
 
-                        using (var image = (Bitmap)Resources.ResourceManager.GetObject(
-                            "Chicken" + chicken.BeakAngle.ToString()))
-                        {
-                            image.MakeTransparent(image.GetPixel(0, 0));  // Workaround
+            //            using (var image = (Bitmap)Resources.ResourceManager.GetObject(
+            //                "Chicken" + chicken.BeakAngle.ToString()))
+            //            {
+            //                image.MakeTransparent(image.GetPixel(0, 0));  // Workaround
 
-                            var offsetX = (s_cellSize.Width - image.Width) / 2;
-                            var offsetY = (s_cellSize.Height - image.Height) / 2;
-                            cellPoint.Offset(offsetX, offsetY);
+            //                var offsetX = (s_cellSize.Width - image.Width) / 2;
+            //                var offsetY = (s_cellSize.Height - image.Height) / 2;
+            //                cellPoint.Offset(offsetX, offsetY);
 
-                            e.Graphics.DrawImageUnscaled(image, cellPoint);
-                        }
-                    }
-                }
-            }
+            //                e.Graphics.DrawImageUnscaled(image, cellPoint);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         private void gameTimer_Tick(object sender, EventArgs e)
@@ -279,26 +279,26 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_MouseMove(object sender, MouseEventArgs e)
         {
-            var toolTip = string.Empty;
+            //var toolTip = string.Empty;
 
-            if (!this.GameRunning)
-            {
-                var mousePosition = e.Location;
-                var size = this.GameEngine.Board.Size;
-                var cellAddress = new Point(mousePosition.X / s_cellSize.Width, mousePosition.Y / s_cellSize.Height);
+            //if (!this.GameRunning)
+            //{
+            //    var mousePosition = e.Location;
+            //    var size = this.GameEngine.Board.Size;
+            //    var cellAddress = new Point(mousePosition.X / s_cellSize.Width, mousePosition.Y / s_cellSize.Height);
 
-                var chicken = this.GameEngine.Board.GetChickenAtPoint(cellAddress);
-                if (chicken != null)
-                {
-                    toolTip = string.Format(
-                        "[{0} : {1}] Kills: {2}",
-                        chicken.UniqueIndex,
-                        chicken.GetType().Name,
-                        chicken.KillCount);
-                }
-            }
+            //    var chicken = this.GameEngine.Board.GetChickenAtPoint(cellAddress);
+            //    if (chicken != null)
+            //    {
+            //        toolTip = string.Format(
+            //            "[{0} : {1}] Kills: {2}",
+            //            chicken.UniqueIndex,
+            //            chicken.GetType().Name,
+            //            chicken.KillCount);
+            //    }
+            //}
 
-            statusLabel.Text = toolTip;
+            //statusLabel.Text = toolTip;
         }
 
         private void pbGame_MouseLeave(object sender, EventArgs e)

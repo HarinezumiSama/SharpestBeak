@@ -49,19 +49,19 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        public Point Position
+        public PointF Position
         {
             get;
             internal set;
         }
 
-        public BeakAngle BeakAngle
+        public float BeakAngle
         {
             get;
             internal set;
         }
 
-        public ChickenUnit PeckedBy
+        public ChickenUnit KilledBy
         {
             get;
             internal set;

@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SharpestBeak.Common
 {
-    public abstract class ChickenUnitLogic
+    public abstract class ChickenUnitLogic : IDisposable
     {
+        #region Fields
+
+        private readonly ReaderWriterLockSlim m_lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+
+        private MoveInfo m_currentMove;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -48,16 +57,6 @@ namespace SharpestBeak.Common
 
         #region Protected Methods
 
-        protected List<ChickenUnit> GetOtherChickens()
-        {
-            if (this.Board == null || this.Unit == null)
-            {
-                throw new InvalidOperationException("Not initialized yet.");
-            }
-
-            return this.Board.AliveChickens.Where(item => item != this.Unit).ToList();
-        }
-
         protected abstract MoveInfo OnMakeMove();
 
         #endregion
@@ -66,8 +65,30 @@ namespace SharpestBeak.Common
 
         public MoveInfo CurrentMove
         {
-            get;
-            internal set;
+            get
+            {
+                m_lock.EnterReadLock();
+                try
+                {
+                    return m_currentMove;
+                }
+                finally
+                {
+                    m_lock.ExitReadLock();
+                }
+            }
+            internal set
+            {
+                m_lock.EnterWriteLock();
+                try
+                {
+                    m_currentMove = value;
+                }
+                finally
+                {
+                    m_lock.ExitWriteLock();
+                }
+            }
         }
 
         public bool IsDead
@@ -84,6 +105,18 @@ namespace SharpestBeak.Common
         {
             this.CurrentMove = this.CanPlay ? OnMakeMove() : null;
             return this.CurrentMove;
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (m_lock != null)
+            {
+                m_lock.Dispose();
+            }
         }
 
         #endregion

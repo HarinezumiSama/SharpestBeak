@@ -93,101 +93,101 @@ namespace SharpestBeak.Common
 
         public void MakePrimitiveMove()
         {
-            if (this.IsGameFinished)
-            {
-                return;
-            }
+            //if (this.IsGameFinished)
+            //{
+            //    return;
+            //}
 
-            if (this.IsNextTurn)
-            {
-                foreach (var aliveChicken in this.Board.AliveChickens)
-                {
-                    aliveChicken.Logic.CurrentMove = null;
-                    aliveChicken.PeckedBy = null;
-                }
-            }
+            //if (this.IsNextTurn)
+            //{
+            //    foreach (var aliveChicken in this.Board.AliveChickens)
+            //    {
+            //        aliveChicken.Logic.CurrentMove = null;
+            //        aliveChicken.KilledBy = null;
+            //    }
+            //}
 
-            var chicken = this.Board.AliveChickens[this.PlayerIndex];
-            var newMove = chicken.Logic.MakeMove();
-            if (newMove != null)
-            {
-                // Action 1 - Beak turn
-                var newBeakAngle = this.Board.GetNewBeakAngle(chicken.BeakAngle, newMove.BeakTurn);
-                var beakTurnOffset = (int)newMove.BeakTurn;
-                if (newBeakAngle != chicken.BeakAngle)
-                {
-                    chicken.BeakAngle = newBeakAngle;
-                    OnDiscreteMoveOccurred();
-                }
+            //var chicken = this.Board.AliveChickens[this.PlayerIndex];
+            //var newMove = chicken.Logic.MakeMove();
+            //if (newMove != null)
+            //{
+            //    // Action 1 - Beak turn
+            //    var newBeakAngle = this.Board.GetNewBeakAngle(chicken.BeakAngle, newMove.BeakTurn);
+            //    var beakTurnOffset = (int)newMove.BeakTurn;
+            //    if (newBeakAngle != chicken.BeakAngle)
+            //    {
+            //        chicken.BeakAngle = newBeakAngle;
+            //        OnDiscreteMoveOccurred();
+            //    }
 
-                // Action 2 - Move or peck
-                var newPosition = chicken.Position;
-                switch (newMove.MoveAction)
-                {
-                    case MoveAction.None:
-                        // Nothing to do
-                        break;
-                    case MoveAction.MoveUp:
-                        newPosition.Y--;
-                        break;
-                    case MoveAction.MoveRight:
-                        newPosition.X++;
-                        break;
-                    case MoveAction.MoveDown:
-                        newPosition.Y++;
-                        break;
-                    case MoveAction.MoveLeft:
-                        newPosition.X--;
-                        break;
-                    case MoveAction.Peck:
-                        {
-                            var attackPoint = this.Board.GetPeckAttackPoint(chicken);
-                            if (attackPoint.HasValue)
-                            {
-                                var target = this.Board.GetChickenAtPoint(attackPoint.Value);
-                                if (target != null && target.PeckedBy == null)
-                                {
-                                    // If both A and B pecked C, first one has priority
-                                    target.PeckedBy = chicken;
-                                }
-                            }
-                            OnDiscreteMoveOccurred();
-                        }
-                        break;
-                    default:
-                        throw new NotImplementedException("Invalid chicken move.");
-                }
+            //    // Action 2 - Move or peck
+            //    var newPosition = chicken.Position;
+            //    switch (newMove.MoveAction)
+            //    {
+            //        case MoveDirection.None:
+            //            // Nothing to do
+            //            break;
+            //        case MoveDirection.MoveUp:
+            //            newPosition.Y--;
+            //            break;
+            //        case MoveDirection.MoveRight:
+            //            newPosition.X++;
+            //            break;
+            //        case MoveDirection.MoveDown:
+            //            newPosition.Y++;
+            //            break;
+            //        case MoveDirection.MoveLeft:
+            //            newPosition.X--;
+            //            break;
+            //        case MoveDirection.Peck:
+            //            {
+            //                var attackPoint = this.Board.GetPeckAttackPoint(chicken);
+            //                if (attackPoint.HasValue)
+            //                {
+            //                    var target = this.Board.GetChickenAtPoint(attackPoint.Value);
+            //                    if (target != null && target.KilledBy == null)
+            //                    {
+            //                        // If both A and B pecked C, first one has priority
+            //                        target.KilledBy = chicken;
+            //                    }
+            //                }
+            //                OnDiscreteMoveOccurred();
+            //            }
+            //            break;
+            //        default:
+            //            throw new NotImplementedException("Invalid chicken move.");
+            //    }
 
-                if (newPosition != chicken.Position && this.Board.IsValidMove(newPosition))
-                {
-                    chicken.Position = newPosition;
-                    OnDiscreteMoveOccurred();
-                }
-            }
+            //    if (newPosition != chicken.Position && this.Board.IsValidMove(newPosition))
+            //    {
+            //        chicken.Position = newPosition;
+            //        OnDiscreteMoveOccurred();
+            //    }
+            //}
 
-            this.PlayerIndex++;
-            this.IsNextTurn = this.PlayerIndex >= this.Board.AliveChickens.Count;
+            //this.PlayerIndex++;
+            //this.IsNextTurn = this.PlayerIndex >= this.Board.AliveChickens.Count;
 
-            if (this.IsNextTurn)
-            {
-                this.PlayerIndex = 0;
+            //if (this.IsNextTurn)
+            //{
+            //    this.PlayerIndex = 0;
 
-                var peckedChickens = this.Board.AliveChickens.Where(item => item.PeckedBy != null).ToList();
-                foreach (var peckedChicken in peckedChickens)
-                {
-                    peckedChicken.IsDead = true;
-                    peckedChicken.PeckedBy.KillCount++;
-                    this.Board.AliveChickensDirect.Remove(peckedChicken);
-                }
-                OnDiscreteMoveOccurred();
+            //    var peckedChickens = this.Board.AliveChickens.Where(item => item.KilledBy != null).ToList();
+            //    foreach (var peckedChicken in peckedChickens)
+            //    {
+            //        peckedChicken.IsDead = true;
+            //        peckedChicken.KilledBy.KillCount++;
+            //        this.Board.AliveChickensDirect.Remove(peckedChicken);
+            //    }
+            //    OnDiscreteMoveOccurred();
 
-                this.TurnIndex++;
-            }
+            //    this.TurnIndex++;
+            //}
 
-            if (this.Board.AliveChickens.Count <= 1)
-            {
-                FinishGame();
-            }
+            //if (this.Board.AliveChickens.Count <= 1)
+            //{
+            //    FinishGame();
+            //}
         }
 
         #endregion

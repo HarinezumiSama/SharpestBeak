@@ -5,13 +5,10 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public enum MoveAction
+    // So far only one real fire mode
+    public enum FireMode
     {
-        None,
-        MoveUp,
-        MoveRight,
-        MoveDown,
-        MoveLeft,
-        Peck
+        None = 0,
+        Single
     }
 }

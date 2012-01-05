@@ -11,11 +11,10 @@ namespace SharpestBeak.UI.WinForms
         #region Fields
 
         private static readonly BeakTurn[] s_turns = (BeakTurn[])Enum.GetValues(typeof(BeakTurn));
-        private static readonly MoveAction[] s_pureMoves = Enum
-            .GetValues(typeof(MoveAction))
-            .Cast<MoveAction>()
-            .Where(item => item != MoveAction.Peck)
-            .ToArray();
+        private static readonly MoveDirection[] s_moveDirections =
+            (MoveDirection[])Enum.GetValues(typeof(MoveDirection));
+        private static readonly FireMode[] s_fireModes = (FireMode[])Enum.GetValues(typeof(FireMode));
+
         private static readonly Random s_random = new Random();
 
         #endregion
@@ -42,22 +41,25 @@ namespace SharpestBeak.UI.WinForms
 
         protected override MoveInfo OnMakeMove()
         {
-            var peckPossibilities = new List<MoveInfo>(s_turns.Length);
-            foreach (var beakTurn in s_turns)
-            {
-                var attackPoint = this.Board.GetPeckAttackPoint(this.Unit, beakTurn);
-                if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
-                {
-                    peckPossibilities.Add(new MoveInfo(beakTurn, MoveAction.Peck));
-                }
-            }
-            if (peckPossibilities.Count > 0)
-            {
-                var index = s_random.Next(peckPossibilities.Count);
-                return peckPossibilities[index];
-            }
+            //var peckPossibilities = new List<MoveInfo>(s_turns.Length);
+            //foreach (var beakTurn in s_turns)
+            //{
+            //    var attackPoint = this.Board.GetPeckAttackPoint(this.Unit, beakTurn);
+            //    if (attackPoint.HasValue && this.Board.GetChickenAtPoint(attackPoint.Value) != null)
+            //    {
+            //        peckPossibilities.Add(new MoveInfo(beakTurn, MoveDirection.Peck));
+            //    }
+            //}
+            //if (peckPossibilities.Count > 0)
+            //{
+            //    var index = s_random.Next(peckPossibilities.Count);
+            //    return peckPossibilities[index];
+            //}
 
-            return new MoveInfo(ChooseRandomValue(s_turns), ChooseRandomValue(s_pureMoves));
+            return new MoveInfo(
+                ChooseRandomValue(s_moveDirections),
+                ChooseRandomValue(s_turns),
+                ChooseRandomValue(s_fireModes));
         }
 
         #endregion

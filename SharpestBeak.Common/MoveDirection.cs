@@ -5,10 +5,12 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public enum BeakTurn
+    public enum MoveDirection
     {
-        CounterClockwise = -1,
-        None = 0,
-        Clockwise = 1,
+        None,
+        MoveUp,
+        MoveRight,
+        MoveDown,
+        MoveLeft
     }
 }
