@@ -73,7 +73,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void PaintGame(GamePaintEventArgs e)
         {
-            pbGame.Refresh();
+            pbGame.Invalidate();
         }
 
         private void ClearStatusLabel()
