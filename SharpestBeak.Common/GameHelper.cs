@@ -68,7 +68,7 @@ namespace SharpestBeak.Common
 
             #region Argument Check
 
-            if (oldBeakAngle < 0)
+            if (oldBeakAngle <= -GameHelper.HalfRevolutionDegrees || oldBeakAngle > GameHelper.HalfRevolutionDegrees)
             {
                 throw new ArgumentOutOfRangeException("oldBeakAngle", oldBeakAngle, "Beak angle cannot be negative.");
             }
@@ -88,16 +88,21 @@ namespace SharpestBeak.Common
                 return oldBeakAngle;
             }
 
-            var result = (oldBeakAngle + timeDelta * GameConstants.NominalBeakAngleSpeed * beakTurnOffset)
-                % GameConstants.FullRotationAngle;
-            if (result < 0f)
+            var result = (oldBeakAngle + timeDelta * GameConstants.NominalBeakAngleSpeed * beakTurnOffset);
+            while (result > GameHelper.HalfRevolutionDegrees && result > -GameHelper.HalfRevolutionDegrees)
             {
-                result += GameConstants.FullRotationAngle;
+                result -= GameHelper.RevolutionDegrees;
             }
-            else if (result >= GameConstants.FullRotationAngle)
+            while (result <= -GameHelper.HalfRevolutionDegrees && result <= GameHelper.HalfRevolutionDegrees)
             {
-                result -= GameConstants.FullRotationAngle;
+                result += GameHelper.RevolutionDegrees;
             }
+
+            if (result > GameHelper.HalfRevolutionDegrees || result <= -GameHelper.HalfRevolutionDegrees)
+            {
+                throw new InvalidOperationException("Computed angle was not fixed correctly.");
+            }
+
             return result;
         }
 
@@ -176,7 +181,7 @@ namespace SharpestBeak.Common
 
         public static BeakTurn GetBeakTurn(float currentAngle, float targetAngle)
         {
-            var difference = -currentAngle + targetAngle;
+            var difference = targetAngle - currentAngle;
             return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
         }
 

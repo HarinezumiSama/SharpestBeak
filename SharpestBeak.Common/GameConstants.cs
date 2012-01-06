@@ -46,7 +46,7 @@ namespace SharpestBeak.Common
 
         public static readonly int MinNominalCellCount = 5;
 
-        public static readonly float FullRotationAngle = 360f;  // In degrees
+        public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
 
         #endregion
     }

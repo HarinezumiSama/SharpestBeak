@@ -111,19 +111,22 @@ namespace SharpestBeak.Common
             {
                 var chicken = this.AllChickens[index];
 
-                Point newPosition;
+                PointF newPosition;
                 do
                 {
-                    newPosition = new Point(
+                    var discretePosition = new Point(
                         s_random.Next(this.CommonData.NominalSize.Width),
                         s_random.Next(this.CommonData.NominalSize.Height));
+                    newPosition = new PointF(
+                        GameConstants.LargeCellSize * discretePosition.X + GameConstants.LargeCellSize / 2,
+                        GameConstants.LargeCellSize * discretePosition.Y + GameConstants.LargeCellSize / 2);
                 }
-                while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
+                while (this.AllChickens.Take(index).Any(
+                    item => item.Position.GetDistance(newPosition) < GameConstants.LargeCellSize));
 
-                chicken.Position = new PointF(
-                    GameConstants.LargeCellSize * newPosition.X + GameConstants.LargeCellSize / 2,
-                    GameConstants.LargeCellSize * newPosition.Y + GameConstants.LargeCellSize / 2);
-                chicken.BeakAngle = (float)Math.Floor(s_random.NextDouble() * GameConstants.FullRotationAngle);
+                chicken.Position = newPosition;
+                chicken.BeakAngle = (float)Math.Floor(
+                    GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
             }
         }
 
@@ -244,7 +247,8 @@ namespace SharpestBeak.Common
                         Thread.Sleep(1);
                     }
                 }
-                var timeDelta = (float)sw.Elapsed.TotalSeconds;  // Will be used when calculating each move
+                //var timeDelta = (float)sw.Elapsed.TotalSeconds;
+                var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
                 sw.Restart();
 
                 // TODO: Check logic error and report it somehow

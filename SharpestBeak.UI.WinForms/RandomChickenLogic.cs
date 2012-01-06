@@ -67,8 +67,6 @@ namespace SharpestBeak.UI.WinForms
 
         protected override MoveInfo OnMakeMove(GameState state)
         {
-            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
-
             if (this.Unit.Position.GetDistance(m_targetPoint)
                 .IsZero(GameConstants.NominalMoveSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
             {
@@ -80,6 +78,7 @@ namespace SharpestBeak.UI.WinForms
                     + new SizeF(GameConstants.LargeCellSize / 2f, GameConstants.LargeCellSize / 2f);
             }
 
+            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
             var move = Math.Abs(targetOffset.X) > Math.Abs(targetOffset.Y)
                 ? targetOffset.X.MapValueSign(MoveDirection.None, MoveDirection.MoveLeft, MoveDirection.MoveRight)
                 : targetOffset.Y.MapValueSign(MoveDirection.None, MoveDirection.MoveUp, MoveDirection.MoveDown);
