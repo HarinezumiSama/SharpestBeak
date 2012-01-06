@@ -47,6 +47,7 @@
             this.pbGame.TabIndex = 0;
             this.pbGame.TabStop = false;
             this.pbGame.Paint += new System.Windows.Forms.PaintEventHandler(this.pbGame_Paint);
+            this.pbGame.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pbGame_MouseClick);
             // 
             // mainToolTip
             // 

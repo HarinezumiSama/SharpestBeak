@@ -53,12 +53,18 @@ namespace SharpestBeak.UI.WinForms
                 this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
                 this.CenterToScreen();
 
-                ClearStatusLabel();
+                ClearStatusLabels();
+                UpdateMoveCountStatus();
 
                 PaintGame(null);  // TODO
             }
             catch (Exception ex)
             {
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
                 MessageBox.Show(
                     this,
                     ex.ToString(),
@@ -73,12 +79,23 @@ namespace SharpestBeak.UI.WinForms
 
         private void PaintGame(GamePaintEventArgs e)
         {
+            if (this.GameEngine.MoveCount % 25 == 0)
+            {
+                UpdateMoveCountStatus();
+            }
             pbGame.Invalidate();
         }
 
-        private void ClearStatusLabel()
+        private void UpdateMoveCountStatus()
+        {
+            turnInfoLabel.Text = string.Format("Move count: {0}", this.GameEngine.MoveCount);
+            turnInfoLabel.Invalidate();
+        }
+
+        private void ClearStatusLabels()
         {
             statusLabel.Text = string.Empty;
+            turnInfoLabel.Text = string.Empty;
         }
 
         private void RunTurnTest()
@@ -91,7 +108,19 @@ namespace SharpestBeak.UI.WinForms
 
         private void StartGame()
         {
-            this.GameEngine.Start();
+            if (!this.GameEngine.IsRunning)
+            {
+                this.GameEngine.Start();
+                UpdateMoveCountStatus();
+            }
+        }
+
+        private void StopGame()
+        {
+            if (this.GameEngine.IsRunning)
+            {
+                this.GameEngine.Stop();
+            }
         }
 
         #endregion
@@ -102,18 +131,17 @@ namespace SharpestBeak.UI.WinForms
         {
             base.OnLoad(e);
 
+            ClearStatusLabels();
             if (!InitializeGameEngine())
             {
                 Application.Exit();
                 return;
             }
-
-            ClearStatusLabel();
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            this.GameEngine.Stop();
+            StopGame();
             base.OnFormClosing(e);
         }
 
@@ -124,21 +152,26 @@ namespace SharpestBeak.UI.WinForms
             switch (e.KeyData)
             {
                 case Keys.F1:
+                    StopGame();
                     RunTurnTest();
                     break;
 
                 case Keys.F5:
-                    StartGame();
+                    if (this.GameEngine.IsRunning)
+                    {
+                        StopGame();
+                    }
+                    else
+                    {
+                        StartGame();
+                    }
                     break;
 
-                //case Keys.F8:
-                //    StopGameRun();
-                //    if (!InitializeGameEngine())
-                //    {
-                //        Application.Exit();
-                //        return;
-                //    }
-                //    break;
+                case Keys.F8:
+                    StopGame();
+                    this.GameEngine.Reset();
+                    PaintGame(null); // TODO
+                    break;
             }
         }
 
@@ -207,6 +240,23 @@ namespace SharpestBeak.UI.WinForms
                 var beakPolygonPoints = defaultBeakPolygonPoints.RotatePoints(uiPosition, unit.BeakAngle);
 
                 graphics.FillPolygon(Brushes.Green, beakPolygonPoints, FillMode.Winding);
+            }
+        }
+
+        private void pbGame_MouseClick(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    if (this.GameEngine.IsRunning)
+                    {
+                        StopGame();
+                    }
+                    else
+                    {
+                        StartGame();
+                    }
+                    break;
             }
         }
 

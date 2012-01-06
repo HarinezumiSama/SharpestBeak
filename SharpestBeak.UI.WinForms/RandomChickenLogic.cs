@@ -16,10 +16,19 @@ namespace SharpestBeak.UI.WinForms
         private static readonly FireMode[] s_fireModes = (FireMode[])Enum.GetValues(typeof(FireMode));
 
         private static readonly Random s_random = new Random();
+        private static readonly object s_randomSyncLock = new object();
 
         #endregion
 
         #region Private Methods
+
+        private static int GetNextRandom(int maxValue)
+        {
+            lock (s_randomSyncLock)
+            {
+                return s_random.Next(maxValue);
+            }
+        }
 
         private static T ChooseRandomValue<T>(IList<T> collection)
         {
@@ -32,7 +41,7 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            return collection[s_random.Next(collection.Count)];
+            return collection[GetNextRandom(collection.Count)];
         }
 
         #endregion

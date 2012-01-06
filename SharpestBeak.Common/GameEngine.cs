@@ -14,13 +14,14 @@ namespace SharpestBeak.Common
         #region Fields
 
         private static readonly Random s_random = new Random();
+        private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(5d);
 
-        private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(10d);
-
-        private readonly object m_syncLock = new object();
-        private readonly EventWaitHandle m_stopEvent = new EventWaitHandle(false, EventResetMode.ManualReset);
+        private readonly ReaderWriterLockSlim m_syncLock =
+            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly ManualResetEvent m_stopEvent = new ManualResetEvent(false);
         private bool m_disposed;
         private readonly Action<GamePaintEventArgs> m_paintCallback;
+        private readonly ThreadSafeValue<ulong> m_moveCount;
         private Thread m_engineThread;
 
         #endregion
@@ -49,8 +50,7 @@ namespace SharpestBeak.Common
             // Pre-initialized properties
             this.NominalSize = size;
             this.RealSize = new SizeF(Constants.LargeCellSize * size.Width, Constants.LargeCellSize * size.Height);
-            this.IsNextTurn = true;
-            this.TurnIndex = 1;
+            m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
 
             // Post-initialized properties
             this.AllChickens = chickenLogicTypes
@@ -60,7 +60,18 @@ namespace SharpestBeak.Common
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
 
-            PositionChickens();
+            if (this.AllChickens.Count > this.NominalSize.Width * this.NominalSize.Height / 2)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "Too many chickens ({0}) for the board of nominal size {1}x{2}.",
+                        this.AllChickens.Count,
+                        this.NominalSize.Width,
+                        this.NominalSize.Height),
+                    "size");
+            }
+
+            Reset();
         }
 
         /// <summary>
@@ -91,27 +102,12 @@ namespace SharpestBeak.Common
         {
             var logic = (ChickenUnitLogic)Activator.CreateInstance(item);
 
-            var result = new ChickenUnit(logic)
-            {
-                UniqueIndex = index + 1,
-                Thread = new Thread(this.DoExecuteLogic) { IsBackground = true }
-            };
-
+            var result = new ChickenUnit(logic) { UniqueIndex = index + 1 };
             return result;
         }
 
         private void PositionChickens()
         {
-            if (this.AllChickens.Count > this.NominalSize.Width * this.NominalSize.Height / 2)
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        "Too many chickens ({0}) for the board of nominal size {1}x{2}.",
-                        this.AllChickens.Count,
-                        this.NominalSize.Width,
-                        this.NominalSize.Height));
-            }
-
             for (int index = 0; index < this.AllChickens.Count; index++)
             {
                 var chicken = this.AllChickens[index];
@@ -132,14 +128,6 @@ namespace SharpestBeak.Common
             }
         }
 
-        private void FinishGame()
-        {
-            lock (m_syncLock)
-            {
-                this.IsGameFinished = true;
-            }
-        }
-
         private void CallPaintCallback()
         {
             m_paintCallback(new GamePaintEventArgs(GetPresentation()));
@@ -151,8 +139,88 @@ namespace SharpestBeak.Common
             CallPaintCallback();
         }
 
+        private void StartInternal()
+        {
+            EnsureNotDisposed();
+
+            if (m_engineThread != null)
+            {
+                throw new InvalidOperationException("Engine is already running.");
+            }
+
+            Application.Idle += this.Application_Idle;
+
+            m_engineThread = new Thread(this.DoExecuteEngine)
+            {
+                Name = GetType().FullName,
+                IsBackground = true
+            };
+            this.AliveChickens.DoForEach(
+                item => item.Thread = new Thread(this.DoExecuteLogic)
+                {
+                    IsBackground = true,
+                    Name = string.Format("Unit #{0}: {1}", item.UniqueIndex, item.Logic.GetType().FullName)
+                });
+
+            m_stopEvent.Reset();
+            CallPaintCallback();
+            m_engineThread.Start();
+
+            this.AliveChickens.DoForEach(item => item.Thread.Start(item.Logic));
+        }
+
+        private void StopInternal()
+        {
+            EnsureNotDisposed();
+
+            var engineThread = m_syncLock.ExecuteInReadLock(() => m_engineThread);
+
+            Application.Idle -= this.Application_Idle;
+
+            m_syncLock.ExecuteInReadLock(
+                () => this.AliveChickens.DoForEach(
+                    item =>
+                    {
+                        item.Thread.Abort();
+                        item.Thread = null;
+                    }));
+
+            m_stopEvent.Set();
+            Thread.Sleep((int)(Constants.LogicPollFrequency.TotalMilliseconds * 5));
+            m_syncLock.ExecuteInWriteLock(
+                () =>
+                {
+                    if (!m_engineThread.Join(s_stopTimeout))
+                    {
+                        m_engineThread.Abort();
+                        m_engineThread.Join();
+                    }
+
+                    m_engineThread = null;
+                });
+        }
+
+        private void ResetInternal()
+        {
+            m_moveCount.Value = 0;
+
+            this.AliveChickens
+                .Select(item => item.Logic)
+                .DoForEach(item => item.MoveCount = 0);
+
+            PositionChickens();
+        }
+
         private void DoExecuteEngine()
         {
+            m_syncLock.ExecuteInWriteLock(
+                () =>
+                {
+                    this.AliveChickens
+                        .Select(item => item.Logic)
+                        .DoForEach(item => item.Error = null);
+                });
+
             var sw = new Stopwatch();
             List<EngineMoveInfo> previousMoves = null;
             while (!m_stopEvent.WaitOne(0))
@@ -166,13 +234,20 @@ namespace SharpestBeak.Common
                 {
                     while (sw.Elapsed < Constants.LogicPollFrequency)
                     {
-                        Thread.Sleep(0);
+                        if (m_stopEvent.WaitOne(0))
+                        {
+                            return;
+                        }
+                        Thread.Sleep(1);
                     }
                 }
                 var timeDelta = (float)sw.Elapsed.TotalSeconds;  // Will be used when calculating each move
                 sw.Restart();
 
+                // TODO: Check logic error and report it somehow
+
                 var newMoves = this.AliveChickens
+                    .Where(item => item.Logic.Error == null)
                     .Select(item => EngineMoveInfo.Create(item))
                     .Where(item => item != null)
                     .ToList();
@@ -183,6 +258,11 @@ namespace SharpestBeak.Common
                 {
                     foreach (var move in previousMoves)
                     {
+                        if (m_stopEvent.WaitOne(0))
+                        {
+                            return;
+                        }
+
                         var unit = move.Unit;
 
                         var newPosition = GameHelper.GetNewPosition(
@@ -204,6 +284,13 @@ namespace SharpestBeak.Common
                 }
 
                 previousMoves = newMoves;
+
+                if (m_stopEvent.WaitOne(0))
+                {
+                    return;
+                }
+
+                this.MoveCount++;
             }
         }
 
@@ -223,7 +310,26 @@ namespace SharpestBeak.Common
                 }
 
                 // TODO: Obtain actual game state for this unit and its logic
-                logic.MakeMove(new GameState { Engine = this });
+                try
+                {
+                    if (logic.ClearCurrentMoveWhileMaking)
+                    {
+                        logic.CurrentMove = null;
+                    }
+                    logic.MakeMove(new GameState());
+                }
+                catch (Exception ex)
+                {
+                    if (ex.IsThreadAbort())
+                    {
+                        throw;
+                    }
+
+                    logic.Error = ex;
+                    logic.Unit.IsDead = true;
+                    return;
+                }
+                logic.MoveCount++;
 
                 Thread.Sleep(1);
             }
@@ -273,38 +379,20 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public bool IsNextTurn
+        public ulong MoveCount
         {
-            get;
-            private set;
-        }
-
-        public int PlayerIndex
-        {
-            get;
-            private set;
-        }
-
-        public bool IsGameFinished
-        {
-            get;
-            private set;
-        }
-
-        public long TurnIndex
-        {
-            get;
-            private set;
+            [DebuggerNonUserCode]
+            get { return m_moveCount.Value; }
+            [DebuggerNonUserCode]
+            private set { m_moveCount.Value = value; }
         }
 
         public bool IsRunning
         {
+            [DebuggerNonUserCode]
             get
             {
-                lock (m_syncLock)
-                {
-                    return m_engineThread != null;
-                }
+                return m_syncLock.ExecuteInReadLock(() => m_engineThread != null);
             }
         }
 
@@ -314,54 +402,22 @@ namespace SharpestBeak.Common
 
         public void Start()
         {
-            lock (m_syncLock)
-            {
-                EnsureNotDisposed();
-
-                if (m_engineThread != null)
-                {
-                    throw new InvalidOperationException("Engine is already running.");
-                }
-
-                Application.Idle += this.Application_Idle;
-
-                m_engineThread = new Thread(this.DoExecuteEngine)
-                {
-                    Name = GetType().FullName,
-                    IsBackground = true
-                };
-
-                m_stopEvent.Reset();
-                CallPaintCallback();
-                m_engineThread.Start();
-
-                this.AliveChickens.DoForEach(item => item.Thread.Start(item.Logic));
-            }
+            m_syncLock.ExecuteInWriteLock(this.StartInternal);
         }
 
         public void Stop()
         {
-            lock (m_syncLock)
+            this.StopInternal();
+        }
+
+        public void Reset()
+        {
+            if (this.IsRunning)
             {
-                EnsureNotDisposed();
-
-                if (m_engineThread == null)
-                {
-                    return;
-                }
-
-                Application.Idle -= this.Application_Idle;
-
-                this.AliveChickens.DoForEach(item => item.Thread.Abort());
-
-                m_stopEvent.Set();
-                if (!m_engineThread.Join(s_stopTimeout))
-                {
-                    m_engineThread.Abort();
-                    m_engineThread.Join();
-                }
-                m_engineThread = null;
+                throw new InvalidOperationException("Cannot reset game engine since it is running.");
             }
+
+            m_syncLock.ExecuteInWriteLock(this.ResetInternal);
         }
 
         #endregion
@@ -370,16 +426,28 @@ namespace SharpestBeak.Common
 
         public void Dispose()
         {
-            lock (m_syncLock)
+            if (m_disposed)
+            {
+                return;
+            }
+
+            m_syncLock.EnterWriteLock();
+            try
             {
                 m_stopEvent.DisposeSafely();
                 foreach (var item in this.AllChickens)
                 {
-                    item.Logic.Dispose();
+                    item.Logic.DisposeSafely();
                 }
+                m_moveCount.DisposeSafely();
 
                 m_disposed = true;
             }
+            finally
+            {
+                m_syncLock.ExitWriteLock();
+            }
+            m_syncLock.DisposeSafely();
         }
 
         #endregion

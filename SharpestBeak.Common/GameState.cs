@@ -21,12 +21,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        // TODO: Remove reference to engine and compute details according to actual unit view
-        public GameEngine Engine
-        {
-            get;
-            internal set;
-        }
+        // TODO: Compute details according to actual unit view
 
         #endregion
     }
