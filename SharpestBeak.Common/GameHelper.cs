@@ -62,16 +62,29 @@ namespace SharpestBeak.Common
             return Math.Abs(value) < tolerance;
         }
 
+        public static bool IsValidAngle(this float angle)
+        {
+            return angle > -GameHelper.HalfRevolutionDegrees && angle <= GameHelper.HalfRevolutionDegrees;
+        }
+
+        public static float EnsureValidAngle(this float angle)
+        {
+            if (!IsValidAngle(angle))
+            {
+                throw new ArgumentOutOfRangeException("angle", angle, "Invalid angle.");
+            }
+
+            return angle;
+        }
+
         public static float GetNewBeakAngle(float oldBeakAngle, BeakTurn beakTurn, float timeDelta)
         {
             int beakTurnOffset = (int)beakTurn;
 
             #region Argument Check
 
-            if (oldBeakAngle <= -GameHelper.HalfRevolutionDegrees || oldBeakAngle > GameHelper.HalfRevolutionDegrees)
-            {
-                throw new ArgumentOutOfRangeException("oldBeakAngle", oldBeakAngle, "Beak angle cannot be negative.");
-            }
+            oldBeakAngle.EnsureValidAngle();
+
             if (Math.Abs(beakTurnOffset) > 1)
             {
                 throw new ArgumentOutOfRangeException("beakTurn", beakTurn, "Invalid beak turn.");

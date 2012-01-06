@@ -243,7 +243,7 @@ namespace SharpestBeak.UI.WinForms
                 if (rcl != null)
                 {
                     var tp = rcl.TargetPoint.Scale(coefficient);
-                    graphics.FillEllipse(Brushes.Red, tp.X - 5, tp.Y - 5, 10, 10);
+                    graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
                 }
             }
         }

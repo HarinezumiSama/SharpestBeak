@@ -59,6 +59,9 @@ namespace SharpestBeak.Common
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
 
+            this.ShotUnitsDirect = new List<ShotUnit>();
+            this.ShotUnits = this.ShotUnitsDirect.AsReadOnly();
+
             if (this.AllChickens.Count > this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2)
             {
                 throw new ArgumentException(
@@ -139,6 +142,11 @@ namespace SharpestBeak.Common
         {
             // TODO: [VM] Compute FPS
             CallPaintCallback();
+        }
+
+        private bool IsStopping()
+        {
+            return m_stopEvent.WaitOne(0);
         }
 
         private void StartInternal()
@@ -229,7 +237,7 @@ namespace SharpestBeak.Common
 
             var sw = new Stopwatch();
             List<EngineMoveInfo> previousMoves = null;
-            while (!m_stopEvent.WaitOne(0))
+            while (!IsStopping())
             {
                 if (m_disposed)
                 {
@@ -240,7 +248,7 @@ namespace SharpestBeak.Common
                 {
                     while (sw.Elapsed < GameConstants.LogicPollFrequency)
                     {
-                        if (m_stopEvent.WaitOne(0))
+                        if (IsStopping())
                         {
                             return;
                         }
@@ -259,13 +267,15 @@ namespace SharpestBeak.Common
                     .Where(item => item != null)
                     .ToList();
 
-                // TODO: Process fire (must be performed immediately!)
+                newMoves
+                    .Where(item => item.FireMode != FireMode.None)
+                    .DoForEach(item => this.ShotUnitsDirect.Add(new ShotUnit(item.Unit)));
 
                 if (previousMoves != null && timeDelta > 0f)
                 {
                     foreach (var move in previousMoves)
                     {
-                        if (m_stopEvent.WaitOne(0))
+                        if (IsStopping())
                         {
                             return;
                         }
@@ -292,7 +302,7 @@ namespace SharpestBeak.Common
 
                 previousMoves = newMoves;
 
-                if (m_stopEvent.WaitOne(0))
+                if (IsStopping())
                 {
                     return;
                 }
@@ -309,7 +319,7 @@ namespace SharpestBeak.Common
                 throw new InvalidOperationException("Invalid logic passed to thread method.");
             }
 
-            while (!m_stopEvent.WaitOne(0))
+            while (!IsStopping())
             {
                 if (m_disposed)
                 {
@@ -364,11 +374,23 @@ namespace SharpestBeak.Common
             private set;
         }
 
+        internal List<ShotUnit> ShotUnitsDirect
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         #region Public Properties
 
         public IList<ChickenUnit> AliveChickens
+        {
+            get;
+            private set;
+        }
+
+        public IList<ShotUnit> ShotUnits
         {
             get;
             private set;

@@ -48,6 +48,10 @@ namespace SharpestBeak.Common
 
         public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
 
+        public static readonly float ShotUnitRadius = LargeCellSize / 20f;
+
+        public static readonly float NominalShotUnitSpeed = 2f * NominalMoveSpeed;  // Per second
+
         #endregion
     }
 }
