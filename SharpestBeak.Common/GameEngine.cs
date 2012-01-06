@@ -48,8 +48,7 @@ namespace SharpestBeak.Common
             m_paintCallback = paintCallback;
 
             // Pre-initialized properties
-            this.NominalSize = size;
-            this.RealSize = new SizeF(Constants.LargeCellSize * size.Width, Constants.LargeCellSize * size.Height);
+            this.CommonData = new GameCommonData(size);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
 
             // Post-initialized properties
@@ -60,14 +59,14 @@ namespace SharpestBeak.Common
             this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
 
-            if (this.AllChickens.Count > this.NominalSize.Width * this.NominalSize.Height / 2)
+            if (this.AllChickens.Count > this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2)
             {
                 throw new ArgumentException(
                     string.Format(
                         "Too many chickens ({0}) for the board of nominal size {1}x{2}.",
                         this.AllChickens.Count,
-                        this.NominalSize.Width,
-                        this.NominalSize.Height),
+                        this.CommonData.NominalSize.Width,
+                        this.CommonData.NominalSize.Height),
                     "size");
             }
 
@@ -116,15 +115,15 @@ namespace SharpestBeak.Common
                 do
                 {
                     newPosition = new Point(
-                        s_random.Next(this.NominalSize.Width),
-                        s_random.Next(this.NominalSize.Height));
+                        s_random.Next(this.CommonData.NominalSize.Width),
+                        s_random.Next(this.CommonData.NominalSize.Height));
                 }
                 while (this.AllChickens.Take(index).Any(item => item.Position == newPosition));
 
                 chicken.Position = new PointF(
-                    Constants.LargeCellSize * newPosition.X + Constants.LargeCellSize / 2,
-                    Constants.LargeCellSize * newPosition.Y + Constants.LargeCellSize / 2);
-                chicken.BeakAngle = (float)Math.Floor(s_random.NextDouble() * Constants.FullRotationAngle);
+                    GameConstants.LargeCellSize * newPosition.X + GameConstants.LargeCellSize / 2,
+                    GameConstants.LargeCellSize * newPosition.Y + GameConstants.LargeCellSize / 2);
+                chicken.BeakAngle = (float)Math.Floor(s_random.NextDouble() * GameConstants.FullRotationAngle);
             }
         }
 
@@ -156,10 +155,14 @@ namespace SharpestBeak.Common
                 IsBackground = true
             };
             this.AliveChickens.DoForEach(
-                item => item.Thread = new Thread(this.DoExecuteLogic)
+                item =>
                 {
-                    IsBackground = true,
-                    Name = string.Format("Unit #{0}: {1}", item.UniqueIndex, item.Logic.GetType().FullName)
+                    item.Thread = new Thread(this.DoExecuteLogic)
+                    {
+                        IsBackground = true,
+                        Name = string.Format("Unit #{0}: {1}", item.UniqueIndex, item.Logic.GetType().FullName)
+                    };
+                    item.Logic.Initialize();
                 });
 
             m_stopEvent.Reset();
@@ -186,7 +189,7 @@ namespace SharpestBeak.Common
                     }));
 
             m_stopEvent.Set();
-            Thread.Sleep((int)(Constants.LogicPollFrequency.TotalMilliseconds * 5));
+            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
             m_syncLock.ExecuteInWriteLock(
                 () =>
                 {
@@ -232,7 +235,7 @@ namespace SharpestBeak.Common
 
                 if (sw.IsRunning)
                 {
-                    while (sw.Elapsed < Constants.LogicPollFrequency)
+                    while (sw.Elapsed < GameConstants.LogicPollFrequency)
                     {
                         if (m_stopEvent.WaitOne(0))
                         {
@@ -316,7 +319,7 @@ namespace SharpestBeak.Common
                     {
                         logic.CurrentMove = null;
                     }
-                    logic.MakeMove(new GameState());
+                    logic.MakeMove(new GameState(this.CommonData));
                 }
                 catch (Exception ex)
                 {
@@ -367,13 +370,7 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public Size NominalSize
-        {
-            get;
-            private set;
-        }
-
-        public SizeF RealSize
+        public GameCommonData CommonData
         {
             get;
             private set;

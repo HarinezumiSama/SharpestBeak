@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Common;
 
 namespace SharpestBeak.UI.WinForms
@@ -17,6 +18,8 @@ namespace SharpestBeak.UI.WinForms
 
         private static readonly Random s_random = new Random();
         private static readonly object s_randomSyncLock = new object();
+
+        private PointF m_targetPoint;
 
         #endregion
 
@@ -48,12 +51,45 @@ namespace SharpestBeak.UI.WinForms
 
         #region Protected Methods
 
+        protected override void OnInitialize()
+        {
+            m_targetPoint = this.Unit.Position;
+        }
+
         protected override MoveInfo OnMakeMove(GameState state)
         {
-            return new MoveInfo(
-                ChooseRandomValue(s_moveDirections),
-                ChooseRandomValue(s_turns),
-                ChooseRandomValue(s_fireModes));
+            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
+
+            if (this.Unit.Position.GetDistance(m_targetPoint)
+                .IsZero(GameConstants.NominalMoveSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
+            {
+                // Choosing new target point
+                var point = new Point(
+                    GetNextRandom(state.Data.NominalSize.Width),
+                    GetNextRandom(state.Data.NominalSize.Height));
+                m_targetPoint = ((PointF)point).Scale(GameConstants.LargeCellSize)
+                    + new SizeF(GameConstants.LargeCellSize / 2f, GameConstants.LargeCellSize / 2f);
+            }
+
+            var move = Math.Abs(targetOffset.X) > Math.Abs(targetOffset.Y)
+                ? targetOffset.X.MapValueSign(MoveDirection.None, MoveDirection.MoveLeft, MoveDirection.MoveRight)
+                : targetOffset.Y.MapValueSign(MoveDirection.None, MoveDirection.MoveUp, MoveDirection.MoveDown);
+
+            var targetAngle = GameHelper.ToDegrees((float)Math.Atan2(targetOffset.Y, targetOffset.X));
+            var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
+
+            return new MoveInfo(move, turn, ChooseRandomValue(s_fireModes));
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        // For debug only
+        public PointF TargetPoint
+        {
+            [DebuggerStepThrough]
+            get { return m_targetPoint; }
         }
 
         #endregion

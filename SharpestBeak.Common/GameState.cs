@@ -12,17 +12,33 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameState"/> class.
         /// </summary>
-        internal GameState()
+        internal GameState(GameCommonData data)
         {
-            // TODO:
+            #region Argument Check
+
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
+            #endregion
+
+            this.Data = data;
         }
 
         #endregion
 
         #region Public Properties
 
+        public GameCommonData Data
+        {
+            get;
+            private set;
+        }
+
         // TODO: Compute details according to actual unit view
 
         #endregion
+
     }
 }

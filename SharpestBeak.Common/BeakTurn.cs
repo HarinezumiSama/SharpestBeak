@@ -7,8 +7,8 @@ namespace SharpestBeak.Common
 {
     public enum BeakTurn
     {
-        CounterClockwise = -1,
+        Clockwise = -1,
         None = 0,
-        Clockwise = 1,
+        CounterClockwise = 1
     }
 }

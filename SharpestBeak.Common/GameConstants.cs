@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SharpestBeak.Common
 {
-    public static class Constants
+    public static class GameConstants
     {
         #region Nested Types
 

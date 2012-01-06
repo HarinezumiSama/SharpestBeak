@@ -45,7 +45,7 @@ namespace SharpestBeak.UI.WinForms
                     new Size(5, 5),
                     Enumerable.Range(1, 2).Select(item => typeof(RandomChickenLogic)));
 
-                var boardSize = this.GameEngine.NominalSize;
+                var boardSize = this.GameEngine.CommonData.NominalSize;
                 var boxSize = new Size(
                     boardSize.Width * s_cellSize + 1,
                     boardSize.Height * s_cellSize + 1);
@@ -191,7 +191,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_Paint(object sender, PaintEventArgs e)
         {
-            var size = this.GameEngine.NominalSize;
+            var size = this.GameEngine.CommonData.NominalSize;
             var graphics = e.Graphics;
 
             // Drawing grid (for debug only... probably)
@@ -216,9 +216,9 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var unit in this.GameEngine.AliveChickens)
             {
-                var coefficient = (float)s_cellSize / Constants.LargeCellSize;
+                var coefficient = (float)s_cellSize / GameConstants.LargeCellSize;
                 var uiPosition = unit.Position.Scale(coefficient);
-                var uiRadius = Constants.ChickenUnit.BodyCircleRadius * coefficient;
+                var uiRadius = GameConstants.ChickenUnit.BodyCircleRadius * coefficient;
 
                 graphics.FillEllipse(
                     Brushes.Green,
@@ -227,19 +227,24 @@ namespace SharpestBeak.UI.WinForms
                     2 * uiRadius,
                     2 * uiRadius);
 
-                var uiBeakOffset = Constants.ChickenUnit.BeakOffset * coefficient;
-                var uiBeakRayOffset = Constants.ChickenUnit.BeakRayOffset * coefficient;
+                var uiBeakOffset = GameConstants.ChickenUnit.BeakOffset * coefficient;
+                var uiBeakRayOffset = GameConstants.ChickenUnit.BeakRayOffset * coefficient;
                 var defaultBeakPolygonPoints = new[]
                 {
                     new PointF(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
                     new PointF(uiPosition.X + uiBeakOffset, uiPosition.Y),
                     new PointF(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
                 };
-                //var defaultBeakPoint = uiPosition + new SizeF(uiBeakOffset, uiBeakOffset);
-                //var beakPoint = defaultBeakPoint.RotatePoint(uiPosition, unit.BeakAngle);
                 var beakPolygonPoints = defaultBeakPolygonPoints.RotatePoints(uiPosition, unit.BeakAngle);
 
                 graphics.FillPolygon(Brushes.Green, beakPolygonPoints, FillMode.Winding);
+
+                var rcl = unit.Logic as RandomChickenLogic;
+                if (rcl != null)
+                {
+                    var tp = rcl.TargetPoint.Scale(coefficient);
+                    graphics.FillEllipse(Brushes.Red, tp.X - 5, tp.Y - 5, 10, 10);
+                }
             }
         }
 

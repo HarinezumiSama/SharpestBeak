@@ -60,6 +60,7 @@ namespace SharpestBeak.Common
             internal set;
         }
 
+        // TODO: [VM] (??) Create own vector with possibility to cast to/from PointF, SizeF etc.
         public PointF Position
         {
             get;

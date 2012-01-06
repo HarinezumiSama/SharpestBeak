@@ -8,6 +8,21 @@ namespace SharpestBeak.Common
 {
     public static class GameHelper
     {
+        #region Constants
+
+        public const float ZeroTolerance = 1E-6f;
+
+        public const float Pi = 3.14159265358979f;
+        public const float DoublePi = 6.283185307179586f;
+
+        public const float HalfRevolutionRadians = Pi;
+        public const float RevolutionRadians = DoublePi;
+
+        public const float HalfRevolutionDegrees = 180f;
+        public const float RevolutionDegrees = 360f;
+
+        #endregion
+
         #region Fields
 
         private static readonly Dictionary<MoveDirection, PointF> s_directionMap =
@@ -42,6 +57,11 @@ namespace SharpestBeak.Common
 
         #region Public Methods
 
+        public static bool IsZero(this float value, float tolerance = ZeroTolerance)
+        {
+            return Math.Abs(value) < tolerance;
+        }
+
         public static float GetNewBeakAngle(float oldBeakAngle, BeakTurn beakTurn, float timeDelta)
         {
             int beakTurnOffset = (int)beakTurn;
@@ -68,15 +88,15 @@ namespace SharpestBeak.Common
                 return oldBeakAngle;
             }
 
-            var result = (oldBeakAngle + timeDelta * Constants.NominalBeakAngleSpeed * beakTurnOffset)
-                % Constants.FullRotationAngle;
+            var result = (oldBeakAngle + timeDelta * GameConstants.NominalBeakAngleSpeed * beakTurnOffset)
+                % GameConstants.FullRotationAngle;
             if (result < 0f)
             {
-                result += Constants.FullRotationAngle;
+                result += GameConstants.FullRotationAngle;
             }
-            else if (result >= Constants.FullRotationAngle)
+            else if (result >= GameConstants.FullRotationAngle)
             {
-                result -= Constants.FullRotationAngle;
+                result -= GameConstants.FullRotationAngle;
             }
             return result;
         }
@@ -89,7 +109,7 @@ namespace SharpestBeak.Common
             }
 
             var moveAngle = Math.Atan2(directionVector.Y, directionVector.X);
-            var moveStep = timeDelta * Constants.NominalMoveSpeed;
+            var moveStep = timeDelta * GameConstants.NominalMoveSpeed;
             var result = oldPosition
                 + new SizeF((float)(moveStep * Math.Cos(moveAngle)), (float)(moveStep * Math.Sin(moveAngle)));
             return result;
@@ -113,8 +133,12 @@ namespace SharpestBeak.Common
 
         public static float ToRadians(float degreeAngle)
         {
-            var result = (float)(degreeAngle / 180d * Math.PI);
-            return result;
+            return degreeAngle / HalfRevolutionDegrees * Pi;
+        }
+
+        public static float ToDegrees(float radianAngle)
+        {
+            return radianAngle / Pi * HalfRevolutionDegrees;
         }
 
         public static PointF RotatePoint(this PointF value, PointF center, float degreeAngle)
@@ -133,6 +157,37 @@ namespace SharpestBeak.Common
             PrepareRotate(degreeAngle, out cos, out sin);
 
             return values.Select(value => RotatePointInternal(value, center, cos, sin)).ToArray();
+        }
+
+        public static SizeF ToSizeF(this PointF value)
+        {
+            return new SizeF(value);
+        }
+
+        public static T MapValueSign<T>(this float value, T zero, T negative, T positive)
+        {
+            if (value.IsZero())
+            {
+                return zero;
+            }
+
+            return value > 0 ? positive : negative;
+        }
+
+        public static BeakTurn GetBeakTurn(float currentAngle, float targetAngle)
+        {
+            var difference = -currentAngle + targetAngle;
+            return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
+        }
+
+        public static float Sqr(this float value)
+        {
+            return value * value;
+        }
+
+        public static float GetDistance(this PointF value, PointF otherValue)
+        {
+            return (float)Math.Sqrt(Sqr(otherValue.X - value.X) + Sqr(otherValue.Y - value.Y));
         }
 
         #endregion
