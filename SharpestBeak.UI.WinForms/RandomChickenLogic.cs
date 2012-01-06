@@ -23,6 +23,15 @@ namespace SharpestBeak.UI.WinForms
 
         #endregion
 
+        #region Constructors
+
+        public RandomChickenLogic()
+        {
+            m_targetPoint = new PointF(-GameConstants.LargeCellSize, -GameConstants.LargeCellSize);
+        }
+
+        #endregion
+
         #region Private Methods
 
         private static int GetNextRandom(int maxValue)
