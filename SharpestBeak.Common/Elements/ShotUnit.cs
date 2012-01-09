@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using SharpestBeak.Common.Elements.Primitives;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Elements
 {
     public sealed class ShotUnit
     {
@@ -108,6 +109,11 @@ namespace SharpestBeak.Common
                 this.Angle,
                 this.Owner.UniqueIndex,
                 this.CreationTime);
+        }
+
+        public ShotElement GetElement()
+        {
+            return new ShotElement(this.Position);
         }
 
         #endregion

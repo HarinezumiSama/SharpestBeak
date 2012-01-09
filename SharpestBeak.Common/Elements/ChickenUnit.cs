@@ -5,8 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using SharpestBeak.Common.Elements.Primitives;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Elements
 {
     public sealed class ChickenUnit
     {
@@ -116,6 +117,11 @@ namespace SharpestBeak.Common
         {
             return new PointF(this.Position.X + GameConstants.ChickenUnit.BeakOffset, this.Position.Y)
                 .Rotate(this.Position, this.BeakAngle);
+        }
+
+        public ChickenElement GetElement()
+        {
+            return new ChickenElement(this.Position, this.BeakAngle);
         }
 
         #endregion

@@ -47,9 +47,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BeakTurn.cs" />
-    <Compile Include="ChickenUnit.cs" />
+    <Compile Include="Elements\ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
+    <Compile Include="CollisionDetector.cs" />
     <Compile Include="DebugHelper.cs" />
+    <Compile Include="Elements\Primitives\ChickenElement.cs" />
+    <Compile Include="Elements\Primitives\CirclePrimitive.cs" />
+    <Compile Include="Elements\Primitives\ShotElement.cs" />
+    <Compile Include="Elements\Primitives\RectanglePrimitive.cs" />
+    <Compile Include="Elements\Primitives\TrianglePrimitive.cs" />
+    <Compile Include="Elements\Primitives\LinePrimitive.cs" />
     <Compile Include="EngineMoveInfo.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FireMode.cs" />
@@ -62,13 +69,17 @@
     <Compile Include="GamePresentation.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Helper.cs" />
+    <Compile Include="ICollidable.cs" />
+    <Compile Include="ICollidableElement.cs" />
+    <Compile Include="ICollidablePrimitive.cs" />
     <Compile Include="MoveInfo.cs" />
     <Compile Include="MoveDirection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShotUnit.cs" />
+    <Compile Include="Elements\ShotUnit.cs" />
     <Compile Include="ThreadSafeValue.cs" />
     <Compile Include="WinApi.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
