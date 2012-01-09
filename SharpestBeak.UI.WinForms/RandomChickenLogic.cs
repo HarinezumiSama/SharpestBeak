@@ -86,7 +86,7 @@ namespace SharpestBeak.UI.WinForms
             var targetAngle = GameHelper.ToDegrees((float)Math.Atan2(targetOffset.Y, targetOffset.X));
             var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
 
-            return new MoveInfo(move, turn, GetNextRandom(10) > 7 ? FireMode.Single : FireMode.None);
+            return new MoveInfo(move, turn, GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
         }
 
         #endregion

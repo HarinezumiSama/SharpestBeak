@@ -144,7 +144,6 @@ namespace SharpestBeak.Common
 
         private void Application_Idle(object sender, EventArgs e)
         {
-            // TODO: [VM] Compute FPS
             CallPaintCallback();
         }
 
@@ -384,13 +383,13 @@ namespace SharpestBeak.Common
                     return;
                 }
 
-                // TODO: Obtain actual game state for this unit and its logic
                 try
                 {
                     if (logic.ClearCurrentMoveWhileMaking)
                     {
                         logic.CurrentMove = null;
                     }
+                    // TODO: Obtain actual game state for this unit and its logic
                     logic.MakeMove(new GameState(this.CommonData));
                 }
                 catch (Exception ex)

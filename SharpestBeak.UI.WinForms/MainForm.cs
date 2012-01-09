@@ -17,7 +17,7 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly int s_cellSize = 64;
+        private static readonly int s_cellSize = 48;
         private static readonly int s_fullCellSize = s_cellSize + 1;
 
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);

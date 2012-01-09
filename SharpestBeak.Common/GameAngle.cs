@@ -42,6 +42,11 @@ namespace SharpestBeak.Common
 
         public static GameAngle FromDegrees(float degreeAngle)
         {
+            if (degreeAngle == -GameHelper.HalfRevolutionDegrees)
+            {
+                degreeAngle = GameHelper.HalfRevolutionDegrees;
+            }
+
             return new GameAngle
             {
                 DegreeValue = degreeAngle.EnsureValidDegreeAngle(),
