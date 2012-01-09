@@ -100,9 +100,9 @@ namespace SharpestBeak.Common
             }
         }
 
-        private ChickenUnit CreateChicken(Type item, int index)
+        private ChickenUnit CreateChicken(Type logicType, int index)
         {
-            var logic = (ChickenUnitLogic)Activator.CreateInstance(item);
+            var logic = (ChickenUnitLogic)Activator.CreateInstance(logicType);
 
             var result = new ChickenUnit(logic)
             {
@@ -185,37 +185,6 @@ namespace SharpestBeak.Common
             m_engineThread.Start();
 
             this.AliveChickens.DoForEach(item => item.Thread.Start(item.Logic));
-        }
-
-        private void StopInternal()
-        {
-            EnsureNotDisposed();
-
-            var engineThread = m_syncLock.ExecuteInReadLock(() => m_engineThread);
-
-            Application.Idle -= this.Application_Idle;
-
-            m_syncLock.ExecuteInReadLock(
-                () => this.AliveChickens.DoForEach(
-                    item =>
-                    {
-                        item.Thread.Abort();
-                        item.Thread = null;
-                    }));
-
-            m_stopEvent.Set();
-            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
-            m_syncLock.ExecuteInWriteLock(
-                () =>
-                {
-                    if (!m_engineThread.Join(s_stopTimeout))
-                    {
-                        m_engineThread.Abort();
-                        m_engineThread.Join();
-                    }
-
-                    m_engineThread = null;
-                });
         }
 
         private void ResetInternal()
@@ -492,7 +461,33 @@ namespace SharpestBeak.Common
 
         public void Stop()
         {
-            this.StopInternal();
+            EnsureNotDisposed();
+
+            var engineThread = m_syncLock.ExecuteInReadLock(() => m_engineThread);
+
+            Application.Idle -= this.Application_Idle;
+
+            m_syncLock.ExecuteInReadLock(
+                () => this.AliveChickens.DoForEach(
+                    item =>
+                    {
+                        item.Thread.Abort();
+                        item.Thread = null;
+                    }));
+
+            m_stopEvent.Set();
+            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
+            m_syncLock.ExecuteInWriteLock(
+                () =>
+                {
+                    if (!m_engineThread.Join(s_stopTimeout))
+                    {
+                        m_engineThread.Abort();
+                        m_engineThread.Join();
+                    }
+
+                    m_engineThread = null;
+                });
         }
 
         public void Reset()
