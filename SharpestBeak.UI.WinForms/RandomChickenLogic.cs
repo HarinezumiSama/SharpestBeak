@@ -68,7 +68,8 @@ namespace SharpestBeak.UI.WinForms
         protected override MoveInfo OnMakeMove(GameState state)
         {
             if (this.Unit.Position.GetDistance(m_targetPoint)
-                .IsZero(GameConstants.ChickenUnit.DefaultSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
+                .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed
+                    * (float)GameConstants.LogicPollFrequency.TotalSeconds))
             {
                 // Choosing new target point
                 var point = new Point(
@@ -78,15 +79,27 @@ namespace SharpestBeak.UI.WinForms
                     + new SizeF(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
             }
 
-            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
-            var move = Math.Abs(targetOffset.X) > Math.Abs(targetOffset.Y)
-                ? targetOffset.X.MapValueSign(MoveDirection.None, MoveDirection.MoveLeft, MoveDirection.MoveRight)
-                : targetOffset.Y.MapValueSign(MoveDirection.None, MoveDirection.MoveUp, MoveDirection.MoveDown);
+            var move = Tuple.Create(MoveDirection.None, float.MaxValue);
+            foreach (var item in s_moveDirections)
+            {
+                var potentialMovePoint = GameHelper.GetNewPosition(
+                    this.Unit.Position,
+                    this.Unit.BeakAngle,
+                    item,
+                    GameConstants.ChickenUnit.DefaultRectilinearSpeed,
+                    (float)GameConstants.LogicPollFrequency.TotalSeconds);
+                var distanceSquared = m_targetPoint.GetDistanceSquared(potentialMovePoint);
+                if (distanceSquared < move.Item2)
+                {
+                    move = Tuple.Create(item, distanceSquared);
+                }
+            }
 
-            var targetAngle = GameHelper.ToDegrees((float)Math.Atan2(targetOffset.Y, targetOffset.X));
+            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
+            var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
             var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
 
-            return new MoveInfo(move, turn, GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
+            return new MoveInfo(move.Item1, turn, GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
         }
 
         #endregion

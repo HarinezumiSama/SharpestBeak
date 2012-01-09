@@ -8,6 +8,29 @@ namespace SharpestBeak.Common
 {
     public struct GameAngle : IEquatable<GameAngle>, IFormattable
     {
+        #region Internal Methods
+
+        internal static float NormalizeDegreeAngle(float value)
+        {
+            var result = value;
+            while (result > GameHelper.HalfRevolutionDegrees && result > -GameHelper.HalfRevolutionDegrees)
+            {
+                result -= GameHelper.RevolutionDegrees;
+            }
+            while (result <= -GameHelper.HalfRevolutionDegrees && result <= GameHelper.HalfRevolutionDegrees)
+            {
+                result += GameHelper.RevolutionDegrees;
+            }
+
+            if (result > GameHelper.HalfRevolutionDegrees || result <= -GameHelper.HalfRevolutionDegrees)
+            {
+                throw new InvalidOperationException("Computed angle was not fixed correctly.");
+            }
+            return result;
+        }
+
+        #endregion
+
         #region Public Properties
 
         public float DegreeValue
@@ -42,11 +65,6 @@ namespace SharpestBeak.Common
 
         public static GameAngle FromDegrees(float degreeAngle)
         {
-            if (degreeAngle == -GameHelper.HalfRevolutionDegrees)
-            {
-                degreeAngle = GameHelper.HalfRevolutionDegrees;
-            }
-
             return new GameAngle
             {
                 DegreeValue = degreeAngle.EnsureValidDegreeAngle(),
@@ -59,14 +77,58 @@ namespace SharpestBeak.Common
             return FromDegrees((float)degreeAngle);
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is GameAngle && Equals((GameAngle)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.DegreeValue.GetHashCode();
+        }
+
         public string ToString(string format)
         {
-            return ToString(format, null);
+            return ToString(format, (IFormatProvider)null);
         }
 
         public override string ToString()
         {
-            return ToString(null);
+            return ToString((string)null, (IFormatProvider)null);
+        }
+
+        #endregion
+
+        #region Operators
+
+        public static GameAngle operator +(GameAngle value)
+        {
+            return value;
+        }
+
+        public static GameAngle operator -(GameAngle value)
+        {
+            return GameAngle.FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
+        }
+
+        public static GameAngle operator +(GameAngle left, GameAngle right)
+        {
+            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
+        }
+
+        public static GameAngle operator -(GameAngle left, GameAngle right)
+        {
+            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
+        }
+
+        public static GameAngle operator *(GameAngle left, float right)
+        {
+            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
+        }
+
+        public static GameAngle operator *(float left, GameAngle right)
+        {
+            return GameAngle.FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
         }
 
         #endregion
@@ -112,7 +174,7 @@ namespace SharpestBeak.Common
             }
             if (radians)
             {
-                sb.AppendFormat(formatProvider, "{1:N3} rad", this.RadianValue);
+                sb.AppendFormat(formatProvider, "{0:N3} rad", this.RadianValue);
             }
             sb.Append("}");
             return sb.ToString();

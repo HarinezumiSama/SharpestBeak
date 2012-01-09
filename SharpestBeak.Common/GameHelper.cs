@@ -15,24 +15,26 @@ namespace SharpestBeak.Common
         public const float Pi = 3.14159265358979f;
         public const float DoublePi = 6.283185307179586f;
 
-        public const float HalfRevolutionRadians = Pi;
         public const float RevolutionRadians = DoublePi;
+        public const float HalfRevolutionRadians = Pi;
+        public const float QuarterRevolutionRadians = Pi / 2f;
 
-        public const float HalfRevolutionDegrees = 180f;
         public const float RevolutionDegrees = 360f;
+        public const float HalfRevolutionDegrees = RevolutionDegrees / 2f;
+        public const float QuarterRevolutionDegrees = RevolutionDegrees / 4f;
 
         #endregion
 
         #region Fields
 
-        private static readonly Dictionary<MoveDirection, PointF> s_directionMap =
-            new Dictionary<MoveDirection, PointF>
+        private static readonly Dictionary<MoveDirection, GameAngle?> s_directionMap =
+            new Dictionary<MoveDirection, GameAngle?>
             {
-                { MoveDirection.None, PointF.Empty },
-                { MoveDirection.MoveDown, new PointF(0, 1f) },
-                { MoveDirection.MoveLeft, new PointF(-1f, 0f) },
-                { MoveDirection.MoveRight, new PointF(1f, 0f) },
-                { MoveDirection.MoveUp, new PointF(0f, -1f) }
+                { MoveDirection.None, null },
+                { MoveDirection.MoveForward,  GameAngle.FromDegrees(0f) },
+                { MoveDirection.MoveBackward, GameAngle.FromDegrees(HalfRevolutionDegrees) },
+                { MoveDirection.MoveLeft, GameAngle.FromDegrees(QuarterRevolutionDegrees) },
+                { MoveDirection.MoveRight, GameAngle.FromDegrees(-QuarterRevolutionDegrees) }
             };
 
         #endregion
@@ -123,43 +125,29 @@ namespace SharpestBeak.Common
                 return oldBeakAngle;
             }
 
-            var proxyResult = oldBeakAngle.DegreeValue
-                + timeDelta * GameConstants.StandardBeakAngleSpeed * beakTurnOffset;
-            while (proxyResult > GameHelper.HalfRevolutionDegrees && proxyResult > -GameHelper.HalfRevolutionDegrees)
-            {
-                proxyResult -= GameHelper.RevolutionDegrees;
-            }
-            while (proxyResult <= -GameHelper.HalfRevolutionDegrees && proxyResult <= GameHelper.HalfRevolutionDegrees)
-            {
-                proxyResult += GameHelper.RevolutionDegrees;
-            }
-
-            if (proxyResult > GameHelper.HalfRevolutionDegrees || proxyResult <= -GameHelper.HalfRevolutionDegrees)
-            {
-                throw new InvalidOperationException("Computed angle was not fixed correctly.");
-            }
-
+            var proxyResult = GameAngle.NormalizeDegreeAngle(oldBeakAngle.DegreeValue
+                + timeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed * beakTurnOffset);
             return GameAngle.FromDegrees(proxyResult);
         }
 
-        public static PointF GetNewPosition(PointF oldPosition, GameAngle angle, float speed, float timeDelta)
+        public static PointF GetNewPosition(
+            PointF oldPosition,
+            GameAngle currentAngle,
+            MoveDirection direction,
+            float speed,
+            float timeDelta)
         {
-            var distance = timeDelta * speed;
-            var result = oldPosition
-                + new SizeF(distance * angle.RadianValue.Cos(), distance * angle.RadianValue.Sin());
-            return result;
-        }
-
-        public static PointF GetNewPosition(PointF oldPosition, MoveDirection direction, float speed, float timeDelta)
-        {
-            if (direction == MoveDirection.None)
+            var relativeAngle = s_directionMap[direction];
+            if (relativeAngle == null)
             {
                 return oldPosition;
             }
 
-            var directionVector = s_directionMap[direction];
-            var angle = Atan2(directionVector.Y, directionVector.X);
-            return GetNewPosition(oldPosition, GameAngle.FromRadians(angle), speed, timeDelta);
+            var actualAngle = currentAngle + relativeAngle.Value;
+            var distance = timeDelta * speed;
+            var result = oldPosition
+                + new SizeF(distance * actualAngle.RadianValue.Cos(), distance * actualAngle.RadianValue.Sin());
+            return result;
         }
 
         public static PointF Scale(this PointF value, float coefficient)
@@ -208,15 +196,20 @@ namespace SharpestBeak.Common
             return value > 0 ? positive : negative;
         }
 
-        public static BeakTurn GetBeakTurn(GameAngle currentAngle, float targetAngle)
+        public static BeakTurn GetBeakTurn(GameAngle currentAngle, GameAngle targetAngle)
         {
-            var difference = targetAngle - currentAngle.DegreeValue;
+            var difference = (targetAngle - currentAngle).DegreeValue;
             return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
+        }
+
+        public static float GetDistanceSquared(this PointF value, PointF otherValue)
+        {
+            return ((otherValue.X - value.X).Sqr() + (otherValue.Y - value.Y).Sqr());
         }
 
         public static float GetDistance(this PointF value, PointF otherValue)
         {
-            return ((otherValue.X - value.X).Sqr() + (otherValue.Y - value.Y).Sqr()).Sqrt();
+            return GetDistanceSquared(value, otherValue).Sqrt();
         }
 
         #endregion

@@ -27,7 +27,12 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a chicken unit, in units per second.
             /// </summary>
-            public static readonly float DefaultSpeed = GameConstants.NominalCellSize;
+            public static readonly float DefaultRectilinearSpeed = GameConstants.NominalCellSize;
+
+            /// <summary>
+            ///     Standard beak angle speed of a chicken unit, in degrees per second.
+            /// </summary>
+            public static readonly float DefaultAngularSpeed = GameHelper.RevolutionDegrees / 4f;
 
             #endregion
         }
@@ -45,7 +50,7 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a shot unit, in units per second.
             /// </summary>
-            public static readonly float DefaultSpeed = 2f * GameConstants.ChickenUnit.DefaultSpeed;
+            public static readonly float DefaultSpeed = 2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
 
             public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d);
 
@@ -63,12 +68,6 @@ namespace SharpestBeak.Common
         public static readonly int MinNominalCellCount = 5;
 
         public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
-
-
-        /// <summary>
-        ///     Standard beak angle speed of a chicken unit, in degrees per second.
-        /// </summary>
-        public static readonly float StandardBeakAngleSpeed = GameHelper.RevolutionDegrees / 4f;
 
         public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
 

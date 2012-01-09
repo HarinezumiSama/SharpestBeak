@@ -130,10 +130,11 @@ namespace SharpestBeak.Common
                 while (this.AllChickens.Take(index).Any(
                     item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
 
+                var newAngle = (float)Math.Floor(
+                    GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
+
                 chicken.Position = newPosition;
-                chicken.BeakAngle = GameAngle.FromDegrees(
-                    Math.Floor(
-                        GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle));
+                chicken.BeakAngle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(newAngle));
             }
         }
 
@@ -251,6 +252,7 @@ namespace SharpestBeak.Common
                                 item.Position = GameHelper.GetNewPosition(
                                     item.Position,
                                     item.Angle,
+                                    MoveDirection.MoveForward,
                                     GameConstants.ShotUnit.DefaultSpeed,
                                     timeDelta);
                                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
@@ -306,8 +308,9 @@ namespace SharpestBeak.Common
 
                                 var newPosition = GameHelper.GetNewPosition(
                                     unit.Position,
+                                    unit.BeakAngle,
                                     move.MoveDirection,
-                                    GameConstants.ChickenUnit.DefaultSpeed,
+                                    GameConstants.ChickenUnit.DefaultRectilinearSpeed,
                                     timeDelta);
                                 var newBeakAngle = GameHelper.GetNewBeakAngle(
                                     unit.BeakAngle,
