@@ -101,6 +101,16 @@ namespace SharpestBeak.Common
 
         #region Operators
 
+        public static bool operator ==(GameAngle left, GameAngle right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GameAngle left, GameAngle right)
+        {
+            return !left.Equals(right);
+        }
+
         public static GameAngle operator +(GameAngle value)
         {
             return value;
@@ -137,7 +147,7 @@ namespace SharpestBeak.Common
 
         public bool Equals(GameAngle other)
         {
-            return (this.DegreeValue - other.DegreeValue).IsZero();
+            return this.DegreeValue == other.DegreeValue;
         }
 
         #endregion

@@ -118,13 +118,13 @@ namespace SharpestBeak.Common
             {
                 var chicken = this.AllChickens[index];
 
-                PointF newPosition;
+                GamePoint newPosition;
                 do
                 {
                     var discretePosition = new Point(
                         s_random.Next(this.CommonData.NominalSize.Width),
                         s_random.Next(this.CommonData.NominalSize.Height));
-                    newPosition = new PointF(
+                    newPosition = new GamePoint(
                         GameConstants.NominalCellSize * discretePosition.X + GameConstants.NominalCellSize / 2,
                         GameConstants.NominalCellSize * discretePosition.Y + GameConstants.NominalCellSize / 2);
                 }

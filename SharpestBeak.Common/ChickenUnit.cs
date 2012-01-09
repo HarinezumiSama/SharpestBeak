@@ -68,8 +68,7 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        // TODO: [VM] (??) Create own vector with possibility to cast to/from PointF, SizeF etc.
-        public PointF Position
+        public GamePoint Position
         {
             get;
             internal set;
@@ -113,9 +112,10 @@ namespace SharpestBeak.Common
                 this.BeakAngle);
         }
 
-        public PointF GetBeakTipPosition()
+        public GamePoint GetBeakTipPosition()
         {
-            return new PointF(this.Position.X + GameConstants.ChickenUnit.BeakOffset, this.Position.Y)
+            return this.Position
+                .OffsetX(GameConstants.ChickenUnit.BeakOffset)
                 .Rotate(this.Position, this.BeakAngle);
         }
 

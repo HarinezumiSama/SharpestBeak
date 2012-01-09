@@ -72,6 +72,7 @@
     <Compile Include="ICollidable.cs" />
     <Compile Include="ICollidableElement.cs" />
     <Compile Include="ICollidablePrimitive.cs" />
+    <Compile Include="GamePoint.cs" />
     <Compile Include="MoveInfo.cs" />
     <Compile Include="MoveDirection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         /// <summary>
         ///     Initializes a new instance of the <see cref="CirclePrimitive"/> class.
         /// </summary>
-        public CirclePrimitive(PointF center, float radius)
+        public CirclePrimitive(GamePoint center, float radius)
         {
             #region Argument Check
 
@@ -32,7 +32,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Public Properties
 
-        public PointF Center
+        public GamePoint Center
         {
             get;
             private set;

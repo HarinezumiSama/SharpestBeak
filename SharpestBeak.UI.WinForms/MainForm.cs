@@ -242,7 +242,7 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
-                var uiPosition = chickenUnit.Position.Scale(coefficient);
+                var uiPosition = chickenUnit.Position * coefficient;
 
                 graphics.FillEllipse(
                     Brushes.Green,
@@ -253,18 +253,18 @@ namespace SharpestBeak.UI.WinForms
 
                 var defaultBeakPolygonPoints = new[]
                 {
-                    new PointF(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
-                    new PointF(uiPosition.X + uiBeakOffset, uiPosition.Y),
-                    new PointF(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
+                    new GamePoint(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
+                    new GamePoint(uiPosition.X + uiBeakOffset, uiPosition.Y),
+                    new GamePoint(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
                 };
                 var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, chickenUnit.BeakAngle);
 
-                graphics.FillPolygon(Brushes.Green, beakPolygonPoints, FillMode.Winding);
+                graphics.FillPolygon(Brushes.Green, beakPolygonPoints.ToPointF(), FillMode.Winding);
 
                 var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
                 {
-                    var tp = rcl.TargetPoint.Scale(coefficient);
+                    var tp = rcl.TargetPoint * coefficient;
                     graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
                 }
             }
@@ -272,7 +272,7 @@ namespace SharpestBeak.UI.WinForms
             var uiShotRadius = GameConstants.ShotUnit.Radius * coefficient;
             foreach (var shotUnit in m_lastPresentation.Shots)
             {
-                var uiPosition = shotUnit.Position.Scale(coefficient);
+                var uiPosition = shotUnit.Position * coefficient;
                 graphics.FillEllipse(
                     Brushes.Red,
                     uiPosition.X - uiShotRadius,

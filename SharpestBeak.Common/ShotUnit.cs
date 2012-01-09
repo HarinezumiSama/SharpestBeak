@@ -71,7 +71,7 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public PointF Position
+        public GamePoint Position
         {
             get;
             internal set;

@@ -19,7 +19,7 @@ namespace SharpestBeak.UI.WinForms
         private static readonly Random s_random = new Random();
         private static readonly object s_randomSyncLock = new object();
 
-        private PointF m_targetPoint;
+        private GamePoint m_targetPoint;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace SharpestBeak.UI.WinForms
 
         public RandomChickenLogic()
         {
-            m_targetPoint = new PointF(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
+            m_targetPoint = new GamePoint(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
         }
 
         #endregion
@@ -72,11 +72,11 @@ namespace SharpestBeak.UI.WinForms
                     * (float)GameConstants.LogicPollFrequency.TotalSeconds))
             {
                 // Choosing new target point
-                var point = new Point(
+                var point = new GamePoint(
                     GetNextRandom(state.Data.NominalSize.Width),
                     GetNextRandom(state.Data.NominalSize.Height));
-                m_targetPoint = ((PointF)point).Scale(GameConstants.NominalCellSize)
-                    + new SizeF(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
+                m_targetPoint = point * GameConstants.NominalCellSize
+                    + new GamePoint(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
             }
 
             var move = Tuple.Create(MoveDirection.None, float.MaxValue);
@@ -107,7 +107,7 @@ namespace SharpestBeak.UI.WinForms
         #region Public Properties
 
         // For debug only
-        public PointF TargetPoint
+        public GamePoint TargetPoint
         {
             [DebuggerStepThrough]
             get

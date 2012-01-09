@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         /// <summary>
         ///     Initializes a new instance of the <see cref="TrianglePrimitive"/> class.
         /// </summary>
-        public TrianglePrimitive(PointF first, PointF second, PointF third)
+        public TrianglePrimitive(GamePoint first, GamePoint second, GamePoint third)
         {
             #region Argument Check
 
@@ -35,19 +35,19 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Public Properties
 
-        public PointF First
+        public GamePoint First
         {
             get;
             private set;
         }
 
-        public PointF Second
+        public GamePoint Second
         {
             get;
             private set;
         }
 
-        public PointF Third
+        public GamePoint Third
         {
             get;
             private set;

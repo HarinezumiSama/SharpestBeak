@@ -19,7 +19,7 @@ namespace SharpestBeak.Common.Elements
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotElement"/> class.
         /// </summary>
-        public ShotElement(PointF position)
+        public ShotElement(GamePoint position)
         {
             this.Position = position;
 
@@ -34,7 +34,7 @@ namespace SharpestBeak.Common.Elements
 
         #region Public Properties
 
-        public PointF Position
+        public GamePoint Position
         {
             get;
             private set;
