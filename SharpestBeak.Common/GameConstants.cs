@@ -13,16 +13,21 @@ namespace SharpestBeak.Common
         {
             #region Fields
 
-            public static readonly float BodyCircleRadius = NominalCellSize / 4f;
+            public static readonly float BodyCircleRadius = GameConstants.NominalCellSize / 4f;
 
             /// <summary>
             ///     Length of beak overhang, counting from the body circle.
             /// </summary>
-            public static readonly float BeakOverhang = NominalCellSize / 8f;
+            public static readonly float BeakOverhang = BodyCircleRadius / 2f;
 
             public static readonly float BeakOffset = BodyCircleRadius + BeakOverhang;
 
             public static readonly float BeakRayOffset = BodyCircleRadius / 2f;
+
+            /// <summary>
+            ///     Standard rectilinear speed of a chicken unit, in units per second.
+            /// </summary>
+            public static readonly float DefaultSpeed = GameConstants.NominalCellSize;
 
             #endregion
         }
@@ -40,7 +45,9 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a shot unit, in units per second.
             /// </summary>
-            public static readonly float StandardSpeed = 2f * GameConstants.StandardMoveSpeed;
+            public static readonly float DefaultSpeed = 2f * GameConstants.ChickenUnit.DefaultSpeed;
+
+            public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d);
 
             #endregion
         }
@@ -57,12 +64,6 @@ namespace SharpestBeak.Common
 
         public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
 
-        public static readonly TimeSpan ShotFrequency = TimeSpan.FromMilliseconds(500d);
-
-        /// <summary>
-        ///     Standard rectilinear speed of a chicken unit, in units per second.
-        /// </summary>
-        public static readonly float StandardMoveSpeed = NominalCellSize;
 
         /// <summary>
         ///     Standard beak angle speed of a chicken unit, in degrees per second.

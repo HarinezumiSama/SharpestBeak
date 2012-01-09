@@ -280,7 +280,11 @@ namespace SharpestBeak.Common
                         this.ShotUnitsDirect.DoForEach(
                             item =>
                             {
-                                item.Position = GameHelper.GetNewPosition(item.Position, item.Angle, timeDelta);
+                                item.Position = GameHelper.GetNewPosition(
+                                    item.Position,
+                                    item.Angle,
+                                    GameConstants.ShotUnit.DefaultSpeed,
+                                    timeDelta);
                                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
 
                                 if (item.Position.X < -GameConstants.ShotUnit.Radius
@@ -307,7 +311,7 @@ namespace SharpestBeak.Common
                                 // Is there any active shot unit from the same chicken unit?
                                 if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
                                 {
-                                    if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotFrequency)
+                                    if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
                                     {
                                         DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
                                         return;
@@ -335,6 +339,7 @@ namespace SharpestBeak.Common
                                 var newPosition = GameHelper.GetNewPosition(
                                     unit.Position,
                                     move.MoveDirection,
+                                    GameConstants.ChickenUnit.DefaultSpeed,
                                     timeDelta);
                                 var newBeakAngle = GameHelper.GetNewBeakAngle(
                                     unit.BeakAngle,

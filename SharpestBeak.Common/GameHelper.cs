@@ -142,28 +142,15 @@ namespace SharpestBeak.Common
             return GameAngle.FromDegrees(proxyResult);
         }
 
-        public static PointF GetNewPosition(PointF oldPosition, GameAngle angle, float timeDelta)
+        public static PointF GetNewPosition(PointF oldPosition, GameAngle angle, float speed, float timeDelta)
         {
-            var moveStep = timeDelta * GameConstants.StandardMoveSpeed;
+            var distance = timeDelta * speed;
             var result = oldPosition
-                + new SizeF(moveStep * angle.RadianValue.Cos(), moveStep * angle.RadianValue.Sin());
+                + new SizeF(distance * angle.RadianValue.Cos(), distance * angle.RadianValue.Sin());
             return result;
         }
 
-        public static PointF GetNewPosition(PointF oldPosition, PointF directionVector, float timeDelta)
-        {
-            if (directionVector == PointF.Empty)
-            {
-                return oldPosition;
-            }
-
-            var moveAngle = Atan2(directionVector.Y, directionVector.X);
-            var moveStep = timeDelta * GameConstants.StandardMoveSpeed;
-            var result = oldPosition + new SizeF(moveStep * moveAngle.Cos(), moveStep * moveAngle.Sin());
-            return result;
-        }
-
-        public static PointF GetNewPosition(PointF oldPosition, MoveDirection direction, float timeDelta)
+        public static PointF GetNewPosition(PointF oldPosition, MoveDirection direction, float speed, float timeDelta)
         {
             if (direction == MoveDirection.None)
             {
@@ -171,7 +158,8 @@ namespace SharpestBeak.Common
             }
 
             var directionVector = s_directionMap[direction];
-            return GetNewPosition(oldPosition, directionVector, timeDelta);
+            var angle = Atan2(directionVector.Y, directionVector.X);
+            return GetNewPosition(oldPosition, GameAngle.FromRadians(angle), speed, timeDelta);
         }
 
         public static PointF Scale(this PointF value, float coefficient)

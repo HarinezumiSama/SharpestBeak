@@ -23,8 +23,13 @@ namespace SharpestBeak.UI.WinForms
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
 
+        private readonly GameEngine m_gameEngine;
         private GamePresentation m_lastPresentation;
-        private ulong m_paintCount;
+        private ulong m_totalPaintCount;
+
+        private float m_fps;
+        private int m_fpsPaintCount;
+        private readonly Stopwatch m_fpsStopwatch = new Stopwatch();
 
         #endregion
 
@@ -33,22 +38,22 @@ namespace SharpestBeak.UI.WinForms
         public MainForm()
         {
             InitializeComponent();
+
+            m_gameEngine = new GameEngine(
+                this.PaintGame,
+                new Size(5, 5),
+                Enumerable.Range(1, 2).Select(item => typeof(RandomChickenLogic)));
         }
 
         #endregion
 
         #region Private Methods
 
-        private bool InitializeGameEngine()
+        private bool InitializeGameUI()
         {
             try
             {
-                this.GameEngine = new GameEngine(
-                    this.PaintGame,
-                    new Size(5, 5),
-                    Enumerable.Range(1, 2).Select(item => typeof(RandomChickenLogic)));
-
-                var boardSize = this.GameEngine.CommonData.NominalSize;
+                var boardSize = m_gameEngine.CommonData.NominalSize;
                 var boxSize = new Size(
                     boardSize.Width * s_cellSize + 1,
                     boardSize.Height * s_cellSize + 1);
@@ -59,7 +64,7 @@ namespace SharpestBeak.UI.WinForms
                 ClearStatusLabels();
                 UpdateMoveCountStatus();
 
-                this.GameEngine.CallPaint();
+                m_gameEngine.CallPaint();
             }
             catch (Exception ex)
             {
@@ -84,7 +89,7 @@ namespace SharpestBeak.UI.WinForms
         {
             m_lastPresentation = e.Presentation;
 
-            if (this.GameEngine.MoveCount % 25 == 0)
+            if (m_gameEngine.MoveCount % 25 == 0)
             {
                 UpdateMoveCountStatus();
             }
@@ -93,13 +98,13 @@ namespace SharpestBeak.UI.WinForms
 
         private void UpdateMoveCountStatus()
         {
-            turnInfoLabel.Text = string.Format("Move count: {0}", this.GameEngine.MoveCount);
+            turnInfoLabel.Text = string.Format("Move count: {0}", m_gameEngine.MoveCount);
             turnInfoLabel.Invalidate();
         }
 
         private void ClearStatusLabels()
         {
-            statusLabel.Text = string.Empty;
+            fpsLabel.Text = string.Empty;
             turnInfoLabel.Text = string.Empty;
         }
 
@@ -111,22 +116,41 @@ namespace SharpestBeak.UI.WinForms
             }
         }
 
+        private void ResetFpsCounter(bool fullReset)
+        {
+            if (fullReset)
+            {
+                m_fps = -1f;
+            }
+            m_fpsPaintCount = 0;
+            m_fpsStopwatch.Restart();
+        }
+
         private void StartGame()
         {
-            if (!this.GameEngine.IsRunning)
+            if (m_gameEngine.IsRunning)
             {
-                m_paintCount = 0;
-                this.GameEngine.Start();
-                UpdateMoveCountStatus();
+                return;
             }
+
+            m_totalPaintCount = 0;
+            ResetFpsCounter(true);
+            m_gameEngine.Start();
+            UpdateMoveCountStatus();
+            fpsTimer.Enabled = true;
         }
 
         private void StopGame()
         {
-            if (this.GameEngine.IsRunning)
+            if (!m_gameEngine.IsRunning)
             {
-                this.GameEngine.Stop();
+                return;
             }
+
+            fpsTimer.Enabled = false;
+            m_gameEngine.Stop();
+            m_fpsStopwatch.Stop();
+            fpsLabel.Text = string.Empty;
         }
 
         #endregion
@@ -138,7 +162,7 @@ namespace SharpestBeak.UI.WinForms
             base.OnLoad(e);
 
             ClearStatusLabels();
-            if (!InitializeGameEngine())
+            if (!InitializeGameUI())
             {
                 Application.Exit();
                 return;
@@ -163,7 +187,7 @@ namespace SharpestBeak.UI.WinForms
                     break;
 
                 case Keys.F5:
-                    if (this.GameEngine.IsRunning)
+                    if (m_gameEngine.IsRunning)
                     {
                         StopGame();
                     }
@@ -175,20 +199,10 @@ namespace SharpestBeak.UI.WinForms
 
                 case Keys.F8:
                     StopGame();
-                    this.GameEngine.Reset();
-                    this.GameEngine.CallPaint();
+                    m_gameEngine.Reset();
+                    m_gameEngine.CallPaint();
                     break;
             }
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public GameEngine GameEngine
-        {
-            get;
-            private set;
         }
 
         #endregion
@@ -267,7 +281,15 @@ namespace SharpestBeak.UI.WinForms
                     2f * uiShotRadius);
             }
 
-            m_paintCount++;
+            m_totalPaintCount++;
+            m_fpsPaintCount++;
+
+            var fpsElapsedSeconds = m_fpsStopwatch.Elapsed.TotalSeconds;
+            if (fpsElapsedSeconds >= 1d)
+            {
+                m_fps = (float)(m_fpsPaintCount / fpsElapsedSeconds);
+                ResetFpsCounter(false);
+            }
         }
 
         private void pbGame_MouseClick(object sender, MouseEventArgs e)
@@ -275,7 +297,7 @@ namespace SharpestBeak.UI.WinForms
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    if (this.GameEngine.IsRunning)
+                    if (m_gameEngine.IsRunning)
                     {
                         StopGame();
                     }
@@ -284,6 +306,14 @@ namespace SharpestBeak.UI.WinForms
                         StartGame();
                     }
                     break;
+            }
+        }
+
+        private void fpsTimer_Tick(object sender, EventArgs e)
+        {
+            if (m_fps >= 0f)
+            {
+                fpsLabel.Text = string.Format("{0:N1} FPS", m_fps);
             }
         }
 

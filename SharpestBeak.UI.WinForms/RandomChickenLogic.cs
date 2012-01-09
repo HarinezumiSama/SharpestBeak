@@ -68,7 +68,7 @@ namespace SharpestBeak.UI.WinForms
         protected override MoveInfo OnMakeMove(GameState state)
         {
             if (this.Unit.Position.GetDistance(m_targetPoint)
-                .IsZero(GameConstants.StandardMoveSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
+                .IsZero(GameConstants.ChickenUnit.DefaultSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
             {
                 // Choosing new target point
                 var point = new Point(
