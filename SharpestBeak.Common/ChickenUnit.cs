@@ -5,9 +5,9 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Elements;
 
-namespace SharpestBeak.Common.Elements
+namespace SharpestBeak.Common
 {
     public sealed class ChickenUnit
     {

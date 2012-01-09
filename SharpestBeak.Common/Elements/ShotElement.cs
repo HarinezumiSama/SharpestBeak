@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using SharpestBeak.Common.Elements.Primitives;
 
-namespace SharpestBeak.Common.Elements.Primitives
+namespace SharpestBeak.Common.Elements
 {
     public sealed class ShotElement : ICollidableElement
     {
