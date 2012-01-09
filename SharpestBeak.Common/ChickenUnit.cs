@@ -31,6 +31,7 @@ namespace SharpestBeak.Common
             #endregion
 
             this.Logic = logic;
+            this.ShotTimer = new Stopwatch();
             logic.Unit = this;
         }
 
@@ -42,6 +43,12 @@ namespace SharpestBeak.Common
         {
             get;
             set;
+        }
+
+        internal Stopwatch ShotTimer
+        {
+            get;
+            private set;
         }
 
         #endregion
@@ -67,7 +74,7 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        public float BeakAngle
+        public GameAngle BeakAngle
         {
             get;
             internal set;
@@ -98,11 +105,17 @@ namespace SharpestBeak.Common
         public override string ToString()
         {
             return string.Format(
-                "[#{0} : {1}] Position = {2}, KillCount = {3}",
+                "[#{0} : {1}] Position = {2}, BeakAngle = {3:D}",
                 this.UniqueIndex,
                 this.GetType().Name,
                 this.Position,
-                this.KillCount);
+                this.BeakAngle);
+        }
+
+        public PointF GetBeakTipPosition()
+        {
+            return new PointF(this.Position.X + GameConstants.ChickenUnit.BeakOffset, this.Position.Y)
+                .Rotate(this.Position, this.BeakAngle);
         }
 
         #endregion

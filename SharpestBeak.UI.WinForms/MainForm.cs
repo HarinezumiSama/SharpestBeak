@@ -23,6 +23,9 @@ namespace SharpestBeak.UI.WinForms
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
 
+        private GamePresentation m_lastPresentation;
+        private ulong m_paintCount;
+
         #endregion
 
         #region Constructors
@@ -56,7 +59,7 @@ namespace SharpestBeak.UI.WinForms
                 ClearStatusLabels();
                 UpdateMoveCountStatus();
 
-                PaintGame(null);  // TODO
+                this.GameEngine.CallPaint();
             }
             catch (Exception ex)
             {
@@ -79,6 +82,8 @@ namespace SharpestBeak.UI.WinForms
 
         private void PaintGame(GamePaintEventArgs e)
         {
+            m_lastPresentation = e.Presentation;
+
             if (this.GameEngine.MoveCount % 25 == 0)
             {
                 UpdateMoveCountStatus();
@@ -110,6 +115,7 @@ namespace SharpestBeak.UI.WinForms
         {
             if (!this.GameEngine.IsRunning)
             {
+                m_paintCount = 0;
                 this.GameEngine.Start();
                 UpdateMoveCountStatus();
             }
@@ -170,7 +176,7 @@ namespace SharpestBeak.UI.WinForms
                 case Keys.F8:
                     StopGame();
                     this.GameEngine.Reset();
-                    PaintGame(null); // TODO
+                    this.GameEngine.CallPaint();
                     break;
             }
         }
@@ -191,7 +197,12 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_Paint(object sender, PaintEventArgs e)
         {
-            var size = this.GameEngine.CommonData.NominalSize;
+            if (m_lastPresentation == null)
+            {
+                return;
+            }
+
+            var size = m_lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
 
             // Drawing grid (for debug only... probably)
@@ -203,49 +214,60 @@ namespace SharpestBeak.UI.WinForms
                     var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
                     ControlPaint.DrawFocusRectangle(graphics, cellRect);
 
-                    Brush backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
-
-                    if (backBrush != null)
-                    {
-                        var backRect = cellRect;
-                        backRect.Inflate(-1, -1);
-                        graphics.FillRectangle(backBrush, backRect);
-                    }
+                    var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
+                    var backRect = cellRect;
+                    backRect.Inflate(-1, -1);
+                    graphics.FillRectangle(backBrush, backRect);
                 }
             }
 
-            foreach (var unit in this.GameEngine.AliveChickens)
+            var coefficient = (float)s_cellSize / GameConstants.NominalCellSize;
+            var uiChickenBodyRadius = GameConstants.ChickenUnit.BodyCircleRadius * coefficient;
+            var uiBeakOffset = GameConstants.ChickenUnit.BeakOffset * coefficient;
+            var uiBeakRayOffset = GameConstants.ChickenUnit.BeakRayOffset * coefficient;
+
+            foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
-                var coefficient = (float)s_cellSize / GameConstants.LargeCellSize;
-                var uiPosition = unit.Position.Scale(coefficient);
-                var uiRadius = GameConstants.ChickenUnit.BodyCircleRadius * coefficient;
+                var uiPosition = chickenUnit.Position.Scale(coefficient);
 
                 graphics.FillEllipse(
                     Brushes.Green,
-                    uiPosition.X - uiRadius,
-                    uiPosition.Y - uiRadius,
-                    2 * uiRadius,
-                    2 * uiRadius);
+                    uiPosition.X - uiChickenBodyRadius,
+                    uiPosition.Y - uiChickenBodyRadius,
+                    2f * uiChickenBodyRadius,
+                    2f * uiChickenBodyRadius);
 
-                var uiBeakOffset = GameConstants.ChickenUnit.BeakOffset * coefficient;
-                var uiBeakRayOffset = GameConstants.ChickenUnit.BeakRayOffset * coefficient;
                 var defaultBeakPolygonPoints = new[]
                 {
                     new PointF(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
                     new PointF(uiPosition.X + uiBeakOffset, uiPosition.Y),
                     new PointF(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
                 };
-                var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, unit.BeakAngle);
+                var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, chickenUnit.BeakAngle);
 
                 graphics.FillPolygon(Brushes.Green, beakPolygonPoints, FillMode.Winding);
 
-                var rcl = unit.Logic as RandomChickenLogic;
+                var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
                 {
                     var tp = rcl.TargetPoint.Scale(coefficient);
                     graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
                 }
             }
+
+            var uiShotRadius = GameConstants.ShotUnit.Radius * coefficient;
+            foreach (var shotUnit in m_lastPresentation.Shots)
+            {
+                var uiPosition = shotUnit.Position.Scale(coefficient);
+                graphics.FillEllipse(
+                    Brushes.Red,
+                    uiPosition.X - uiShotRadius,
+                    uiPosition.Y - uiShotRadius,
+                    2f * uiShotRadius,
+                    2f * uiShotRadius);
+            }
+
+            m_paintCount++;
         }
 
         private void pbGame_MouseClick(object sender, MouseEventArgs e)

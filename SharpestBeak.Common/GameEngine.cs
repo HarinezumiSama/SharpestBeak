@@ -104,7 +104,10 @@ namespace SharpestBeak.Common
         {
             var logic = (ChickenUnitLogic)Activator.CreateInstance(item);
 
-            var result = new ChickenUnit(logic) { UniqueIndex = index + 1 };
+            var result = new ChickenUnit(logic)
+            {
+                UniqueIndex = index + 1
+            };
             return result;
         }
 
@@ -121,15 +124,16 @@ namespace SharpestBeak.Common
                         s_random.Next(this.CommonData.NominalSize.Width),
                         s_random.Next(this.CommonData.NominalSize.Height));
                     newPosition = new PointF(
-                        GameConstants.LargeCellSize * discretePosition.X + GameConstants.LargeCellSize / 2,
-                        GameConstants.LargeCellSize * discretePosition.Y + GameConstants.LargeCellSize / 2);
+                        GameConstants.NominalCellSize * discretePosition.X + GameConstants.NominalCellSize / 2,
+                        GameConstants.NominalCellSize * discretePosition.Y + GameConstants.NominalCellSize / 2);
                 }
                 while (this.AllChickens.Take(index).Any(
-                    item => item.Position.GetDistance(newPosition) < GameConstants.LargeCellSize));
+                    item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
 
                 chicken.Position = newPosition;
-                chicken.BeakAngle = (float)Math.Floor(
-                    GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
+                chicken.BeakAngle = GameAngle.FromDegrees(
+                    Math.Floor(
+                        GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle));
             }
         }
 
@@ -175,6 +179,7 @@ namespace SharpestBeak.Common
                     };
                     item.Logic.Initialize();
                 });
+            this.ShotUnitsDirect.Clear();
 
             m_stopEvent.Reset();
             CallPaintCallback();
@@ -259,48 +264,96 @@ namespace SharpestBeak.Common
                 var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
                 sw.Restart();
 
-                // TODO: Check logic error and report it somehow
-
-                var newMoves = this.AliveChickens
-                    .Where(item => item.Logic.Error == null)
-                    .Select(item => EngineMoveInfo.Create(item))
-                    .Where(item => item != null)
-                    .ToList();
-
-                newMoves
-                    .Where(item => item.FireMode != FireMode.None)
-                    .DoForEach(item => this.ShotUnitsDirect.Add(new ShotUnit(item.Unit)));
-
-                if (previousMoves != null && timeDelta > 0f)
-                {
-                    foreach (var move in previousMoves)
+                m_syncLock.ExecuteInWriteLock(
+                    () =>
                     {
-                        if (IsStopping())
+                        // TODO: Check logic error and report it somehow
+
+                        var newMoves = this.AliveChickens
+                            .Where(item => item.Logic.Error == null)
+                            .Select(item => EngineMoveInfo.Create(item))
+                            .Where(item => item != null)
+                            .ToList();
+
+                        // Processing existing shot units
+                        var explodedShotUnits = new List<ShotUnit>();
+                        this.ShotUnitsDirect.DoForEach(
+                            item =>
+                            {
+                                item.Position = GameHelper.GetNewPosition(item.Position, item.Angle, timeDelta);
+                                DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
+
+                                if (item.Position.X < -GameConstants.ShotUnit.Radius
+                                    || item.Position.X > this.CommonData.RealSize.Width
+                                        + GameConstants.ShotUnit.Radius
+                                    || item.Position.Y < -GameConstants.ShotUnit.Radius
+                                    || item.Position.Y > this.CommonData.RealSize.Height
+                                        + GameConstants.ShotUnit.Radius)
+                                {
+                                    item.Exploded = true;
+                                    explodedShotUnits.Add(item);
+
+                                    DebugHelper.WriteLine("Shot {{{0}}} has exploded.", item);
+                                }
+                            });
+
+                        this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+
+                        // Processing new shot units
+                        var shootingMoves = newMoves.Where(item => item.FireMode != FireMode.None).ToArray();
+                        shootingMoves.DoForEach(
+                            item =>
+                            {
+                                // Is there any active shot unit from the same chicken unit?
+                                if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
+                                {
+                                    if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotFrequency)
+                                    {
+                                        DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
+                                        return;
+                                    }
+                                }
+
+                                var shot = new ShotUnit(item.Unit);
+                                this.ShotUnitsDirect.Add(shot);
+                                item.Unit.ShotTimer.Restart();
+
+                                DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
+                            });
+
+                        if (previousMoves != null && timeDelta > 0f)
                         {
-                            return;
+                            foreach (var move in previousMoves)
+                            {
+                                if (IsStopping())
+                                {
+                                    return;
+                                }
+
+                                var unit = move.Unit;
+
+                                var newPosition = GameHelper.GetNewPosition(
+                                    unit.Position,
+                                    move.MoveDirection,
+                                    timeDelta);
+                                var newBeakAngle = GameHelper.GetNewBeakAngle(
+                                    unit.BeakAngle,
+                                    move.BeakTurn,
+                                    timeDelta);
+
+                                // TODO: [VM] Check collisions
+
+                                unit.Position = newPosition;
+                                unit.BeakAngle = newBeakAngle;
+
+                                DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
+                            }
+
+                            // TODO: Check deaths etc.
                         }
 
-                        var unit = move.Unit;
-
-                        var newPosition = GameHelper.GetNewPosition(
-                            unit.Position,
-                            move.MoveDirection,
-                            timeDelta);
-                        var newBeakAngle = GameHelper.GetNewBeakAngle(
-                            unit.BeakAngle,
-                            move.BeakTurn,
-                            timeDelta);
-
-                        // TODO: [VM] Check collisions
-
-                        unit.Position = newPosition;
-                        unit.BeakAngle = newBeakAngle;
-                    }
-
-                    // TODO: Check deaths etc.
-                }
-
-                previousMoves = newMoves;
+                        previousMoves = newMoves;
+                    });
 
                 if (IsStopping())
                 {
@@ -354,8 +407,7 @@ namespace SharpestBeak.Common
 
         private GamePresentation GetPresentation()
         {
-            // TODO: implement
-            return new GamePresentation();
+            return m_syncLock.ExecuteInReadLock(() => new GamePresentation(this));
         }
 
         #endregion
@@ -405,9 +457,15 @@ namespace SharpestBeak.Common
         public ulong MoveCount
         {
             [DebuggerNonUserCode]
-            get { return m_moveCount.Value; }
+            get
+            {
+                return m_moveCount.Value;
+            }
             [DebuggerNonUserCode]
-            private set { m_moveCount.Value = value; }
+            private set
+            {
+                m_moveCount.Value = value;
+            }
         }
 
         public bool IsRunning
@@ -441,6 +499,11 @@ namespace SharpestBeak.Common
             }
 
             m_syncLock.ExecuteInWriteLock(this.ResetInternal);
+        }
+
+        public void CallPaint()
+        {
+            CallPaintCallback();
         }
 
         #endregion

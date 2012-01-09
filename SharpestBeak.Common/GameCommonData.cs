@@ -17,8 +17,8 @@ namespace SharpestBeak.Common
         {
             this.NominalSize = size;
             this.RealSize = new SizeF(
-                GameConstants.LargeCellSize * size.Width,
-                GameConstants.LargeCellSize * size.Height);
+                GameConstants.NominalCellSize * size.Width,
+                GameConstants.NominalCellSize * size.Height);
         }
 
         #endregion

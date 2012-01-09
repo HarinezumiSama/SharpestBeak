@@ -20,6 +20,11 @@ namespace SharpestBeak.Common
             }
         }
 
+        public static string ToFixedString(this DateTime value)
+        {
+            return value.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        }
+
         #endregion
     }
 }

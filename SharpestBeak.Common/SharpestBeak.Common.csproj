@@ -49,9 +49,11 @@
     <Compile Include="BeakTurn.cs" />
     <Compile Include="ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
+    <Compile Include="DebugHelper.cs" />
     <Compile Include="EngineMoveInfo.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FireMode.cs" />
+    <Compile Include="GameAngle.cs" />
     <Compile Include="GameCommonData.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameEngine.cs" />

@@ -27,7 +27,7 @@ namespace SharpestBeak.UI.WinForms
 
         public RandomChickenLogic()
         {
-            m_targetPoint = new PointF(-GameConstants.LargeCellSize, -GameConstants.LargeCellSize);
+            m_targetPoint = new PointF(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
         }
 
         #endregion
@@ -68,14 +68,14 @@ namespace SharpestBeak.UI.WinForms
         protected override MoveInfo OnMakeMove(GameState state)
         {
             if (this.Unit.Position.GetDistance(m_targetPoint)
-                .IsZero(GameConstants.NominalMoveSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
+                .IsZero(GameConstants.StandardMoveSpeed * (float)GameConstants.LogicPollFrequency.TotalSeconds))
             {
                 // Choosing new target point
                 var point = new Point(
                     GetNextRandom(state.Data.NominalSize.Width),
                     GetNextRandom(state.Data.NominalSize.Height));
-                m_targetPoint = ((PointF)point).Scale(GameConstants.LargeCellSize)
-                    + new SizeF(GameConstants.LargeCellSize / 2f, GameConstants.LargeCellSize / 2f);
+                m_targetPoint = ((PointF)point).Scale(GameConstants.NominalCellSize)
+                    + new SizeF(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
             }
 
             var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
@@ -86,7 +86,7 @@ namespace SharpestBeak.UI.WinForms
             var targetAngle = GameHelper.ToDegrees((float)Math.Atan2(targetOffset.Y, targetOffset.X));
             var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
 
-            return new MoveInfo(move, turn, ChooseRandomValue(s_fireModes));
+            return new MoveInfo(move, turn, GetNextRandom(10) > 7 ? FireMode.Single : FireMode.None);
         }
 
         #endregion
@@ -97,7 +97,10 @@ namespace SharpestBeak.UI.WinForms
         public PointF TargetPoint
         {
             [DebuggerStepThrough]
-            get { return m_targetPoint; }
+            get
+            {
+                return m_targetPoint;
+            }
         }
 
         #endregion
