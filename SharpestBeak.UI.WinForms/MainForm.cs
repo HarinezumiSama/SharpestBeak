@@ -235,7 +235,7 @@ namespace SharpestBeak.UI.WinForms
                     new PointF(uiPosition.X + uiBeakOffset, uiPosition.Y),
                     new PointF(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
                 };
-                var beakPolygonPoints = defaultBeakPolygonPoints.RotatePoints(uiPosition, unit.BeakAngle);
+                var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, unit.BeakAngle);
 
                 graphics.FillPolygon(Brushes.Green, beakPolygonPoints, FillMode.Winding);
 

@@ -39,18 +39,18 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
-        private static void PrepareRotate(float degreeAngle, out double cos, out double sin)
+        private static void PrepareRotate(float degreeAngle, out float cos, out float sin)
         {
-            var degree = ToRadians(degreeAngle);
-            cos = Math.Cos(degree);
-            sin = Math.Sin(degree);
+            var angle = ToRadians(degreeAngle);
+            cos = angle.Cos();
+            sin = angle.Sin();
         }
 
-        private static PointF RotatePointInternal(PointF value, PointF center, double cos, double sin)
+        private static PointF RotatePointInternal(PointF value, PointF center, float cos, float sin)
         {
             var newX = center.X + (value.X - center.X) * cos - (value.Y - center.Y) * sin;
             var newY = center.Y + (value.X - center.X) * sin + (value.Y - center.Y) * cos;
-            return new PointF((float)newX, (float)newY);
+            return new PointF(newX, newY);
         }
 
         #endregion
@@ -75,6 +75,31 @@ namespace SharpestBeak.Common
             }
 
             return angle;
+        }
+
+        public static float Cos(this float value)
+        {
+            return (float)Math.Cos(value);
+        }
+
+        public static float Sin(this float value)
+        {
+            return (float)Math.Sin(value);
+        }
+
+        public static float Atan2(float y, float x)
+        {
+            return (float)Math.Atan2(y, x);
+        }
+
+        public static float Sqr(this float value)
+        {
+            return value * value;
+        }
+
+        public static float Sqrt(this float value)
+        {
+            return (float)Math.Sqrt(value);
         }
 
         public static float GetNewBeakAngle(float oldBeakAngle, BeakTurn beakTurn, float timeDelta)
@@ -126,10 +151,9 @@ namespace SharpestBeak.Common
                 return oldPosition;
             }
 
-            var moveAngle = Math.Atan2(directionVector.Y, directionVector.X);
+            var moveAngle = Atan2(directionVector.Y, directionVector.X);
             var moveStep = timeDelta * GameConstants.NominalMoveSpeed;
-            var result = oldPosition
-                + new SizeF((float)(moveStep * Math.Cos(moveAngle)), (float)(moveStep * Math.Sin(moveAngle)));
+            var result = oldPosition + new SizeF(moveStep * moveAngle.Cos(), moveStep * moveAngle.Sin());
             return result;
         }
 
@@ -149,29 +173,27 @@ namespace SharpestBeak.Common
             return new PointF(value.X * coefficient, value.Y * coefficient);
         }
 
-        public static float ToRadians(float degreeAngle)
+        public static float ToRadians(this float degreeAngle)
         {
             return degreeAngle / HalfRevolutionDegrees * Pi;
         }
 
-        public static float ToDegrees(float radianAngle)
+        public static float ToDegrees(this float radianAngle)
         {
             return radianAngle / Pi * HalfRevolutionDegrees;
         }
 
-        public static PointF RotatePoint(this PointF value, PointF center, float degreeAngle)
+        public static PointF Rotate(this PointF value, PointF center, float degreeAngle)
         {
-            double cos;
-            double sin;
+            float cos, sin;
             PrepareRotate(degreeAngle, out cos, out sin);
 
             return RotatePointInternal(value, center, cos, sin);
         }
 
-        public static PointF[] RotatePoints(this IEnumerable<PointF> values, PointF center, float degreeAngle)
+        public static PointF[] Rotate(this IEnumerable<PointF> values, PointF center, float degreeAngle)
         {
-            double cos;
-            double sin;
+            float cos, sin;
             PrepareRotate(degreeAngle, out cos, out sin);
 
             return values.Select(value => RotatePointInternal(value, center, cos, sin)).ToArray();
@@ -198,14 +220,9 @@ namespace SharpestBeak.Common
             return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
         }
 
-        public static float Sqr(this float value)
-        {
-            return value * value;
-        }
-
         public static float GetDistance(this PointF value, PointF otherValue)
         {
-            return (float)Math.Sqrt(Sqr(otherValue.X - value.X) + Sqr(otherValue.Y - value.Y));
+            return ((otherValue.X - value.X).Sqr() + (otherValue.Y - value.Y).Sqr()).Sqrt();
         }
 
         #endregion
