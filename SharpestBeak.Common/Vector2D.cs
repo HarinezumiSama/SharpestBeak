@@ -96,6 +96,12 @@ namespace SharpestBeak.Common
             return left.X * right.X + left.Y * right.Y;
         }
 
+        // Returns Z component of resulting Vector3D(0, 0, Z)
+        public static float CrossProduct(Vector2D left, Vector2D right)
+        {
+            return left.X * right.Y - left.Y * right.X;
+        }
+
         public override int GetHashCode()
         {
             return m_x.GetHashCode() ^ m_y.GetHashCode();
@@ -163,7 +169,7 @@ namespace SharpestBeak.Common
 
         public Vector2D GetNormal()
         {
-            return new Vector2D(-m_y, m_x);
+            return new Vector2D(m_y, -m_x);
         }
 
         public Vector2D Normalize()
@@ -239,6 +245,11 @@ namespace SharpestBeak.Common
         public static float operator *(Vector2D left, Vector2D right)
         {
             return DotProduct(left, right);
+        }
+
+        public static float operator ^(Vector2D left, Vector2D right)
+        {
+            return CrossProduct(left, right);
         }
 
         public static implicit operator Vector2D(Point value)

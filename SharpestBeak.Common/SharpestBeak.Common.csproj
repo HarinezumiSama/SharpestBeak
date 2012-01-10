@@ -50,6 +50,7 @@
     <Compile Include="ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
     <Compile Include="CollisionDetector.cs" />
+    <Compile Include="Elements\Primitives\ConvexState.cs" />
     <Compile Include="Vector2D.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="Elements\ChickenElement.cs" />

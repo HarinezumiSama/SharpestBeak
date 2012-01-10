@@ -8,6 +8,12 @@ namespace SharpestBeak.Common.Elements.Primitives
 {
     public sealed class PolygonPrimitive : ICollidablePrimitive
     {
+        #region Fields
+
+        private ConvexState? m_convexState;
+
+        #endregion
+
         #region Nested Types
 
         #region ConvexSign Enumeration
@@ -50,21 +56,84 @@ namespace SharpestBeak.Common.Elements.Primitives
             #endregion
 
             this.Vertices = vertices.ToList().AsReadOnly();
-            this.VertexCount = this.Vertices.Count;
+            this.Count = this.Vertices.Count;
 
             #region Argument Check
 
-            if (this.VertexCount < c_minVertexCount)
+            if (this.Count < c_minVertexCount)
             {
                 throw new ArgumentException(
                     string.Format(
                         "The number of vertices in the polygon must be at least {0} while is {1}.",
                         c_minVertexCount,
-                        this.VertexCount),
+                        this.Count),
                     "vertices");
             }
 
             #endregion
+
+            this.Edges = GetEdges(this.Vertices);
+        }
+
+        private IList<Vector2D> GetEdges(IList<Point2D> vertices)
+        {
+            var count = vertices.Count;
+            var resultProxy = new List<Vector2D>(count);
+            var currentPoint = this.Vertices[0];
+            for (int nextIndex = 1; nextIndex <= count; nextIndex++)
+            {
+                var nextPoint = nextIndex < count ? vertices[nextIndex] : vertices[0];
+                resultProxy.Add(nextPoint - currentPoint);
+                currentPoint = nextPoint;
+            }
+            if (resultProxy.Count != count)
+            {
+                throw new InvalidOperationException();
+            }
+            return resultProxy.AsReadOnly();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private ConvexState GetConvexStateInternal()
+        {
+            ConvexSign sign = ConvexSign.None;
+            for (int index = 0; index < this.Count; index++)
+            {
+                var nextIndex = (index + 1) % this.Count;
+
+                var edge1 = this.Edges[index];
+                var edge2 = this.Edges[nextIndex];
+
+                var z = edge1 ^ edge2;
+                if (z.IsPositive())
+                {
+                    sign |= ConvexSign.Positive;
+                }
+                else if (z.IsNegative())
+                {
+                    sign |= ConvexSign.Negative;
+                }
+
+                if ((sign & ConvexSign.Both) == ConvexSign.Both)
+                {
+                    return ConvexState.Concave;
+                }
+            }
+
+            switch (sign)
+            {
+                case ConvexSign.None:
+                    return ConvexState.Undefined;
+                case ConvexSign.Positive:
+                    return ConvexState.ConvexCounterClockwise;
+                case ConvexSign.Negative:
+                    return ConvexState.ConvexClockwise;
+            }
+
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -77,7 +146,13 @@ namespace SharpestBeak.Common.Elements.Primitives
             private set;
         }
 
-        public int VertexCount
+        public IList<Vector2D> Edges
+        {
+            get;
+            private set;
+        }
+
+        public int Count
         {
             get;
             private set;
@@ -87,35 +162,19 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Public Methods
 
+        public ConvexState GetConvexState()
+        {
+            if (!m_convexState.HasValue)
+            {
+                m_convexState = GetConvexStateInternal();
+            }
+            return m_convexState.Value;
+        }
+
         public bool IsConvex()
         {
-            ConvexSign sign = ConvexSign.None;
-
-            for (int index = 0; index < this.VertexCount; index++)
-            {
-                var index1 = (index + 1) % this.VertexCount;
-                var index2 = (index + 2) % this.VertexCount;
-
-                var edge1 = this.Vertices[index1] - this.Vertices[index];
-                var edge2 = this.Vertices[index2] - this.Vertices[index1];
-
-                var z = edge1.X * edge2.Y - edge1.Y * edge2.X;
-                if (z.IsPositive())
-                {
-                    sign |= ConvexSign.Positive;
-                }
-                else if (z.IsNegative())
-                {
-                    sign |= ConvexSign.Negative;
-                }
-
-                if (sign == ConvexSign.Both)
-                {
-                    return false;
-                }
-            }
-
-            return sign == ConvexSign.Positive || sign == ConvexSign.Negative;
+            var state = GetConvexState();
+            return state == ConvexState.ConvexClockwise || state == ConvexState.ConvexCounterClockwise;
         }
 
         #endregion
