@@ -6,6 +6,8 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
+    // TODO: [VM] Replace Rectangle and Triangle with Polygon (?)
+
     public sealed class RectanglePrimitive : ICollidablePrimitive
     {
         #region Constructors
@@ -59,7 +61,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         public bool HasCollision(ICollidable other)
         {
-            throw new NotImplementedException();
+            return CollisionDetector.CheckPrimitiveCollision(this, other);
         }
 
         #endregion

@@ -50,7 +50,22 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         public bool HasCollision(ICollidablePrimitive other)
         {
-            throw new NotImplementedException();
+            #region Argument Check
+
+            if (other == null)
+            {
+                throw new ArgumentNullException("other");
+            }
+
+            #endregion
+
+            var otherCircle = other as CirclePrimitive;
+            if (otherCircle != null)
+            {
+                return CollisionDetector.CheckCircleToCircleCollision(this, otherCircle);
+            }
+
+            throw new NotSupportedException();
         }
 
         #endregion
@@ -59,7 +74,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         public bool HasCollision(ICollidable other)
         {
-            throw new NotImplementedException();
+            return CollisionDetector.CheckPrimitiveCollision(this, other);
         }
 
         #endregion

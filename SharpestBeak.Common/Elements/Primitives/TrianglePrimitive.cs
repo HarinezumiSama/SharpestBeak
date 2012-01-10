@@ -68,7 +68,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         public bool HasCollision(ICollidable other)
         {
-            throw new NotImplementedException();
+            return CollisionDetector.CheckPrimitiveCollision(this, other);
         }
 
         #endregion

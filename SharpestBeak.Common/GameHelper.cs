@@ -63,6 +63,23 @@ namespace SharpestBeak.Common
             return Math.Abs(value) < tolerance;
         }
 
+        public static bool IsInRange(this float value, float min, float max, float tolerance = ZeroTolerance)
+        {
+            #region Argument Check
+
+            if (min > max)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "min",
+                    min,
+                    "Range minimum is greater than its maximum.");
+            }
+
+            #endregion
+
+            return (value > min && value < max) || (value - min).IsZero(tolerance) || (value - max).IsZero(tolerance);
+        }
+
         public static bool IsValidDegreeAngle(this float angle)
         {
             return angle > -GameHelper.HalfRevolutionDegrees && angle <= GameHelper.HalfRevolutionDegrees;

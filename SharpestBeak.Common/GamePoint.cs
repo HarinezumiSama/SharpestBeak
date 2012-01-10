@@ -113,14 +113,30 @@ namespace SharpestBeak.Common
             return new GamePoint(-this.X, -this.Y);
         }
 
+        public float GetLengthSquared()
+        {
+            return this.X.Sqr() + this.Y.Sqr();
+        }
+
+        public float GetLength()
+        {
+            return this.GetLengthSquared().Sqrt();
+        }
+
         public float GetDistanceSquared(GamePoint otherValue)
         {
-            return ((otherValue.X - this.X).Sqr() + (otherValue.Y - this.Y).Sqr());
+            return (otherValue - this).GetLengthSquared();
         }
 
         public float GetDistance(GamePoint otherValue)
         {
             return GetDistanceSquared(otherValue).Sqrt();
+        }
+
+        public GamePoint Project(GamePoint target)
+        {
+            var coefficient = (this * target) / target.GetLengthSquared();
+            return new GamePoint(target.X * coefficient, target.Y * coefficient);
         }
 
         #endregion
@@ -165,6 +181,11 @@ namespace SharpestBeak.Common
         public static GamePoint operator *(float left, GamePoint right)
         {
             return new GamePoint(left * right.X, left * right.Y);
+        }
+
+        public static float operator *(GamePoint left, GamePoint right)
+        {
+            return left.X * right.X + left.Y * right.Y;
         }
 
         public static implicit operator GamePoint(Point value)
