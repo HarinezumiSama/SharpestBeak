@@ -43,7 +43,44 @@ namespace SharpestBeak.Common
 
         public static bool IsZero(this float value, float tolerance = ZeroTolerance)
         {
+            #region Argument Check
+
+            if (tolerance < 0)
+            {
+                throw new ArgumentOutOfRangeException("tolerance", tolerance, "Tolerance must be positive.");
+            }
+
+            #endregion
+
             return Math.Abs(value) < tolerance;
+        }
+
+        public static bool IsPositive(this float value, float tolerance = ZeroTolerance)
+        {
+            #region Argument Check
+
+            if (tolerance < 0)
+            {
+                throw new ArgumentOutOfRangeException("tolerance", tolerance, "Tolerance must be positive.");
+            }
+
+            #endregion
+
+            return value >= tolerance;
+        }
+
+        public static bool IsNegative(this float value, float tolerance = ZeroTolerance)
+        {
+            #region Argument Check
+
+            if (tolerance < 0)
+            {
+                throw new ArgumentOutOfRangeException("tolerance", tolerance, "Tolerance must be positive.");
+            }
+
+            #endregion
+
+            return value <= -tolerance;
         }
 
         public static bool IsInRange(this float value, float min, float max, float tolerance = ZeroTolerance)

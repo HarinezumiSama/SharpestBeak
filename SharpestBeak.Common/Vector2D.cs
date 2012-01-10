@@ -168,7 +168,8 @@ namespace SharpestBeak.Common
 
         public Vector2D Normalize()
         {
-            return this / GetLength();
+            var length = GetLength();
+            return length.IsZero() ? this : this / length;
         }
 
         //public Vector2D Project(Vector2D target)
@@ -228,7 +229,11 @@ namespace SharpestBeak.Common
 
         public static Vector2D operator /(Vector2D left, float right)
         {
-            return new Vector2D(left.X / right, left.Y / right);
+            if (right.IsZero())
+            {
+                throw new DivideByZeroException();
+            }
+            return left * (1f / right);
         }
 
         public static float operator *(Vector2D left, Vector2D right)
