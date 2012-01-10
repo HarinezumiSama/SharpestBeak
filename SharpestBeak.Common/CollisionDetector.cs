@@ -142,7 +142,11 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            throw new NotImplementedException();
+            var centerDistanceSqr = circle1.Center.GetDistanceSquared(circle2.Center);
+            var radiusSumSqr = (circle1.Radius + circle2.Radius).Sqr();
+            var difference = radiusSumSqr - centerDistanceSqr;
+
+            return difference > 0f || difference.IsZero();
         }
 
         #endregion
