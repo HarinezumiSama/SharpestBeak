@@ -54,8 +54,7 @@
     <Compile Include="Elements\ChickenElement.cs" />
     <Compile Include="Elements\Primitives\CirclePrimitive.cs" />
     <Compile Include="Elements\ShotElement.cs" />
-    <Compile Include="Elements\Primitives\RectanglePrimitive.cs" />
-    <Compile Include="Elements\Primitives\TrianglePrimitive.cs" />
+    <Compile Include="Elements\Primitives\PolygonPrimitive.cs" />
     <Compile Include="Elements\Primitives\LinePrimitive.cs" />
     <Compile Include="EngineMoveInfo.cs" />
     <Compile Include="ExtensionMethods.cs" />

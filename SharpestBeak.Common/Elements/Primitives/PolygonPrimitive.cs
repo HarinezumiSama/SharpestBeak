@@ -6,41 +6,32 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
-    // TODO: [VM] Replace Rectangle and Triangle with Polygon (?)
-
-    public sealed class RectanglePrimitive : ICollidablePrimitive
+    public sealed class PolygonPrimitive : ICollidablePrimitive
     {
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="RectanglePrimitive"/> class.
+        ///     Initializes a new instance of the <see cref="PolygonPrimitive"/> class.
         /// </summary>
-        public RectanglePrimitive(GamePoint first, GamePoint second)
+        public PolygonPrimitive(IEnumerable<GamePoint> vertices)
         {
             #region Argument Check
 
-            if (first.GetDistance(second).IsZero())
+            if (vertices == null)
             {
-                throw new ArgumentException("Rectangle points must be different.");
+                throw new ArgumentNullException("vertices");
             }
 
             #endregion
 
-            this.First = first;
-            this.Second = second;
+            this.Vertices = vertices.ToList().AsReadOnly();
         }
 
         #endregion
 
         #region Public Properties
 
-        public GamePoint First
-        {
-            get;
-            private set;
-        }
-
-        public GamePoint Second
+        public IList<GamePoint> Vertices
         {
             get;
             private set;
