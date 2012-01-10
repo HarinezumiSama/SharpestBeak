@@ -39,23 +39,6 @@ namespace SharpestBeak.Common
 
         #endregion
 
-        #region Private Methods
-
-        private static void PrepareRotate(float radianAngle, out float cos, out float sin)
-        {
-            cos = radianAngle.Cos();
-            sin = radianAngle.Sin();
-        }
-
-        private static GamePoint RotatePointInternal(GamePoint value, GamePoint center, float cos, float sin)
-        {
-            var newX = center.X + (value.X - center.X) * cos - (value.Y - center.Y) * sin;
-            var newY = center.Y + (value.X - center.X) * sin + (value.Y - center.Y) * cos;
-            return new GamePoint(newX, newY);
-        }
-
-        #endregion
-
         #region Public Methods
 
         public static bool IsZero(this float value, float tolerance = ZeroTolerance)
@@ -147,8 +130,8 @@ namespace SharpestBeak.Common
             return GameAngle.FromDegrees(proxyResult);
         }
 
-        public static GamePoint GetNewPosition(
-            GamePoint oldPosition,
+        public static Point2D GetNewPosition(
+            Point2D oldPosition,
             GameAngle currentAngle,
             MoveDirection direction,
             float speed,
@@ -163,7 +146,7 @@ namespace SharpestBeak.Common
             var actualAngle = currentAngle + relativeAngle.Value;
             var distance = timeDelta * speed;
             var result = oldPosition
-                + new GamePoint(distance * actualAngle.RadianValue.Cos(), distance * actualAngle.RadianValue.Sin());
+                + new Vector2D(distance * actualAngle.RadianValue.Cos(), distance * actualAngle.RadianValue.Sin());
             return result;
         }
 
@@ -182,32 +165,12 @@ namespace SharpestBeak.Common
             return radianAngle / Pi * HalfRevolutionDegrees;
         }
 
-        public static GamePoint Rotate(this GamePoint value, GamePoint center, GameAngle angle)
+        public static Point2D[] Rotate(this IEnumerable<Point2D> values, Point2D center, GameAngle angle)
         {
-            float cos, sin;
-            PrepareRotate(angle.RadianValue, out cos, out sin);
-
-            return RotatePointInternal(value, center, cos, sin);
+            return Point2D.Rotate(values, center, angle);
         }
 
-        public static GamePoint[] Rotate(this IEnumerable<GamePoint> values, GamePoint center, GameAngle angle)
-        {
-            #region Argument Check
-
-            if (values == null)
-            {
-                throw new ArgumentNullException("values");
-            }
-
-            #endregion
-
-            float cos, sin;
-            PrepareRotate(angle.RadianValue, out cos, out sin);
-
-            return values.Select(value => RotatePointInternal(value, center, cos, sin)).ToArray();
-        }
-
-        public static PointF[] ToPointF(this IEnumerable<GamePoint> values)
+        public static PointF[] ToPointF(this IEnumerable<Point2D> values)
         {
             #region Argument Check
 

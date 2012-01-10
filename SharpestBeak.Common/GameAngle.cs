@@ -87,14 +87,21 @@ namespace SharpestBeak.Common
             return this.DegreeValue.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return ToString((string)null, (IFormatProvider)null);
+        }
+
         public string ToString(string format)
         {
             return ToString(format, (IFormatProvider)null);
         }
 
-        public override string ToString()
+        public void CosSin(out float cos, out float sin)
         {
-            return ToString((string)null, (IFormatProvider)null);
+            var rad = this.RadianValue;
+            cos = rad.Cos();
+            sin = rad.Sin();
         }
 
         #endregion

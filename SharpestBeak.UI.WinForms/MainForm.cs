@@ -253,9 +253,9 @@ namespace SharpestBeak.UI.WinForms
 
                 var defaultBeakPolygonPoints = new[]
                 {
-                    new GamePoint(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
-                    new GamePoint(uiPosition.X + uiBeakOffset, uiPosition.Y),
-                    new GamePoint(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
+                    new Point2D(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
+                    new Point2D(uiPosition.X + uiBeakOffset, uiPosition.Y),
+                    new Point2D(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
                 };
                 var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, chickenUnit.BeakAngle);
 

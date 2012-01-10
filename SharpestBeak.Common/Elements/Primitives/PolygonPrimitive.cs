@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         /// <summary>
         ///     Initializes a new instance of the <see cref="PolygonPrimitive"/> class.
         /// </summary>
-        public PolygonPrimitive(IEnumerable<GamePoint> vertices)
+        public PolygonPrimitive(IEnumerable<Point2D> vertices)
         {
             #region Argument Check
 
@@ -31,7 +31,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Public Properties
 
-        public IList<GamePoint> Vertices
+        public IList<Point2D> Vertices
         {
             get;
             private set;

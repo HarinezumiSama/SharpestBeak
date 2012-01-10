@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         /// <summary>
         ///     Initializes a new instance of the <see cref="LinePrimitive"/> class.
         /// </summary>
-        public LinePrimitive(GamePoint first, GamePoint second)
+        public LinePrimitive(Point2D first, Point2D second)
         {
             #region Argument Check
 
@@ -32,13 +32,13 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Public Properties
 
-        public GamePoint First
+        public Point2D First
         {
             get;
             private set;
         }
 
-        public GamePoint Second
+        public Point2D Second
         {
             get;
             private set;

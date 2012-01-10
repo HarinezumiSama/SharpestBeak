@@ -68,7 +68,7 @@ namespace SharpestBeak.Common
             internal set;
         }
 
-        public GamePoint Position
+        public Point2D Position
         {
             get;
             internal set;
@@ -112,7 +112,7 @@ namespace SharpestBeak.Common
                 this.BeakAngle);
         }
 
-        public GamePoint GetBeakTipPosition()
+        public Point2D GetBeakTipPosition()
         {
             return this.Position
                 .OffsetX(GameConstants.ChickenUnit.BeakOffset)
