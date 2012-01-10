@@ -222,6 +222,11 @@ namespace SharpestBeak.Common
             return new Point2D(left.X + right.X, left.Y + right.Y);
         }
 
+        public static Vector2D operator -(Point2D left, Point2D right)
+        {
+            return new Vector2D(left.X - right.X, left.Y - right.Y);
+        }
+
         public static Point2D operator -(Vector2D left, Point2D right)
         {
             return new Point2D(left.X - right.X, left.Y - right.Y);

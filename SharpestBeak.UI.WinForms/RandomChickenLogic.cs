@@ -95,7 +95,7 @@ namespace SharpestBeak.UI.WinForms
                 }
             }
 
-            var targetOffset = m_targetPoint - this.Unit.Position.ToSizeF();
+            var targetOffset = m_targetPoint - this.Unit.Position;
             var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
             var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
 

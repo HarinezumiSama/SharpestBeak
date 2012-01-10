@@ -102,8 +102,8 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var dir1 = line1.Second.ToVector2D() - line1.First.ToVector2D();
-            var dir2 = line2.Second.ToVector2D() - line2.First.ToVector2D();
+            var dir1 = line1.Second - line1.First;
+            var dir2 = line2.Second - line2.First;
 
             var denominator = dir2.Y * dir1.X - dir2.X * dir1.Y;
             var numeratorA = dir2.X * (line1.First.Y - line2.First.Y) - dir2.Y * (line1.First.X - line2.First.X);
