@@ -72,6 +72,39 @@ namespace SharpestBeak.Common
             DoForEach<T>(collection, (item, index) => action(item));
         }
 
+        public static void MinMax(this IEnumerable<float> collection, out float min, out float max)
+        {
+            #region Argument Check
+
+            if (collection == null)
+            {
+                throw new ArgumentNullException("collection");
+            }
+
+            #endregion
+
+            float? minProxy = null;
+            float? maxProxy = null;
+            foreach (var item in collection)
+            {
+                if (!minProxy.HasValue || item < minProxy.Value)
+                {
+                    minProxy = item;
+                }
+                if (!maxProxy.HasValue || item > maxProxy.Value)
+                {
+                    maxProxy = item;
+                }
+            }
+            if (!minProxy.HasValue || !maxProxy.HasValue)
+            {
+                throw new InvalidOperationException("No elements in the collection.");
+            }
+
+            min = minProxy.Value;
+            max = maxProxy.Value;
+        }
+
         public static bool IsThreadAbort(this Exception exception)
         {
             return exception is ThreadAbortException || exception is ThreadInterruptedException;

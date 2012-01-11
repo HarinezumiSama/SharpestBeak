@@ -19,6 +19,15 @@ namespace SharpestBeak.Common.Elements.Primitives
             // Nothing to do
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
+        /// </summary>
+        public ConvexPolygonPrimitive(params Point2D[] vertices)
+            : this((IEnumerable<Point2D>)vertices)
+        {
+            // Nothing to do
+        }
+
         #endregion
 
         #region Private Methods
@@ -70,7 +79,22 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         public bool HasCollision(ICollidablePrimitive other)
         {
-            throw new NotImplementedException();
+            #region Argument Check
+
+            if (other == null)
+            {
+                throw new ArgumentNullException("other");
+            }
+
+            #endregion
+
+            var otherCpp = other as ConvexPolygonPrimitive;
+            if (otherCpp != null)
+            {
+                return CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp);
+            }
+
+            throw new NotSupportedException();
         }
 
         #endregion

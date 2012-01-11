@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpestBeak.Common;
+using SharpestBeak.Common.Elements;
+using SharpestBeak.Common.Elements.Primitives;
 using SharpestBeak.UI.WinForms.Properties;
 
 namespace SharpestBeak.UI.WinForms
@@ -37,13 +39,25 @@ namespace SharpestBeak.UI.WinForms
 
         public MainForm()
         {
-            #region Manual Test
+            #region Manual Test 1
 
             //var v1 = new Vector2D(1f, 2f);
             //var v2 = new Vector2D(3f, -2f);
             //var pv = v1.Project(v2);
             //var p = v1.ProjectScalar(v2);
             //var pr = v2.Normalize() * p;
+
+            #endregion
+
+            #region Manual Test 2
+
+            //var pg1 = new ConvexPolygonPrimitive(new Point2D(2, 1), new Point2D(4, 2), new Point2D(1, 5));
+            //var pg2 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(3, 4));
+            //var pg3 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(0, 0));
+            //var c1 = CollisionDetector.CheckCollision(pg1, pg2);
+            //Debug.WriteLine(c1);
+            //var c2 = CollisionDetector.CheckCollision(pg1, pg3);
+            //Debug.WriteLine(c1);
 
             #endregion
 

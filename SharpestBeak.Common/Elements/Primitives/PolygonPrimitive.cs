@@ -60,6 +60,15 @@ namespace SharpestBeak.Common.Elements.Primitives
             this.Count = this.Vertices.Count;
         }
 
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="PolygonPrimitive"/> class.
+        /// </summary>
+        public PolygonPrimitive(params Point2D[] vertices)
+            : this((IEnumerable<Point2D>)vertices)
+        {
+            // Nothing to do
+        }
+
         #endregion
 
         #region Protected Methods

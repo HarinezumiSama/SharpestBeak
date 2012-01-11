@@ -9,6 +9,36 @@ namespace SharpestBeak.Common
 {
     public static class CollisionDetector
     {
+        #region Private Methods
+
+        private static bool HasSeparatingAxis(
+            ConvexPolygonPrimitive polygon,
+            ConvexPolygonPrimitive otherPolygon)
+        {
+            for (int index = 0; index < polygon.Edges.Count; index++)
+            {
+                var direction = polygon.Edges[index].GetNormal();
+
+                var projections = polygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
+                var otherProjections = otherPolygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
+
+                float min, max;
+                projections.MinMax(out min, out max);
+
+                float otherMin, otherMax;
+                otherProjections.MinMax(out otherMin, out otherMax);
+
+                if (min > otherMax || max < otherMin)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
+
         #region Internal Methods
 
         internal static bool CheckPrimitiveCollision(ICollidablePrimitive primitive, ICollidable other)
@@ -147,6 +177,26 @@ namespace SharpestBeak.Common
             var difference = radiusSumSqr - centerDistanceSqr;
 
             return difference > 0f || difference.IsZero();
+        }
+
+        internal static bool CheckPolygonToPolygonCollision(
+            ConvexPolygonPrimitive polygon1,
+            ConvexPolygonPrimitive polygon2)
+        {
+            #region Argument Check
+
+            if (polygon1 == null)
+            {
+                throw new ArgumentNullException("polygon1");
+            }
+            if (polygon2 == null)
+            {
+                throw new ArgumentNullException("polygon2");
+            }
+
+            #endregion
+
+            return !HasSeparatingAxis(polygon1, polygon2) && !HasSeparatingAxis(polygon2, polygon1);
         }
 
         #endregion
