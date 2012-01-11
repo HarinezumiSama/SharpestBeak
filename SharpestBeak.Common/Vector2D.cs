@@ -178,11 +178,11 @@ namespace SharpestBeak.Common
             return length.IsZero() ? this : this / length;
         }
 
-        //public Vector2D Project(Vector2D target)
-        //{
-        //    var coefficient = (this * target) / target.GetLengthSquared();
-        //    return new Vector2D(target.X * coefficient, target.Y * coefficient);
-        //}
+        public Vector2D Project(Vector2D target)
+        {
+            var coefficient = (this * target) / target.GetLengthSquared();
+            return this * coefficient;
+        }
 
         #endregion
 

@@ -182,11 +182,11 @@ namespace SharpestBeak.Common
             return RotatePointInternal(this, center, cos, sin);
         }
 
-        //public Point2D Project(Vector2D target)
-        //{
-        //    var coefficient = (this * target) / target.GetLengthSquared();
-        //    return new Point2D(target.X * coefficient, target.Y * coefficient);
-        //}
+        public Point2D Project(Vector2D target)
+        {
+            var coefficient = (this.ToVector2D() * target) / target.GetLengthSquared();
+            return this * coefficient;
+        }
 
         #endregion
 
