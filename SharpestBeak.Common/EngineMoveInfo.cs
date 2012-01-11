@@ -6,7 +6,7 @@ using SharpestBeak.Common.Elements;
 
 namespace SharpestBeak.Common
 {
-    public sealed class EngineMoveInfo : MoveInfo
+    public sealed class EngineMoveInfo
     {
         #region Constructors
 
@@ -14,7 +14,6 @@ namespace SharpestBeak.Common
         ///     Initializes a new instance of the <see cref="EngineMoveInfo"/> class.
         /// </summary>
         private EngineMoveInfo(ChickenUnit unit, MoveInfo moveInfo)
-            : base(moveInfo.MoveDirection, moveInfo.BeakTurn, moveInfo.FireMode)
         {
             #region Argument Check
 
@@ -22,9 +21,14 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("unit");
             }
+            if (moveInfo == null)
+            {
+                throw new ArgumentNullException("moveInfo");
+            }
 
             #endregion
 
+            this.Info = moveInfo;
             this.Unit = unit;
         }
 
@@ -50,6 +54,12 @@ namespace SharpestBeak.Common
         #endregion
 
         #region Public Properties
+
+        public MoveInfo Info
+        {
+            get;
+            private set;
+        }
 
         public ChickenUnit Unit
         {

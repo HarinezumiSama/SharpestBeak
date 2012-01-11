@@ -17,6 +17,7 @@ namespace SharpestBeak.Common
         private readonly ThreadSafeValue<Exception> m_error;
         private readonly ThreadSafeValue<ulong> m_moveCount;
         private readonly ThreadSafeValue<MoveInfo> m_currentMove;
+        private readonly ThreadSafeValue<MoveInfo> m_previousMove;
 
         #endregion
 
@@ -30,6 +31,7 @@ namespace SharpestBeak.Common
             m_error = new ThreadSafeValue<Exception>(m_lock);
             m_moveCount = new ThreadSafeValue<ulong>(m_lock);
             m_currentMove = new ThreadSafeValue<MoveInfo>(m_lock);
+            m_previousMove = new ThreadSafeValue<MoveInfo>(m_lock);
         }
 
         #endregion
@@ -39,7 +41,7 @@ namespace SharpestBeak.Common
         private bool CanPlay
         {
             [DebuggerNonUserCode]
-            get { return this.Unit != null && !this.IsDead; }
+            get { return !this.IsDead; }
         }
 
         #endregion
@@ -106,6 +108,14 @@ namespace SharpestBeak.Common
             get { return m_currentMove.Value; }
             [DebuggerNonUserCode]
             protected internal set { m_currentMove.Value = value; }
+        }
+
+        public MoveInfo PreviousMove
+        {
+            [DebuggerNonUserCode]
+            get { return m_previousMove.Value; }
+            [DebuggerNonUserCode]
+            protected internal set { m_previousMove.Value = value; }
         }
 
         public bool IsDead

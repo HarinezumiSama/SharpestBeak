@@ -52,6 +52,7 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Elements\Primitives\ConvexState.cs" />
     <Compile Include="Elements\Primitives\ConvexPolygonPrimitive.cs" />
+    <Compile Include="MoveInfoState.cs" />
     <Compile Include="Vector2D.cs" />
     <Compile Include="DebugHelper.cs" />
     <Compile Include="Elements\ChickenElement.cs" />

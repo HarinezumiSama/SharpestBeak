@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using SharpestBeak.Common.Elements;
@@ -12,6 +13,9 @@ namespace SharpestBeak.Common
 
         private static readonly object s_instanceCountLock = new object();
         private static ulong s_instanceCount;
+
+        private Point2D m_position;
+        private ShotElement m_cachedElement;
 
         #endregion
 
@@ -31,9 +35,11 @@ namespace SharpestBeak.Common
 
             #endregion
 
+            var beakTipPosition = owner.GetBeakTipPosition();
+
             this.UniqueIndex = GetUniqueIndex();
             this.Owner = owner;
-            this.Position = owner.GetBeakTipPosition();
+            this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
             this.Angle = owner.BeakAngle;
             this.CreationTime = DateTime.Now;
         }
@@ -50,6 +56,15 @@ namespace SharpestBeak.Common
                 return s_instanceCount;
             }
         }
+
+        #region Private Methods
+
+        private void ResetCachedElement()
+        {
+            m_cachedElement = null;
+        }
+
+        #endregion
 
         #endregion
 
@@ -73,8 +88,19 @@ namespace SharpestBeak.Common
 
         public Point2D Position
         {
-            get;
-            internal set;
+            [DebuggerStepThrough]
+            get
+            {
+                return m_position;
+            }
+            set
+            {
+                if (m_position != value)
+                {
+                    m_position = value;
+                    ResetCachedElement();
+                }
+            }
         }
 
         public GameAngle Angle
@@ -113,7 +139,11 @@ namespace SharpestBeak.Common
 
         public ShotElement GetElement()
         {
-            return new ShotElement(this.Position);
+            if (m_cachedElement == null)
+            {
+                m_cachedElement = new ShotElement(this.Position);
+            }
+            return m_cachedElement;
         }
 
         #endregion

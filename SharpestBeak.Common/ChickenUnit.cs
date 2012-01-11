@@ -11,6 +11,14 @@ namespace SharpestBeak.Common
 {
     public sealed class ChickenUnit
     {
+        #region Fields
+
+        private Point2D m_position;
+        private GameAngle m_beakAngle;
+        private ChickenElement m_cachedElement;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -34,6 +42,15 @@ namespace SharpestBeak.Common
             this.Logic = logic;
             this.ShotTimer = new Stopwatch();
             logic.Unit = this;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ResetCachedElement()
+        {
+            m_cachedElement = null;
         }
 
         #endregion
@@ -70,14 +87,36 @@ namespace SharpestBeak.Common
 
         public Point2D Position
         {
-            get;
-            internal set;
+            [DebuggerStepThrough]
+            get
+            {
+                return m_position;
+            }
+            set
+            {
+                if (m_position != value)
+                {
+                    m_position = value;
+                    ResetCachedElement();
+                }
+            }
         }
 
         public GameAngle BeakAngle
         {
-            get;
-            internal set;
+            [DebuggerStepThrough]
+            get
+            {
+                return m_beakAngle;
+            }
+            set
+            {
+                if (m_beakAngle != value)
+                {
+                    m_beakAngle = value;
+                    ResetCachedElement();
+                }
+            }
         }
 
         public ChickenUnit KilledBy
@@ -121,7 +160,11 @@ namespace SharpestBeak.Common
 
         public ChickenElement GetElement()
         {
-            return new ChickenElement(this.Position, this.BeakAngle);
+            if (m_cachedElement == null)
+            {
+                m_cachedElement = new ChickenElement(this.Position, this.BeakAngle);
+            }
+            return m_cachedElement;
         }
 
         #endregion

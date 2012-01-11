@@ -12,18 +12,18 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameState"/> class.
         /// </summary>
-        internal GameState(GameCommonData data)
+        internal GameState(GameEngine engine)
         {
             #region Argument Check
 
-            if (data == null)
+            if (engine == null)
             {
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException("engine");
             }
 
             #endregion
 
-            this.Data = data;
+            this.Data = engine.CommonData;
         }
 
         #endregion

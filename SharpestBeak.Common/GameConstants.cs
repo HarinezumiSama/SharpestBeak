@@ -20,6 +20,9 @@ namespace SharpestBeak.Common
             /// </summary>
             public static readonly float BeakOverhang = BodyCircleRadius / 2f;
 
+            /// <summary>
+            ///     Distance from body circle center to beak tip.
+            /// </summary>
             public static readonly float BeakOffset = BodyCircleRadius + BeakOverhang;
 
             public static readonly float BeakRayOffset = BodyCircleRadius / 2f;

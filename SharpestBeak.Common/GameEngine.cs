@@ -227,55 +227,28 @@ namespace SharpestBeak.Common
                         {
                             return;
                         }
-                        Thread.Sleep(1);
+                        Thread.Yield();
                     }
                 }
-                //var timeDelta = (float)sw.Elapsed.TotalSeconds;
                 var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
                 sw.Restart();
 
                 m_syncLock.ExecuteInWriteLock(
                     () =>
                     {
-                        // TODO: Check logic error and report it somehow
-
-                        var newMoves = this.AliveChickens
+                        var aliveChickens = this.AliveChickens
                             .Where(item => item.Logic.Error == null)
+                            .ToArray();
+
+                        var newMoves = aliveChickens
                             .Select(item => EngineMoveInfo.Create(item))
                             .Where(item => item != null)
                             .ToList();
 
-                        // Processing existing shot units
-                        var explodedShotUnits = new List<ShotUnit>();
-                        this.ShotUnitsDirect.DoForEach(
-                            item =>
-                            {
-                                item.Position = GameHelper.GetNewPosition(
-                                    item.Position,
-                                    item.Angle,
-                                    MoveDirection.MoveForward,
-                                    GameConstants.ShotUnit.DefaultSpeed,
-                                    timeDelta);
-                                DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
-
-                                if (item.Position.X < -GameConstants.ShotUnit.Radius
-                                    || item.Position.X > this.CommonData.RealSize.Width
-                                        + GameConstants.ShotUnit.Radius
-                                    || item.Position.Y < -GameConstants.ShotUnit.Radius
-                                    || item.Position.Y > this.CommonData.RealSize.Height
-                                        + GameConstants.ShotUnit.Radius)
-                                {
-                                    item.Exploded = true;
-                                    explodedShotUnits.Add(item);
-
-                                    DebugHelper.WriteLine("Shot {{{0}}} has exploded.", item);
-                                }
-                            });
-
-                        this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+                        var oldShotUnits = this.ShotUnitsDirect.ToArray();
 
                         // Processing new shot units
-                        var shootingMoves = newMoves.Where(item => item.FireMode != FireMode.None).ToArray();
+                        var shootingMoves = newMoves.Where(item => item.Info.FireMode != FireMode.None).ToArray();
                         shootingMoves.DoForEach(
                             item =>
                             {
@@ -296,6 +269,67 @@ namespace SharpestBeak.Common
                                 DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
                             });
 
+                        #region Processing Shot Collisions
+
+                        var explodedShotUnits = new List<ShotUnit>();
+                        oldShotUnits.DoForEach(
+                            item =>
+                            {
+                                item.Position = GameHelper.GetNewPosition(
+                                    item.Position,
+                                    item.Angle,
+                                    MoveDirection.MoveForward,
+                                    GameConstants.ShotUnit.DefaultSpeed,
+                                    timeDelta);
+                                DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
+
+                                if (item.Position.X < -GameConstants.ShotUnit.Radius
+                                    || item.Position.X > this.CommonData.RealSize.Width
+                                        + GameConstants.ShotUnit.Radius
+                                    || item.Position.Y < -GameConstants.ShotUnit.Radius
+                                    || item.Position.Y > this.CommonData.RealSize.Height
+                                        + GameConstants.ShotUnit.Radius)
+                                {
+                                    item.Exploded = true;
+                                    explodedShotUnits.Add(item);
+
+                                    DebugHelper.WriteLine("Shot {{{0}}} has exploded outside of game board.", item);
+                                }
+                            });
+
+                        foreach (var shotUnit in oldShotUnits)
+                        {
+                            var shotElement = shotUnit.GetElement();
+
+                            var injuredChicken = aliveChickens
+                                .SingleOrDefault(
+                                    item => !item.IsDead
+                                        && CollisionDetector.CheckCollision(shotElement, item.GetElement()));
+                            if (injuredChicken != null)
+                            {
+                                shotUnit.Exploded = true;
+                                explodedShotUnits.Add(shotUnit);
+
+                                injuredChicken.IsDead = true;
+                                injuredChicken.KilledBy = shotUnit.Owner;
+                                var suicide = shotUnit.Owner == injuredChicken;
+                                if (!suicide)
+                                {
+                                    shotUnit.Owner.KillCount++;
+                                }
+
+                                DebugHelper.WriteLine(
+                                    "Shot {{{0}}} has exploded and killed {{{1}}}{2}.",
+                                    shotUnit,
+                                    injuredChicken,
+                                    suicide ? " [suicide]" : string.Empty);
+                            }
+                        }
+
+                        this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+
+                        #endregion
+
                         if (previousMoves != null && timeDelta > 0f)
                         {
                             foreach (var move in previousMoves)
@@ -310,23 +344,39 @@ namespace SharpestBeak.Common
                                 var newPosition = GameHelper.GetNewPosition(
                                     unit.Position,
                                     unit.BeakAngle,
-                                    move.MoveDirection,
+                                    move.Info.MoveDirection,
                                     GameConstants.ChickenUnit.DefaultRectilinearSpeed,
                                     timeDelta);
                                 var newBeakAngle = GameHelper.GetNewBeakAngle(
                                     unit.BeakAngle,
-                                    move.BeakTurn,
+                                    move.Info.BeakTurn,
                                     timeDelta);
 
-                                // TODO: [VM] Check collisions
+                                // TODO: [VM] Check out-of-game-board collision
 
-                                unit.Position = newPosition;
-                                unit.BeakAngle = newBeakAngle;
+                                var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
+                                var otherChickens = aliveChickens.Where(item => item != unit).ToArray();
+                                var conflictingChicken = otherChickens.FirstOrDefault(
+                                    item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
+                                if (conflictingChicken != null)
+                                {
+                                    move.Info.State = MoveInfoState.Rejected;
+                                    DebugHelper.WriteLine(
+                                        "Blocked collision of chicken {{{0}}} with {{{1}}}.",
+                                        unit,
+                                        conflictingChicken);
+                                }
+                                else
+                                {
+                                    unit.Position = newPosition;
+                                    unit.BeakAngle = newBeakAngle;
+                                    move.Info.State = MoveInfoState.Handled;
 
-                                DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
+                                    DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
+                                }
                             }
 
-                            // TODO: Check deaths etc.
+                            this.AliveChickensDirect.RemoveAll(item => item.IsDead);
                         }
 
                         previousMoves = newMoves;
@@ -358,12 +408,22 @@ namespace SharpestBeak.Common
 
                 try
                 {
+                    var currentMove = logic.CurrentMove;
+                    if (currentMove != null)
+                    {
+                        while (currentMove.State == MoveInfoState.None)
+                        {
+                            Thread.Yield();
+                        }
+                    }
+
+                    logic.PreviousMove = logic.CurrentMove;
                     if (logic.ClearCurrentMoveWhileMaking)
                     {
                         logic.CurrentMove = null;
                     }
-                    // TODO: Obtain actual game state for this unit and its logic
-                    logic.MakeMove(new GameState(this.CommonData));
+
+                    logic.MakeMove(new GameState(this));
                 }
                 catch (Exception ex)
                 {
@@ -374,11 +434,19 @@ namespace SharpestBeak.Common
 
                     logic.Error = ex;
                     logic.Unit.IsDead = true;
+
+                    DebugHelper.WriteLine(
+                        "Chicken #{0} is now dead since logic '{1}' caused an error:{2}{3}",
+                        logic.Unit.UniqueIndex,
+                        logic.GetType().FullName,
+                        Environment.NewLine,
+                        ex.ToString());
+
                     return;
                 }
                 logic.MoveCount++;
 
-                Thread.Sleep(1);
+                Thread.Yield();
             }
         }
 

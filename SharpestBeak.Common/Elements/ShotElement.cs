@@ -25,6 +25,11 @@ namespace SharpestBeak.Common.Elements
 
             m_primitives = new List<ICollidablePrimitive>
             {
+                //new ConvexPolygonPrimitive(
+                //    position + new Vector2D(-GameConstants.ShotUnit.Radius, -GameConstants.ShotUnit.Radius),
+                //    position + new Vector2D(GameConstants.ShotUnit.Radius, -GameConstants.ShotUnit.Radius),
+                //    position + new Vector2D(GameConstants.ShotUnit.Radius, GameConstants.ShotUnit.Radius),
+                //    position + new Vector2D(-GameConstants.ShotUnit.Radius, GameConstants.ShotUnit.Radius))
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
             .AsReadOnly();

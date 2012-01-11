@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using SharpestBeak.Common.Elements.Primitives;
 
 namespace SharpestBeak.Common.Elements
 {
     public sealed class ChickenElement : ICollidableElement
     {
+        #region Fields
+
+        private readonly IList<ICollidablePrimitive> m_roughPrimitives;
+        private readonly IList<ICollidablePrimitive> m_primitives;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -16,6 +24,15 @@ namespace SharpestBeak.Common.Elements
         {
             this.Position = position;
             this.BeakAngle = beakAngle;
+
+            m_roughPrimitives = new List<ICollidablePrimitive>
+            {
+                new CirclePrimitive(position, GameConstants.ChickenUnit.BeakOffset)
+            }
+            .AsReadOnly();
+
+            // TODO: [VM] More exact presentation (circle + triangle)
+            m_primitives = m_roughPrimitives;
         }
 
         #endregion
@@ -45,12 +62,12 @@ namespace SharpestBeak.Common.Elements
 
         public IList<ICollidablePrimitive> GetRoughPrimitives()
         {
-            throw new NotImplementedException();
+            return m_roughPrimitives;
         }
 
         public IList<ICollidablePrimitive> GetPrimitives()
         {
-            throw new NotImplementedException();
+            return m_primitives;
         }
 
         #endregion
