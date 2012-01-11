@@ -6,14 +6,8 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
-    public sealed class PolygonPrimitive : ICollidablePrimitive
+    public class PolygonPrimitive
     {
-        #region Fields
-
-        private ConvexState? m_convexState;
-
-        #endregion
-
         #region Nested Types
 
         #region ConvexSign Enumeration
@@ -35,7 +29,13 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Constants
 
-        private const int c_minVertexCount = 3;
+        public const int MinVertexCount = 3;
+
+        #endregion
+
+        #region Fields
+
+        private ConvexState? m_convexState;
 
         #endregion
 
@@ -56,30 +56,37 @@ namespace SharpestBeak.Common.Elements.Primitives
             #endregion
 
             this.Vertices = vertices.ToList().AsReadOnly();
+            this.Edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
+        }
 
+        #endregion
+
+        #region Protected Methods
+
+        protected static IList<Vector2D> GetEdges(IList<Point2D> vertices)
+        {
             #region Argument Check
 
-            if (this.Count < c_minVertexCount)
+            if (vertices == null)
+            {
+                throw new ArgumentNullException("vertices");
+            }
+            if (vertices.Count < MinVertexCount)
             {
                 throw new ArgumentException(
                     string.Format(
-                        "The number of vertices in the polygon must be at least {0} while is {1}.",
-                        c_minVertexCount,
-                        this.Count),
+                        "The number of vertices in the polygon must be at least {0} while it is {1}.",
+                        MinVertexCount,
+                        vertices.Count),
                     "vertices");
             }
 
             #endregion
 
-            this.Edges = GetEdges(this.Vertices);
-        }
-
-        private IList<Vector2D> GetEdges(IList<Point2D> vertices)
-        {
             var count = vertices.Count;
             var resultProxy = new List<Vector2D>(count);
-            var currentPoint = this.Vertices[0];
+            var currentPoint = vertices[0];
             for (int nextIndex = 1; nextIndex <= count; nextIndex++)
             {
                 var nextPoint = nextIndex < count ? vertices[nextIndex] : vertices[0];
@@ -93,19 +100,33 @@ namespace SharpestBeak.Common.Elements.Primitives
             return resultProxy.AsReadOnly();
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private ConvexState GetConvexStateInternal()
+        protected static ConvexState GetConvexState(IList<Vector2D> edges)
         {
-            ConvexSign sign = ConvexSign.None;
-            for (int index = 0; index < this.Count; index++)
-            {
-                var nextIndex = (index + 1) % this.Count;
+            #region Argument Check
 
-                var edge1 = this.Edges[index];
-                var edge2 = this.Edges[nextIndex];
+            if (edges == null)
+            {
+                throw new ArgumentNullException("edges");
+            }
+            if (edges.Count < MinVertexCount)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "The number of edges in the polygon must be at least {0} while it is {1}.",
+                        MinVertexCount,
+                        edges.Count),
+                    "edges");
+            }
+
+            #endregion
+
+            ConvexSign sign = ConvexSign.None;
+            for (int index = 0; index < edges.Count; index++)
+            {
+                var nextIndex = (index + 1) % edges.Count;
+
+                var edge1 = edges[index];
+                var edge2 = edges[nextIndex];
 
                 var z = edge1 ^ edge2;
                 if (z.IsPositive())
@@ -133,7 +154,8 @@ namespace SharpestBeak.Common.Elements.Primitives
                     return ConvexState.ConvexClockwise;
             }
 
-            throw new NotImplementedException();
+            throw new InvalidOperationException(
+                string.Format("Unexpected convex computation state: {0}.", sign));
         }
 
         #endregion
@@ -166,7 +188,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         {
             if (!m_convexState.HasValue)
             {
-                m_convexState = GetConvexStateInternal();
+                m_convexState = GetConvexState(this.Edges);
             }
             return m_convexState.Value;
         }
@@ -175,24 +197,6 @@ namespace SharpestBeak.Common.Elements.Primitives
         {
             var state = GetConvexState();
             return state == ConvexState.ConvexClockwise || state == ConvexState.ConvexCounterClockwise;
-        }
-
-        #endregion
-
-        #region ICollidablePrimitive Members
-
-        public bool HasCollision(ICollidablePrimitive other)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region ICollidable Members
-
-        public bool HasCollision(ICollidable other)
-        {
-            return CollisionDetector.CheckPrimitiveCollision(this, other);
         }
 
         #endregion
