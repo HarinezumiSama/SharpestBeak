@@ -7,6 +7,7 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
+    [Serializable]
     public struct Point2D : IEquatable<Point2D>
     {
         #region Fields
@@ -166,7 +167,7 @@ namespace SharpestBeak.Common
 
         public float GetDistanceSquared(Point2D otherValue)
         {
-            return (otherValue - this.ToVector2D()).ToVector2D().GetLengthSquared();
+            return (otherValue.ToVector2D() - this.ToVector2D()).GetLengthSquared();
         }
 
         public float GetDistance(Point2D otherValue)
@@ -185,7 +186,12 @@ namespace SharpestBeak.Common
         public Point2D Project(Vector2D target)
         {
             var coefficient = (this.ToVector2D() * target) / target.GetLengthSquared();
-            return this * coefficient;
+            return target.ToPoint2D() * coefficient;
+        }
+
+        public float ProjectScalar(Vector2D target)
+        {
+            return (this.ToVector2D() * target) / target.GetLength();
         }
 
         #endregion
@@ -267,7 +273,7 @@ namespace SharpestBeak.Common
             return new Point2D(value);
         }
 
-        public static implicit operator Point2D(Vector2D value)
+        public static explicit operator Point2D(Vector2D value)
         {
             return new Point2D(value);
         }

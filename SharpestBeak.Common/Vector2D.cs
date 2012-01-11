@@ -7,11 +7,15 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
+    [Serializable]
     public struct Vector2D : IEquatable<Vector2D>
     {
         #region Fields
 
         public static readonly Vector2D Zero = new Vector2D();
+        public static readonly Vector2D UnitX = new Vector2D(1f, 0f);
+        public static readonly Vector2D UnitY = new Vector2D(0f, 1f);
+        public static readonly Vector2D One = new Vector2D(1f, 1f);
 
         private readonly float m_x;
         private readonly float m_y;
@@ -181,7 +185,12 @@ namespace SharpestBeak.Common
         public Vector2D Project(Vector2D target)
         {
             var coefficient = (this * target) / target.GetLengthSquared();
-            return this * coefficient;
+            return target * coefficient;
+        }
+
+        public float ProjectScalar(Vector2D target)
+        {
+            return (this * target) / target.GetLength();
         }
 
         #endregion
@@ -267,7 +276,7 @@ namespace SharpestBeak.Common
             return new Vector2D(value);
         }
 
-        public static implicit operator Vector2D(Point2D value)
+        public static explicit operator Vector2D(Point2D value)
         {
             return new Vector2D(value);
         }

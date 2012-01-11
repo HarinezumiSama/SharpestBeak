@@ -37,6 +37,16 @@ namespace SharpestBeak.UI.WinForms
 
         public MainForm()
         {
+            #region Manual Test
+
+            //var v1 = new Vector2D(1f, 2f);
+            //var v2 = new Vector2D(3f, -2f);
+            //var pv = v1.Project(v2);
+            //var p = v1.ProjectScalar(v2);
+            //var pr = v2.Normalize() * p;
+
+            #endregion
+
             InitializeComponent();
 
             m_gameEngine = new GameEngine(
