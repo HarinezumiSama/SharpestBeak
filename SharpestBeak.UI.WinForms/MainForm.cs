@@ -19,6 +19,9 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
+        private static readonly Size s_gameBoardSize = new Size(5, 5);
+        private static readonly int s_chickenUnitCount = 2;
+
         private static readonly int s_cellSize = 48;
         private static readonly int s_fullCellSize = s_cellSize + 1;
 
@@ -65,8 +68,8 @@ namespace SharpestBeak.UI.WinForms
 
             m_gameEngine = new GameEngine(
                 this.PaintGame,
-                new Size(5, 5),
-                Enumerable.Range(1, 2).Select(item => typeof(RandomChickenLogic)));
+                s_gameBoardSize,
+                Enumerable.Range(1, s_chickenUnitCount).Select(item => typeof(RandomChickenLogic)));
         }
 
         #endregion
