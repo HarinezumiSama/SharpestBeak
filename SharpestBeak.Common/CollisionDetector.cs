@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
+using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Elements.Primitives;
 
 namespace SharpestBeak.Common
@@ -218,7 +220,9 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            return first.HasCollision(second);
+            var result = first.HasCollision(second);
+            PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
+            return result;
         }
 
         #endregion

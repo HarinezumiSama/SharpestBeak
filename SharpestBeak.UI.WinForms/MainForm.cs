@@ -19,8 +19,8 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly Size s_gameBoardSize = new Size(5, 5);
-        private static readonly int s_chickenUnitCount = 2;
+        private static readonly Size s_gameBoardSize = new Size(16, 16);
+        private static readonly int s_chickenUnitCount = 10;
 
         private static readonly int s_cellSize = 48;
         private static readonly int s_fullCellSize = s_cellSize + 1;
@@ -125,7 +125,12 @@ namespace SharpestBeak.UI.WinForms
 
         private void UpdateMoveCountStatus()
         {
+            //turnInfoLabel.Text = string.Format(
+            //    "Move count: {0}, collision checks: {1}",
+            //    m_gameEngine.MoveCount,
+            //    CollisionDetector.CallCount);
             turnInfoLabel.Text = string.Format("Move count: {0}", m_gameEngine.MoveCount);
+
             turnInfoLabel.Invalidate();
         }
 

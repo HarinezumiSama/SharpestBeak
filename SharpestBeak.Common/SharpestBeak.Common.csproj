@@ -17,22 +17,26 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\_Output_\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>..\_Output_\Debug\SharpestBeak.Common.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\_Output_\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <DocumentationFile>..\_Output_\Release\SharpestBeak.Common.xml</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -50,6 +54,8 @@
     <Compile Include="ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
     <Compile Include="CollisionDetector.cs" />
+    <Compile Include="Diagnostics\AutoStopwatch.cs" />
+    <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
     <Compile Include="Elements\Primitives\ConvexState.cs" />
     <Compile Include="Elements\Primitives\ConvexPolygonPrimitive.cs" />
     <Compile Include="MoveInfoState.cs" />

@@ -169,8 +169,8 @@ namespace SharpestBeak.Common
 
         public static Point2D GetNewPosition(Point2D oldPosition, GameAngle angle, float distance)
         {
-            var result = oldPosition
-                + new Vector2D(distance * angle.RadianValue.Cos(), distance * angle.RadianValue.Sin());
+            var rad = angle.RadianValue;
+            var result = oldPosition + new Vector2D(distance * rad.Cos(), distance * rad.Sin());
             return result;
         }
 
@@ -189,6 +189,7 @@ namespace SharpestBeak.Common
 
             var actualAngle = currentAngle + relativeAngle.Value;
             var distance = timeDelta * speed;
+
             var result = GetNewPosition(oldPosition, actualAngle, distance);
             return result;
         }

@@ -7,8 +7,14 @@ using System.Threading;
 
 namespace SharpestBeak.Common
 {
-    internal sealed class ThreadSafeValue<T> : IDisposable
+    public sealed class ThreadSafeValue<T> : IDisposable
     {
+        #region Constants
+
+        public const LockRecursionPolicy DefaultRecursionPolicy = LockRecursionPolicy.NoRecursion;
+
+        #endregion
+
         #region Fields
 
         private readonly bool m_ownLock;
@@ -19,7 +25,7 @@ namespace SharpestBeak.Common
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeValue"/> class.
+        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
         /// </summary>
         private ThreadSafeValue(ReaderWriterLockSlim @lock, bool ownLock, T value = default(T))
         {
@@ -38,7 +44,7 @@ namespace SharpestBeak.Common
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeValue"/> class.
+        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
         /// </summary>
         public ThreadSafeValue(ReaderWriterLockSlim @lock, T value = default(T))
             : this(@lock, false, value)
@@ -57,10 +63,21 @@ namespace SharpestBeak.Common
         }
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeValue"/> class.
+        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
         /// </summary>
-        public ThreadSafeValue(T value = default(T))
-            : this(new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion), true, value)
+        public ThreadSafeValue(
+            LockRecursionPolicy recursionPolicy = DefaultRecursionPolicy,
+            T value = default(T))
+            : this(new ReaderWriterLockSlim(recursionPolicy), true, value)
+        {
+            // Nothing to do
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
+        /// </summary>
+        public ThreadSafeValue(T value)
+            : this(DefaultRecursionPolicy, value)
         {
             // Nothing to do
         }
@@ -103,6 +120,16 @@ namespace SharpestBeak.Common
                     this.Lock.ExitWriteLock();
                 }
             }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            var value = this.Value;
+            return value == null ? string.Empty : value.ToString();
         }
 
         #endregion

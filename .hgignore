@@ -1,5 +1,6 @@
 glob:*/bin/*
 glob:*/obj/*
+glob:_Output_/*
 glob:*.suo
 glob:*.csproj.user
 glob:build*.log

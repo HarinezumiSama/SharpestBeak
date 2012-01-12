@@ -35,6 +35,11 @@ namespace SharpestBeak.Common
             }
         }
 
+        public static bool IsNullOrWhiteSpace(this string value)
+        {
+            return string.IsNullOrWhiteSpace(value);
+        }
+
         public static void DoForEach<T>(this IEnumerable<T> collection, Action<T, int> action)
         {
             #region Argument Check

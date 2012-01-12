@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Elements;
 
 namespace SharpestBeak.Common
@@ -230,156 +231,19 @@ namespace SharpestBeak.Common
                         Thread.Yield();
                     }
                 }
-                var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
                 sw.Restart();
 
                 m_syncLock.ExecuteInWriteLock(
                     () =>
                     {
-                        var aliveChickens = this.AliveChickens
-                            .Where(item => item.Logic.Error == null)
-                            .ToArray();
-
-                        var newMoves = aliveChickens
-                            .Select(item => EngineMoveInfo.Create(item))
-                            .Where(item => item != null)
-                            .ToList();
-
-                        var oldShotUnits = this.ShotUnitsDirect.ToArray();
-
-                        // Processing new shot units
-                        var shootingMoves = newMoves.Where(item => item.Info.FireMode != FireMode.None).ToArray();
-                        shootingMoves.DoForEach(
-                            item =>
+                        using (var asw =
+                            new AutoStopwatch(s => DebugHelper.WriteLine(s))
                             {
-                                // Is there any active shot unit from the same chicken unit?
-                                if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
-                                {
-                                    if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
-                                    {
-                                        DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
-                                        return;
-                                    }
-                                }
-
-                                var shot = new ShotUnit(item.Unit);
-                                this.ShotUnitsDirect.Add(shot);
-                                item.Unit.ShotTimer.Restart();
-
-                                DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
-                            });
-
-                        #region Processing Shot Collisions
-
-                        var explodedShotUnits = new List<ShotUnit>();
-                        oldShotUnits.DoForEach(
-                            item =>
-                            {
-                                item.Position = GameHelper.GetNewPosition(
-                                    item.Position,
-                                    item.Angle,
-                                    MoveDirection.MoveForward,
-                                    GameConstants.ShotUnit.DefaultSpeed,
-                                    timeDelta);
-                                DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
-
-                                if (item.Position.X < -GameConstants.ShotUnit.Radius
-                                    || item.Position.X > this.CommonData.RealSize.Width
-                                        + GameConstants.ShotUnit.Radius
-                                    || item.Position.Y < -GameConstants.ShotUnit.Radius
-                                    || item.Position.Y > this.CommonData.RealSize.Height
-                                        + GameConstants.ShotUnit.Radius)
-                                {
-                                    item.Exploded = true;
-                                    explodedShotUnits.Add(item);
-
-                                    DebugHelper.WriteLine("Shot {{{0}}} has exploded outside of game board.", item);
-                                }
-                            });
-
-                        foreach (var shotUnit in oldShotUnits)
+                                OutputFormat = string.Format("Engine step #{0} took {{0}}.", this.MoveCount + 1)
+                            })
                         {
-                            var shotElement = shotUnit.GetElement();
-
-                            var injuredChicken = aliveChickens
-                                .SingleOrDefault(
-                                    item => !item.IsDead
-                                        && CollisionDetector.CheckCollision(shotElement, item.GetElement()));
-                            if (injuredChicken != null)
-                            {
-                                shotUnit.Exploded = true;
-                                explodedShotUnits.Add(shotUnit);
-
-                                injuredChicken.IsDead = true;
-                                injuredChicken.KilledBy = shotUnit.Owner;
-                                var suicide = shotUnit.Owner == injuredChicken;
-                                if (!suicide)
-                                {
-                                    shotUnit.Owner.KillCount++;
-                                }
-
-                                DebugHelper.WriteLine(
-                                    "Shot {{{0}}} has exploded and killed {{{1}}}{2}.",
-                                    shotUnit,
-                                    injuredChicken,
-                                    suicide ? " [suicide]" : string.Empty);
-                            }
+                            ProcessEngineStep(ref previousMoves);
                         }
-
-                        this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
-
-                        #endregion
-
-                        if (previousMoves != null && timeDelta > 0f)
-                        {
-                            foreach (var move in previousMoves)
-                            {
-                                if (IsStopping())
-                                {
-                                    return;
-                                }
-
-                                var unit = move.Unit;
-
-                                var newPosition = GameHelper.GetNewPosition(
-                                    unit.Position,
-                                    unit.BeakAngle,
-                                    move.Info.MoveDirection,
-                                    GameConstants.ChickenUnit.DefaultRectilinearSpeed,
-                                    timeDelta);
-                                var newBeakAngle = GameHelper.GetNewBeakAngle(
-                                    unit.BeakAngle,
-                                    move.Info.BeakTurn,
-                                    timeDelta);
-
-                                // TODO: [VM] Check out-of-game-board collision
-
-                                var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
-                                var otherChickens = aliveChickens.Where(item => item != unit).ToArray();
-                                var conflictingChicken = otherChickens.FirstOrDefault(
-                                    item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
-                                if (conflictingChicken != null)
-                                {
-                                    move.Info.State = MoveInfoState.Rejected;
-                                    DebugHelper.WriteLine(
-                                        "Blocked collision of chicken {{{0}}} with {{{1}}}.",
-                                        unit,
-                                        conflictingChicken);
-                                }
-                                else
-                                {
-                                    unit.Position = newPosition;
-                                    unit.BeakAngle = newBeakAngle;
-                                    move.Info.State = MoveInfoState.Handled;
-
-                                    DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
-                                }
-                            }
-
-                            this.AliveChickensDirect.RemoveAll(item => item.IsDead);
-                        }
-
-                        previousMoves = newMoves;
                     });
 
                 if (IsStopping())
@@ -388,7 +252,165 @@ namespace SharpestBeak.Common
                 }
 
                 this.MoveCount++;
+                PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
             }
+        }
+
+        private void ProcessEngineStep(ref List<EngineMoveInfo> previousMoves)
+        {
+            var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
+
+            var aliveChickens = this.AliveChickens
+                .Where(item => item.Logic.Error == null)
+                .ToArray();
+
+            var newMoves = aliveChickens
+                .Select(item => EngineMoveInfo.Create(item))
+                .Where(item => item != null)
+                .ToList();
+
+            var oldShotUnits = this.ShotUnitsDirect.ToArray();
+
+            // Processing new shot units
+            var shootingMoves = newMoves.Where(item => item.Info.FireMode != FireMode.None).ToArray();
+            shootingMoves.DoForEach(
+                item =>
+                {
+                    // Is there any active shot unit from the same chicken unit?
+                    if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
+                    {
+                        if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
+                        {
+                            DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
+                            return;
+                        }
+                    }
+
+                    var shot = new ShotUnit(item.Unit);
+                    this.ShotUnitsDirect.Add(shot);
+                    item.Unit.ShotTimer.Restart();
+
+                    DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
+                });
+
+            #region Processing Shot Collisions
+
+            var explodedShotUnits = new List<ShotUnit>();
+            oldShotUnits.DoForEach(
+                item =>
+                {
+                    item.Position = GameHelper.GetNewPosition(
+                        item.Position,
+                        item.Angle,
+                        MoveDirection.MoveForward,
+                        GameConstants.ShotUnit.DefaultSpeed,
+                        timeDelta);
+                    DebugHelper.WriteLine("Shot {{{0}}} has moved.", item);
+
+                    if (item.Position.X < -GameConstants.ShotUnit.Radius
+                        || item.Position.X > this.CommonData.RealSize.Width
+                            + GameConstants.ShotUnit.Radius
+                        || item.Position.Y < -GameConstants.ShotUnit.Radius
+                        || item.Position.Y > this.CommonData.RealSize.Height
+                            + GameConstants.ShotUnit.Radius)
+                    {
+                        item.Exploded = true;
+                        explodedShotUnits.Add(item);
+
+                        DebugHelper.WriteLine("Shot {{{0}}} has exploded outside of game board.", item);
+                    }
+                });
+
+            using (var asw =
+                new AutoStopwatch(s => DebugHelper.WriteLine(s))
+                {
+                    OutputFormat = "Shot/chicken collision took {0}."
+                })
+            {
+                foreach (var shotUnit in oldShotUnits)
+                {
+                    var shotElement = shotUnit.GetElement();
+
+                    var injuredChicken = aliveChickens
+                        .SingleOrDefault(
+                            item => !item.IsDead
+                                && CollisionDetector.CheckCollision(shotElement, item.GetElement()));
+                    if (injuredChicken != null)
+                    {
+                        shotUnit.Exploded = true;
+                        explodedShotUnits.Add(shotUnit);
+
+                        injuredChicken.IsDead = true;
+                        injuredChicken.KilledBy = shotUnit.Owner;
+                        var suicide = shotUnit.Owner == injuredChicken;
+                        if (!suicide)
+                        {
+                            shotUnit.Owner.KillCount++;
+                        }
+
+                        DebugHelper.WriteLine(
+                            "Shot {{{0}}} has exploded and killed {{{1}}}{2}.",
+                            shotUnit,
+                            injuredChicken,
+                            suicide ? " [suicide]" : string.Empty);
+                    }
+                }
+            }
+
+            this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+
+            #endregion
+
+            if (previousMoves != null && timeDelta > 0f)
+            {
+                foreach (var move in previousMoves)
+                {
+                    if (IsStopping())
+                    {
+                        return;
+                    }
+
+                    var unit = move.Unit;
+
+                    var newPosition = GameHelper.GetNewPosition(
+                        unit.Position,
+                        unit.BeakAngle,
+                        move.Info.MoveDirection,
+                        GameConstants.ChickenUnit.DefaultRectilinearSpeed,
+                        timeDelta);
+                    var newBeakAngle = GameHelper.GetNewBeakAngle(
+                        unit.BeakAngle,
+                        move.Info.BeakTurn,
+                        timeDelta);
+
+                    // TODO: [VM] Check out-of-game-board collision
+
+                    var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
+                    var otherChickens = aliveChickens.Where(item => item != unit).ToArray();
+                    var conflictingChicken = otherChickens.FirstOrDefault(
+                        item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
+                    if (conflictingChicken != null)
+                    {
+                        move.Info.State = MoveInfoState.Rejected;
+                        DebugHelper.WriteLine(
+                            "Blocked collision of chicken {{{0}}} with {{{1}}}.",
+                            unit,
+                            conflictingChicken);
+                    }
+                    else
+                    {
+                        unit.Position = newPosition;
+                        unit.BeakAngle = newBeakAngle;
+                        move.Info.State = MoveInfoState.Handled;
+
+                        DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
+                    }
+                }
+
+                this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+            }
+
+            previousMoves = newMoves;
         }
 
         private void DoExecuteLogic(object logicInstance)
