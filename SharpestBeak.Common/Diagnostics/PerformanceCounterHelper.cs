@@ -61,13 +61,13 @@ namespace SharpestBeak.Common.Diagnostics
             counters.Add(
                 new CounterCreationData(
                     CollisionCountPerStepCounterName,
-                    CollisionCountPerStepCounterName,
+                    "The number of collision detection calls per one game engine step.",
                     PerformanceCounterType.AverageCount64));
 
             counters.Add(
                 new CounterCreationData(
                     CollisionCountPerStepBaseCounterName,
-                    CollisionCountPerStepBaseCounterName,
+                    string.Format("Base counter for '{0}'.", CollisionCountPerStepCounterName),
                     PerformanceCounterType.AverageBase));
 
             var category = PerformanceCounterCategory.Create(
