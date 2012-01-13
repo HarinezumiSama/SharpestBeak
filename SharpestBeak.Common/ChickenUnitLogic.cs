@@ -58,6 +58,8 @@ namespace SharpestBeak.Common
 
         #region Protected Methods
 
+        protected abstract void OnReset();
+
         protected abstract void OnInitialize();
 
         protected abstract MoveInfo OnMakeMove(GameState state);
@@ -78,14 +80,23 @@ namespace SharpestBeak.Common
 
         #region Internal Methods
 
-        internal void MakeMove(GameState state)
+        internal void Reset()
         {
-            this.CurrentMove = this.CanPlay && state != null ? OnMakeMove(state) : null;
+            this.Unit.IsDead = false;
+            this.MoveCount = 0;
+            this.Error = null;
+
+            OnReset();
         }
 
         internal void Initialize()
         {
             OnInitialize();
+        }
+
+        internal void MakeMove(GameState state)
+        {
+            this.CurrentMove = this.CanPlay && state != null ? OnMakeMove(state) : null;
         }
 
         #endregion

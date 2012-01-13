@@ -80,7 +80,7 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            Reset();
+            ResetInternal();
         }
 
         /// <summary>
@@ -204,14 +204,7 @@ namespace SharpestBeak.Common
 
             PositionChickens();
 
-            this.AllChickens
-                .Select(item => item.Logic)
-                .DoForEach(item =>
-                {
-                    item.MoveCount = 0;
-                    item.Initialize();
-                    item.Error = null;
-                });
+            this.AllChickens.DoForEach(item => item.Logic.Reset());
         }
 
         private void DoExecuteEngine()
@@ -605,6 +598,7 @@ namespace SharpestBeak.Common
             }
 
             m_syncLock.ExecuteInWriteLock(this.ResetInternal);
+            CallPaintCallback();
         }
 
         public void CallPaint()

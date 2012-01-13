@@ -23,15 +23,6 @@ namespace SharpestBeak.UI.WinForms
 
         #endregion
 
-        #region Constructors
-
-        public RandomChickenLogic()
-        {
-            m_targetPoint = new Point2D(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
-        }
-
-        #endregion
-
         #region Private Methods
 
         private static int GetNextRandom(int maxValue)
@@ -59,6 +50,11 @@ namespace SharpestBeak.UI.WinForms
         #endregion
 
         #region Protected Methods
+
+        protected override void OnReset()
+        {
+            m_targetPoint = new Point2D(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
+        }
 
         protected override void OnInitialize()
         {

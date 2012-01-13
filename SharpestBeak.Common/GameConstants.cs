@@ -30,12 +30,12 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a chicken unit, in units per second.
             /// </summary>
-            public static readonly float DefaultRectilinearSpeed = GameConstants.NominalCellSize;
+            public static readonly float DefaultRectilinearSpeed = GameConstants.NominalCellSize / SlowDownRatio;
 
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
-            public static readonly float DefaultAngularSpeed = GameHelper.RevolutionDegrees / 4f;
+            public static readonly float DefaultAngularSpeed = GameHelper.RevolutionDegrees / 4f / SlowDownRatio;
 
             #endregion
         }
@@ -66,11 +66,13 @@ namespace SharpestBeak.Common
 
         #region Fields
 
+        internal static readonly float SlowDownRatio = 1f;
+
         public static readonly float NominalCellSize = 100f;
 
         public static readonly int MinNominalCellCount = 5;
 
-        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
+        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d * SlowDownRatio);
 
         public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
 
