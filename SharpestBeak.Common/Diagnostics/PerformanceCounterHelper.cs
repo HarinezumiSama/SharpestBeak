@@ -101,5 +101,18 @@ namespace SharpestBeak.Common.Diagnostics
         }
 
         #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        ///     Initializes <see cref="PerformanceCounterHelper"/>. Used to initialize
+        ///     <see cref="PerformanceCounterHelper"/> at a specific time.
+        /// </summary>
+        public static PerformanceCounterHelper Initialize()
+        {
+            return Instance;
+        }
+
+        #endregion
     }
 }

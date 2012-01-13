@@ -49,6 +49,8 @@ namespace SharpestBeak.Common
 
             m_paintCallback = paintCallback;
 
+            PerformanceCounterHelper.Initialize();
+
             // Pre-initialized properties
             this.CommonData = new GameCommonData(size);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
@@ -58,11 +60,12 @@ namespace SharpestBeak.Common
                 .Select((item, index) => CreateChicken(item, index))
                 .ToList()
                 .AsReadOnly();
-            this.AliveChickensDirect = new List<ChickenUnit>(this.AllChickens);
+            this.AliveChickensDirect = new List<ChickenUnit>();
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
-
             this.ShotUnitsDirect = new List<ShotUnit>();
             this.ShotUnits = this.ShotUnitsDirect.AsReadOnly();
+
+            #region Argument Check
 
             if (this.AllChickens.Count > this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2)
             {
@@ -74,6 +77,8 @@ namespace SharpestBeak.Common
                         this.CommonData.NominalSize.Height),
                     "size");
             }
+
+            #endregion
 
             Reset();
         }
@@ -194,11 +199,19 @@ namespace SharpestBeak.Common
         {
             m_moveCount.Value = 0;
 
-            this.AliveChickens
-                .Select(item => item.Logic)
-                .DoForEach(item => item.MoveCount = 0);
+            this.AliveChickensDirect.ChangeContents(this.AllChickens);
+            this.ShotUnitsDirect.Clear();
 
             PositionChickens();
+
+            this.AllChickens
+                .Select(item => item.Logic)
+                .DoForEach(item =>
+                {
+                    item.MoveCount = 0;
+                    item.Initialize();
+                    item.Error = null;
+                });
         }
 
         private void DoExecuteEngine()

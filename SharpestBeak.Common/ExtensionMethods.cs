@@ -77,6 +77,36 @@ namespace SharpestBeak.Common
             DoForEach<T>(collection, (item, index) => action(item));
         }
 
+        public static void ChangeContents<T>(this IList<T> list, IEnumerable<T> newContents)
+        {
+            #region Argument Check
+
+            if (list == null)
+            {
+                throw new ArgumentNullException("list");
+            }
+            if (newContents == null)
+            {
+                throw new ArgumentNullException("newContents");
+            }
+
+            #endregion
+
+            list.Clear();
+            var castList = list as List<T>;
+            if (castList == null)
+            {
+                foreach (var item in newContents)
+                {
+                    list.Add(item);
+                }
+            }
+            else
+            {
+                castList.AddRange(newContents);
+            }
+        }
+
         public static void MinMax(this IEnumerable<float> collection, out float min, out float max)
         {
             #region Argument Check

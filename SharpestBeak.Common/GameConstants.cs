@@ -18,14 +18,14 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Length of beak overhang, counting from the body circle.
             /// </summary>
-            public static readonly float BeakOverhang = BodyCircleRadius / 2f;
+            public static readonly float BeakOverhang = BodyCircleRadius * 0.75f;
 
             /// <summary>
             ///     Distance from body circle center to beak tip.
             /// </summary>
             public static readonly float BeakOffset = BodyCircleRadius + BeakOverhang;
 
-            public static readonly float BeakRayOffset = BodyCircleRadius / 2f;
+            public static readonly float BeakRayOffset = BodyCircleRadius * 0.75f;
 
             /// <summary>
             ///     Standard rectilinear speed of a chicken unit, in units per second.
