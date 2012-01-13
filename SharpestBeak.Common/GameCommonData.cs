@@ -15,6 +15,19 @@ namespace SharpestBeak.Common
         /// </summary>
         internal GameCommonData(Size size)
         {
+            #region Argument Check
+
+            if (size.Width < GameConstants.MinNominalCellCount || size.Height < GameConstants.MinNominalCellCount)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "The board size cannot be less than {0} nominal cells in each dimension.",
+                        GameConstants.MinNominalCellCount),
+                    "size");
+            }
+
+            #endregion
+
             this.NominalSize = size;
             this.RealSize = new SizeF(
                 GameConstants.NominalCellSize * size.Width,

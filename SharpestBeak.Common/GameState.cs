@@ -12,7 +12,7 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameState"/> class.
         /// </summary>
-        internal GameState(GameEngine engine)
+        internal GameState(GameEngine engine, IEnumerable<ChickenUnit> chickens)
         {
             #region Argument Check
 
@@ -20,10 +20,15 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("engine");
             }
+            if (chickens == null)
+            {
+                throw new ArgumentNullException("chickens");
+            }
 
             #endregion
 
             this.Data = engine.CommonData;
+            this.UnitStates = chickens.Select(item => new ChickenUnitState(item)).ToList().AsReadOnly();
         }
 
         #endregion
@@ -36,9 +41,12 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        // TODO: Compute details according to actual unit view
+        public IList<ChickenUnitState> UnitStates
+        {
+            get;
+            private set;
+        }
 
         #endregion
-
     }
 }

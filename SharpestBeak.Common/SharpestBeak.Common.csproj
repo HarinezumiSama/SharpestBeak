@@ -51,8 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BeakTurn.cs" />
+    <Compile Include="ChickenLogicRecord.cs" />
     <Compile Include="ChickenUnit.cs" />
     <Compile Include="ChickenUnitLogic.cs" />
+    <Compile Include="ChickenUnitState.cs" />
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />

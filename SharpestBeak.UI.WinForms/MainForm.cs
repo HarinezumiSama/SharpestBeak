@@ -69,7 +69,7 @@ namespace SharpestBeak.UI.WinForms
             m_gameEngine = new GameEngine(
                 this.PaintGame,
                 s_gameBoardSize,
-                Enumerable.Range(1, s_chickenUnitCount).Select(item => typeof(RandomChickenLogic)));
+                new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount));
         }
 
         #endregion
@@ -296,8 +296,11 @@ namespace SharpestBeak.UI.WinForms
                 var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
                 {
-                    var tp = rcl.TargetPoint * coefficient;
-                    graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
+                    foreach (var targetPoint in rcl.TargetPoints)
+                    {
+                        var tp = targetPoint * coefficient;
+                        graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
+                    }
                 }
             }
 

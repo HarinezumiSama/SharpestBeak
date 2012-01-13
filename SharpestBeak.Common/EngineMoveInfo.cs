@@ -36,19 +36,19 @@ namespace SharpestBeak.Common
 
         #region Internal Methods
 
-        internal static EngineMoveInfo Create(ChickenUnit unit)
+        internal static EngineMoveInfo Create(ChickenUnitState unitState)
         {
             #region Argument Check
 
-            if (unit == null)
+            if (unitState == null)
             {
-                throw new ArgumentNullException("unit");
+                throw new ArgumentNullException("unitState");
             }
 
             #endregion
 
-            var move = unit.Logic.CurrentMove;
-            return move == null ? null : new EngineMoveInfo(unit, move);
+            var move = unitState.CurrentMove;
+            return move == null ? null : new EngineMoveInfo(unitState.Unit, move);
         }
 
         #endregion

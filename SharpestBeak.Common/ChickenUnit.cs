@@ -32,16 +32,11 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("logic");
             }
-            if (logic.Unit != null)
-            {
-                throw new ArgumentException("The specified logic is already assigned to another unit.", "logic");
-            }
 
             #endregion
 
             this.Logic = logic;
             this.ShotTimer = new Stopwatch();
-            logic.Unit = this;
         }
 
         #endregion

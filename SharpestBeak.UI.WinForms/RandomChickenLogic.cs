@@ -19,7 +19,8 @@ namespace SharpestBeak.UI.WinForms
         private static readonly Random s_random = new Random();
         private static readonly object s_randomSyncLock = new object();
 
-        private Point2D m_targetPoint;
+        private readonly Dictionary<int, Point2D> m_targetPoints = new Dictionary<int, Point2D>();
+        private readonly object m_targetPointsLock = new object();
 
         #endregion
 
@@ -53,51 +54,75 @@ namespace SharpestBeak.UI.WinForms
 
         protected override void OnReset()
         {
-            m_targetPoint = new Point2D(-GameConstants.NominalCellSize, -GameConstants.NominalCellSize);
+            lock (m_targetPointsLock)
+            {
+                m_targetPoints.Clear();
+            }
         }
 
         protected override void OnInitialize()
         {
-            m_targetPoint = this.Unit.Position;
+            lock (m_targetPointsLock)
+            {
+                m_targetPoints.Clear();
+            }
         }
 
-        protected override MoveInfo OnMakeMove(GameState state)
+        protected override void OnMakeMove(GameState state)
         {
-            var needNewTargetPoint = (this.PreviousMove != null && this.PreviousMove.State == MoveInfoState.Rejected)
-                || this.Unit.Position.GetDistance(m_targetPoint)
-                    .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed
-                        * (float)GameConstants.LogicPollFrequency.TotalSeconds);
-            if (needNewTargetPoint)
+            foreach (var unitState in state.UnitStates)
             {
-                // Choosing new target point
-                var point = new Point2D(
-                    GetNextRandom(state.Data.NominalSize.Width),
-                    GetNextRandom(state.Data.NominalSize.Height));
-                m_targetPoint = point * GameConstants.NominalCellSize
-                    + new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
-            }
-
-            var move = Tuple.Create(MoveDirection.None, float.MaxValue);
-            foreach (var item in s_moveDirections)
-            {
-                var potentialMovePoint = GameHelper.GetNewPosition(
-                    this.Unit.Position,
-                    this.Unit.BeakAngle,
-                    item,
-                    GameConstants.ChickenUnit.DefaultRectilinearSpeed,
-                    (float)GameConstants.LogicPollFrequency.TotalSeconds);
-                var distanceSquared = m_targetPoint.GetDistanceSquared(potentialMovePoint);
-                if (distanceSquared < move.Item2)
+                Point2D targetPoint;
+                lock (m_targetPointsLock)
                 {
-                    move = Tuple.Create(item, distanceSquared);
+                    targetPoint = m_targetPoints.GetValueOrDefault(unitState.UniqueIndex, unitState.Position);
                 }
+
+                var needNewTargetPoint =
+                    (unitState.PreviousMove != null
+                        && unitState.PreviousMove.State == MoveInfoState.Rejected)
+                    || unitState.Position.GetDistance(targetPoint)
+                        .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed
+                            * (float)GameConstants.LogicPollFrequency.TotalSeconds);
+                if (needNewTargetPoint)
+                {
+                    // Choosing new target point
+                    var point = new Point2D(
+                        GetNextRandom(state.Data.NominalSize.Width),
+                        GetNextRandom(state.Data.NominalSize.Height));
+                    targetPoint = point * GameConstants.NominalCellSize
+                        + new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
+                    lock (m_targetPointsLock)
+                    {
+                        m_targetPoints[unitState.UniqueIndex] = targetPoint;
+                    }
+                }
+
+                var move = Tuple.Create(MoveDirection.None, float.MaxValue);
+                foreach (var item in s_moveDirections)
+                {
+                    var potentialMovePoint = GameHelper.GetNewPosition(
+                        unitState.Position,
+                        unitState.BeakAngle,
+                        item,
+                        GameConstants.ChickenUnit.DefaultRectilinearSpeed,
+                        (float)GameConstants.LogicPollFrequency.TotalSeconds);
+                    var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
+                    if (distanceSquared < move.Item2)
+                    {
+                        move = Tuple.Create(item, distanceSquared);
+                    }
+                }
+
+                var targetOffset = targetPoint - unitState.Position;
+                var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
+                var turn = GameHelper.GetBeakTurn(unitState.BeakAngle, targetAngle);
+
+                unitState.CurrentMove = new MoveInfo(
+                    move.Item1,
+                    turn,
+                    GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
             }
-
-            var targetOffset = m_targetPoint - this.Unit.Position;
-            var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
-            var turn = GameHelper.GetBeakTurn(this.Unit.BeakAngle, targetAngle);
-
-            return new MoveInfo(move.Item1, turn, GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
         }
 
         #endregion
@@ -105,12 +130,15 @@ namespace SharpestBeak.UI.WinForms
         #region Public Properties
 
         // For debug only
-        public Point2D TargetPoint
+        public Point2D[] TargetPoints
         {
             [DebuggerStepThrough]
             get
             {
-                return m_targetPoint;
+                lock (m_targetPointsLock)
+                {
+                    return m_targetPoints.Values.ToArray();
+                }
             }
         }
 

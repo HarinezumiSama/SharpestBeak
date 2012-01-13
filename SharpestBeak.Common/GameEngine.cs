@@ -26,6 +26,8 @@ namespace SharpestBeak.Common
         private readonly ThreadSafeValue<ulong> m_moveCount;
         private Thread m_engineThread;
 
+        private readonly object m_lastMovesLock = new object();
+
         #endregion
 
         #region Constructors
@@ -36,13 +38,21 @@ namespace SharpestBeak.Common
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
             Size size,
-            IEnumerable<Type> chickenLogicTypes)
+            IEnumerable<ChickenLogicRecord> chickens)
         {
             #region Fields
 
             if (paintCallback == null)
             {
                 throw new ArgumentNullException("paintCallback");
+            }
+            if (chickens == null)
+            {
+                throw new ArgumentNullException("chickens");
+            }
+            if (chickens.Any(item => item == null))
+            {
+                throw new ArgumentException("The collection contains a null element.", "chickens");
             }
 
             #endregion
@@ -54,12 +64,15 @@ namespace SharpestBeak.Common
             // Pre-initialized properties
             this.CommonData = new GameCommonData(size);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
+            this.LastMoves = new Dictionary<ChickenUnit, ChickenUnitState>();
 
             // Post-initialized properties
-            this.AllChickens = chickenLogicTypes
-                .Select((item, index) => CreateChicken(item, index))
+            this.Logics = chickens.Select(item => CreateLogic(item)).ToList().AsReadOnly();
+            this.AllChickens = this.Logics
+                .SelectMany(item => item.Units)
                 .ToList()
                 .AsReadOnly();
+            this.AllChickens.DoForEach((item, index) => item.UniqueIndex = index + 1);
             this.AliveChickensDirect = new List<ChickenUnit>();
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
             this.ShotUnitsDirect = new List<ShotUnit>();
@@ -89,8 +102,8 @@ namespace SharpestBeak.Common
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
             Size size,
-            params Type[] chickenTypes)
-            : this(paintCallback, size, (IEnumerable<Type>)chickenTypes)
+            params ChickenLogicRecord[] chickens)
+            : this(paintCallback, size, (IEnumerable<ChickenLogicRecord>)chickens)
         {
             // Nothing to do
         }
@@ -99,23 +112,28 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
+        private static ChickenUnitLogic CreateLogic(ChickenLogicRecord logicRecord)
+        {
+            #region Argument Check
+
+            if (logicRecord == null)
+            {
+                throw new ArgumentNullException("logicRecord");
+            }
+
+            #endregion
+
+            var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type);
+            result.CreateUnits(logicRecord.UnitCount);
+            return result;
+        }
+
         private void EnsureNotDisposed()
         {
             if (m_disposed)
             {
                 throw new ObjectDisposedException(GetType().FullName);
             }
-        }
-
-        private ChickenUnit CreateChicken(Type logicType, int index)
-        {
-            var logic = (ChickenUnitLogic)Activator.CreateInstance(logicType);
-
-            var result = new ChickenUnit(logic)
-            {
-                UniqueIndex = index + 1
-            };
-            return result;
         }
 
         private void PositionChickens()
@@ -242,8 +260,7 @@ namespace SharpestBeak.Common
                 m_syncLock.ExecuteInWriteLock(
                     () =>
                     {
-                        using (var asw =
-                            new AutoStopwatch(s => DebugHelper.WriteLine(s))
+                        using (new AutoStopwatch(s => DebugHelper.WriteLine(s))
                             {
                                 OutputFormat = string.Format("Engine step #{0} took {{0}}.", this.MoveCount + 1)
                             })
@@ -270,10 +287,16 @@ namespace SharpestBeak.Common
                 .Where(item => item.Logic.Error == null)
                 .ToArray();
 
-            var newMoves = aliveChickens
-                .Select(item => EngineMoveInfo.Create(item))
-                .Where(item => item != null)
-                .ToList();
+            List<EngineMoveInfo> newMoves;
+            lock (m_lastMovesLock)
+            {
+                newMoves = this.LastMoves
+                    .Values
+                    .Where(item => item.CurrentMove != null)
+                    .Select(item => EngineMoveInfo.Create(item))
+                    .Where(item => item != null)
+                    .ToList();
+            }
 
             var oldShotUnits = this.ShotUnitsDirect.ToArray();
 
@@ -436,22 +459,24 @@ namespace SharpestBeak.Common
 
                 try
                 {
-                    var currentMove = logic.CurrentMove;
-                    if (currentMove != null)
-                    {
-                        while (currentMove.State == MoveInfoState.None)
-                        {
-                            Thread.Yield();
-                        }
-                    }
+                    // TODO: [VM] Analyse non-processed moves
 
-                    logic.PreviousMove = logic.CurrentMove;
-                    if (logic.ClearCurrentMoveWhileMaking)
-                    {
-                        logic.CurrentMove = null;
-                    }
+                    //var currentMove = logic.CurrentMove;
+                    //if (currentMove != null)
+                    //{
+                    //    while (currentMove.State == MoveInfoState.None)
+                    //    {
+                    //        Thread.Yield();
+                    //    }
+                    //}
 
-                    logic.MakeMove(new GameState(this));
+                    //logic.PreviousMove = logic.CurrentMove;
+                    //if (logic.ClearCurrentMoveWhileMaking)
+                    //{
+                    //    logic.CurrentMove = null;
+                    //}
+
+                    logic.MakeMove(new GameState(this, logic.Units));
                 }
                 catch (Exception ex)
                 {
@@ -461,18 +486,21 @@ namespace SharpestBeak.Common
                     }
 
                     logic.Error = ex;
-                    logic.Unit.IsDead = true;
-
-                    DebugHelper.WriteLine(
-                        "Chicken #{0} is now dead since logic '{1}' caused an error:{2}{3}",
-                        logic.Unit.UniqueIndex,
-                        logic.GetType().FullName,
-                        Environment.NewLine,
-                        ex.ToString());
+                    logic.Units.DoForEach(
+                        item =>
+                        {
+                            item.IsDead = true;
+                            DebugHelper.WriteLine(
+                                "Chicken #{0} is now dead since logic '{1}' caused an error:{2}{3}",
+                                item.UniqueIndex,
+                                logic.GetType().FullName,
+                                Environment.NewLine,
+                                ex.ToString());
+                        });
 
                     return;
                 }
-                logic.MoveCount++;
+                //logic.MoveCount++;
 
                 Thread.Yield();
             }
@@ -505,9 +533,21 @@ namespace SharpestBeak.Common
             private set;
         }
 
+        internal Dictionary<ChickenUnit, ChickenUnitState> LastMoves
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         #region Public Properties
+
+        public IList<ChickenUnitLogic> Logics
+        {
+            get;
+            private set;
+        }
 
         public IList<ChickenUnit> AliveChickens
         {

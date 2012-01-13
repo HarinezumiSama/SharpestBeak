@@ -107,6 +107,24 @@ namespace SharpestBeak.Common
             }
         }
 
+        public static TValue GetValueOrDefault<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary,
+            TKey key,
+            TValue defaultValue = default(TValue))
+        {
+            #region Argument Check
+
+            if (dictionary == null)
+            {
+                throw new ArgumentNullException("dictionary");
+            }
+
+            #endregion
+
+            TValue result;
+            return dictionary.TryGetValue(key, out result) ? result : defaultValue;
+        }
+
         public static void MinMax(this IEnumerable<float> collection, out float min, out float max)
         {
             #region Argument Check
