@@ -68,5 +68,18 @@ namespace SharpestBeak.Common
         }
 
         #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0}. Info = {{{1}}}, Unit = {{{2}}}",
+                GetType().Name,
+                this.Info,
+                this.Unit);
+        }
+
+        #endregion
     }
 }

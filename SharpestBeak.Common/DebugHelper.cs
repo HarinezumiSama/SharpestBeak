@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
@@ -19,6 +20,11 @@ namespace SharpestBeak.Common
 
         public static void WriteLine(string format, params object[] args)
         {
+            if (!Settings.Default.EnableDebugOutput)
+            {
+                return;
+            }
+
             if (s_sb == null)
             {
                 s_sb = new StringBuilder();

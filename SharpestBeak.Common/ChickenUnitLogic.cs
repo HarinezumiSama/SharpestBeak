@@ -16,7 +16,6 @@ namespace SharpestBeak.Common
         private readonly List<ChickenUnit> m_unitsDirect = new List<ChickenUnit>();
 
         private readonly ThreadSafeValue<Exception> m_error;
-        //private readonly ThreadSafeValue<ulong> m_moveCount;
 
         #endregion
 
@@ -47,12 +46,24 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
+        internal Thread Thread
+        {
+            get;
+            set;
+        }
+
         internal Exception Error
         {
             [DebuggerNonUserCode]
-            get { return m_error.Value; }
+            get
+            {
+                return m_error.Value;
+            }
             [DebuggerNonUserCode]
-            set { m_error.Value = value; }
+            set
+            {
+                m_error.Value = value;
+            }
         }
 
         internal IList<ChickenUnit> Units
@@ -105,36 +116,6 @@ namespace SharpestBeak.Common
                 OnMakeMove(state);
             }
         }
-
-        #endregion
-
-        #region Protected Internal Properties
-
-        protected internal virtual bool ClearCurrentMoveWhileMaking
-        {
-            [DebuggerStepThrough]
-            get { return false; }
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        //public MoveInfo PreviousMove
-        //{
-        //    [DebuggerNonUserCode]
-        //    get { return m_previousMove.Value; }
-        //    [DebuggerNonUserCode]
-        //    protected internal set { m_previousMove.Value = value; }
-        //}
-
-        //public ulong MoveCount
-        //{
-        //    [DebuggerNonUserCode]
-        //    get { return m_moveCount.Value; }
-        //    [DebuggerNonUserCode]
-        //    internal set { m_moveCount.Value = value; }
-        //}
 
         #endregion
 

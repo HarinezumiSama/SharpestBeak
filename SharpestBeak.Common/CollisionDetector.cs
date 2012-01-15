@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
@@ -221,7 +222,10 @@ namespace SharpestBeak.Common
             #endregion
 
             var result = first.HasCollision(second);
-            PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
+            if (Settings.Default.UsePerformanceCounters)
+            {
+                PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
+            }
             return result;
         }
 

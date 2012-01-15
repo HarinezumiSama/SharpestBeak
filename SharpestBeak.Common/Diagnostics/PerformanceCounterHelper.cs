@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace SharpestBeak.Common.Diagnostics
@@ -26,7 +27,17 @@ namespace SharpestBeak.Common.Diagnostics
 
         private PerformanceCounterHelper()
         {
-            Setup();
+            using (new AutoStopwatch(
+                s => DebugHelper.WriteLine(s))
+                {
+                    OutputFormat = string.Format(
+                        "{0} in {1} took {{0}}.",
+                        ((Action)Setup).Method.Name,
+                        MethodBase.GetCurrentMethod().GetQualifiedName())
+                })
+            {
+                Setup();
+            }
 
             this.CollisionCountPerStep = new PerformanceCounter(
                 CategoryName,

@@ -52,12 +52,6 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
-        internal Thread Thread
-        {
-            get;
-            set;
-        }
-
         internal Stopwatch ShotTimer
         {
             get;
@@ -139,9 +133,9 @@ namespace SharpestBeak.Common
         public override string ToString()
         {
             return string.Format(
-                "[#{0} : {1}] Position = {2}, BeakAngle = {3:D}",
-                this.UniqueIndex,
+                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}",
                 this.GetType().Name,
+                this.UniqueIndex,
                 this.Position,
                 this.BeakAngle);
         }

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Elements;
+using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
@@ -59,7 +60,10 @@ namespace SharpestBeak.Common
 
             m_paintCallback = paintCallback;
 
-            PerformanceCounterHelper.Initialize();
+            if (Settings.Default.UsePerformanceCounters)
+            {
+                PerformanceCounterHelper.Initialize();
+            }
 
             // Pre-initialized properties
             this.CommonData = new GameCommonData(size);
@@ -194,15 +198,16 @@ namespace SharpestBeak.Common
                 Name = GetType().FullName,
                 IsBackground = true
             };
-            this.AliveChickens.DoForEach(
+            this.Logics
+                .DoForEach(
                 item =>
                 {
                     item.Thread = new Thread(this.DoExecuteLogic)
                     {
                         IsBackground = true,
-                        Name = string.Format("Unit #{0}: {1}", item.UniqueIndex, item.Logic.GetType().FullName)
+                        Name = string.Format("Logic '{0}'", item.GetType().FullName)
                     };
-                    item.Logic.Initialize();
+                    item.Initialize();
                 });
             this.ShotUnitsDirect.Clear();
 
@@ -210,7 +215,7 @@ namespace SharpestBeak.Common
             CallPaintCallback();
             m_engineThread.Start();
 
-            this.AliveChickens.DoForEach(item => item.Thread.Start(item.Logic));
+            this.Logics.DoForEach(item => item.Thread.Start(item));
         }
 
         private void ResetInternal()
@@ -236,7 +241,7 @@ namespace SharpestBeak.Common
                 });
 
             var sw = new Stopwatch();
-            List<EngineMoveInfo> previousMoves = null;
+            //List<EngineMoveInfo> previousMoves = null;
             while (!IsStopping())
             {
                 if (m_disposed)
@@ -265,7 +270,7 @@ namespace SharpestBeak.Common
                                 OutputFormat = string.Format("Engine step #{0} took {{0}}.", this.MoveCount + 1)
                             })
                         {
-                            ProcessEngineStep(ref previousMoves);
+                            ProcessEngineStep(/*ref previousMoves*/);
                         }
                     });
 
@@ -275,11 +280,14 @@ namespace SharpestBeak.Common
                 }
 
                 this.MoveCount++;
-                PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
+                if (Settings.Default.UsePerformanceCounters)
+                {
+                    PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
+                }
             }
         }
 
-        private void ProcessEngineStep(ref List<EngineMoveInfo> previousMoves)
+        private void ProcessEngineStep(/*ref List<EngineMoveInfo> previousMoves*/)
         {
             var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
 
@@ -287,21 +295,23 @@ namespace SharpestBeak.Common
                 .Where(item => item.Logic.Error == null)
                 .ToArray();
 
-            List<EngineMoveInfo> newMoves;
+            //List<EngineMoveInfo> newMoves;
+            List<ChickenUnitState> newMoves;
             lock (m_lastMovesLock)
             {
-                newMoves = this.LastMoves
-                    .Values
-                    .Where(item => item.CurrentMove != null)
-                    .Select(item => EngineMoveInfo.Create(item))
-                    .Where(item => item != null)
+                newMoves = aliveChickens
+                    .Select(item => this.LastMoves.GetValueOrDefault(item))
+                    .Where(item => item != null && item.CurrentMove != null
+                        && item.CurrentMove.State == MoveInfoState.None)
+                    //.Select(item => EngineMoveInfo.Create(item))
+                    //.Where(item => item != null)
                     .ToList();
             }
 
             var oldShotUnits = this.ShotUnitsDirect.ToArray();
 
             // Processing new shot units
-            var shootingMoves = newMoves.Where(item => item.Info.FireMode != FireMode.None).ToArray();
+            var shootingMoves = newMoves.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
             shootingMoves.DoForEach(
                 item =>
                 {
@@ -356,6 +366,8 @@ namespace SharpestBeak.Common
                     OutputFormat = "Shot/chicken collision took {0}."
                 })
             {
+                // TODO: [VM] Process shot-to-shot collisions
+
                 foreach (var shotUnit in oldShotUnits)
                 {
                     var shotElement = shotUnit.GetElement();
@@ -390,7 +402,8 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            if (previousMoves != null && timeDelta > 0f)
+            var previousMoves = newMoves;
+            if (previousMoves != null && previousMoves.Any() && timeDelta > 0f)
             {
                 foreach (var move in previousMoves)
                 {
@@ -400,16 +413,21 @@ namespace SharpestBeak.Common
                     }
 
                     var unit = move.Unit;
+                    DebugHelper.WriteLine(
+                        "{0} is processing move {{{1}}} of chicken {{{2}}}.",
+                        GetType().Name,
+                        move.CurrentMove,
+                        unit);
 
                     var newPosition = GameHelper.GetNewPosition(
                         unit.Position,
                         unit.BeakAngle,
-                        move.Info.MoveDirection,
+                        move.CurrentMove.MoveDirection,
                         GameConstants.ChickenUnit.DefaultRectilinearSpeed,
                         timeDelta);
                     var newBeakAngle = GameHelper.GetNewBeakAngle(
                         unit.BeakAngle,
-                        move.Info.BeakTurn,
+                        move.CurrentMove.BeakTurn,
                         timeDelta);
 
                     // TODO: [VM] Check out-of-game-board collision
@@ -420,7 +438,7 @@ namespace SharpestBeak.Common
                         item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
                     if (conflictingChicken != null)
                     {
-                        move.Info.State = MoveInfoState.Rejected;
+                        move.CurrentMove.State = MoveInfoState.Rejected;
                         DebugHelper.WriteLine(
                             "Blocked collision of chicken {{{0}}} with {{{1}}}.",
                             unit,
@@ -430,16 +448,16 @@ namespace SharpestBeak.Common
                     {
                         unit.Position = newPosition;
                         unit.BeakAngle = newBeakAngle;
-                        move.Info.State = MoveInfoState.Handled;
+                        move.CurrentMove.State = MoveInfoState.Handled;
 
                         DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
                     }
                 }
-
-                this.AliveChickensDirect.RemoveAll(item => item.IsDead);
             }
 
-            previousMoves = newMoves;
+            this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+
+            //previousMoves = newMoves;
         }
 
         private void DoExecuteLogic(object logicInstance)
@@ -459,24 +477,62 @@ namespace SharpestBeak.Common
 
                 try
                 {
-                    // TODO: [VM] Analyse non-processed moves
+                    GameState gameState;
+                    lock (m_lastMovesLock)
+                    {
+                        if (logic.Units.All(item => item.IsDead))
+                        {
+                            DebugHelper.WriteLine(
+                                "Exiting thread '{0}' since logic '{1}' has no alive units.",
+                                Thread.CurrentThread.Name,
+                                logic.GetType().FullName);
+                            return;
+                        }
 
-                    //var currentMove = logic.CurrentMove;
-                    //if (currentMove != null)
-                    //{
-                    //    while (currentMove.State == MoveInfoState.None)
-                    //    {
-                    //        Thread.Yield();
-                    //    }
-                    //}
+                        var unitsToHandle = logic
+                            .Units
+                            .Select(
+                                item => new
+                                {
+                                    Unit = item,
+                                    State = this.LastMoves.GetValueOrDefault(item)
+                                })
+                            .Where(
+                                info =>
+                                {
+                                    return info.State == null
+                                        || info.State.CurrentMove == null
+                                        || info.State.CurrentMove.State != MoveInfoState.None;
+                                })
+                                .Select(
+                                    info => info.State == null
+                                        ? new ChickenUnitState(info.Unit)
+                                        : new ChickenUnitState(info.State))
+                            .ToArray();
+                        if (!unitsToHandle.Any())
+                        {
+                            Thread.Yield();
+                            continue;
+                        }
 
-                    //logic.PreviousMove = logic.CurrentMove;
-                    //if (logic.ClearCurrentMoveWhileMaking)
-                    //{
-                    //    logic.CurrentMove = null;
-                    //}
+                        gameState = new GameState(this, unitsToHandle);
+                    }
 
-                    logic.MakeMove(new GameState(this, logic.Units));
+                    logic.MakeMove(gameState);
+
+                    lock (m_lastMovesLock)
+                    {
+                        gameState.UnitStates.DoForEach(
+                            item =>
+                            {
+                                DebugHelper.WriteLine(
+                                    "Logic '{0}', for chicken {{{1}}}, is making move {{{2}}}.",
+                                    logic.GetType().Name,
+                                    item.Unit,
+                                    item.CurrentMove == null ? "NONE" : item.CurrentMove.ToString());
+                                this.LastMoves[item.Unit] = item;
+                            });
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -608,7 +664,7 @@ namespace SharpestBeak.Common
             Application.Idle -= this.Application_Idle;
 
             m_syncLock.ExecuteInReadLock(
-                () => this.AliveChickens.DoForEach(
+                () => this.Logics.DoForEach(
                     item =>
                     {
                         item.Thread.Abort();

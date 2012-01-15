@@ -72,6 +72,15 @@ namespace SharpestBeak.UI.WinForms
         {
             foreach (var unitState in state.UnitStates)
             {
+                if (unitState.IsDead)
+                {
+                    lock (m_targetPointsLock)
+                    {
+                        m_targetPoints.Remove(unitState.UniqueIndex);
+                    }
+                    continue;
+                }
+
                 Point2D targetPoint;
                 lock (m_targetPointsLock)
                 {
@@ -118,10 +127,11 @@ namespace SharpestBeak.UI.WinForms
                 var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
                 var turn = GameHelper.GetBeakTurn(unitState.BeakAngle, targetAngle);
 
-                unitState.CurrentMove = new MoveInfo(
-                    move.Item1,
-                    turn,
-                    GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None);
+                unitState.SetCurrentMove(
+                    new MoveInfo(
+                        move.Item1,
+                        turn,
+                        GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None));
             }
         }
 

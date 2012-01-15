@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 
@@ -35,11 +37,13 @@ namespace SharpestBeak.Common
             }
         }
 
+        [DebuggerNonUserCode]
         public static bool IsNullOrWhiteSpace(this string value)
         {
             return string.IsNullOrWhiteSpace(value);
         }
 
+        [DebuggerNonUserCode]
         public static void DoForEach<T>(this IEnumerable<T> collection, Action<T, int> action)
         {
             #region Argument Check
@@ -63,6 +67,7 @@ namespace SharpestBeak.Common
             }
         }
 
+        [DebuggerNonUserCode]
         public static void DoForEach<T>(this IEnumerable<T> collection, Action<T> action)
         {
             #region Argument Check
@@ -319,6 +324,20 @@ namespace SharpestBeak.Common
             {
                 @lock.ExitWriteLock();
             }
+        }
+
+        public static string GetQualifiedName(this MethodBase method)
+        {
+            #region Argument Check
+
+            if (method == null)
+            {
+                throw new ArgumentNullException("method");
+            }
+
+            #endregion
+
+            return (method.DeclaringType ?? method.ReflectedType).Name + Type.Delimiter + method.Name;
         }
 
         #endregion

@@ -72,12 +72,13 @@ namespace SharpestBeak.Common
         public override string ToString()
         {
             return string.Format(
-                "{0}. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}, State = {4}",
+                "{0} [{5}]. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}, State = {4}",
                 GetType().Name,
                 this.BeakTurn,
                 this.MoveDirection,
                 this.FireMode,
-                this.State);
+                this.State,
+                System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this));
         }
 
         #endregion
