@@ -241,7 +241,7 @@ namespace SharpestBeak.Common
                 });
 
             var sw = new Stopwatch();
-            //List<EngineMoveInfo> previousMoves = null;
+            List<ChickenUnitState> previousUnitStates = null;
             while (!IsStopping())
             {
                 if (m_disposed)
@@ -270,7 +270,7 @@ namespace SharpestBeak.Common
                                 OutputFormat = string.Format("Engine step #{0} took {{0}}.", this.MoveCount + 1)
                             })
                         {
-                            ProcessEngineStep(/*ref previousMoves*/);
+                            ProcessEngineStep(ref previousUnitStates);
                         }
                     });
 
@@ -287,7 +287,7 @@ namespace SharpestBeak.Common
             }
         }
 
-        private void ProcessEngineStep(/*ref List<EngineMoveInfo> previousMoves*/)
+        private void ProcessEngineStep(ref List<ChickenUnitState> previousUnitStates)
         {
             var timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
 
@@ -295,23 +295,20 @@ namespace SharpestBeak.Common
                 .Where(item => item.Logic.Error == null)
                 .ToArray();
 
-            //List<EngineMoveInfo> newMoves;
-            List<ChickenUnitState> newMoves;
+            List<ChickenUnitState> newUnitStates;
             lock (m_lastMovesLock)
             {
-                newMoves = aliveChickens
+                newUnitStates = aliveChickens
                     .Select(item => this.LastMoves.GetValueOrDefault(item))
                     .Where(item => item != null && item.CurrentMove != null
                         && item.CurrentMove.State == MoveInfoState.None)
-                    //.Select(item => EngineMoveInfo.Create(item))
-                    //.Where(item => item != null)
                     .ToList();
             }
 
             var oldShotUnits = this.ShotUnitsDirect.ToArray();
 
             // Processing new shot units
-            var shootingMoves = newMoves.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
+            var shootingMoves = newUnitStates.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
             shootingMoves.DoForEach(
                 item =>
                 {
@@ -402,32 +399,31 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var previousMoves = newMoves;
-            if (previousMoves != null && previousMoves.Any() && timeDelta > 0f)
+            if (previousUnitStates != null && previousUnitStates.Any() && timeDelta > 0f)
             {
-                foreach (var move in previousMoves)
+                foreach (var unitState in previousUnitStates)
                 {
                     if (IsStopping())
                     {
                         return;
                     }
 
-                    var unit = move.Unit;
+                    var unit = unitState.Unit;
                     DebugHelper.WriteLine(
                         "{0} is processing move {{{1}}} of chicken {{{2}}}.",
                         GetType().Name,
-                        move.CurrentMove,
+                        unitState.CurrentMove,
                         unit);
 
                     var newPosition = GameHelper.GetNewPosition(
                         unit.Position,
                         unit.BeakAngle,
-                        move.CurrentMove.MoveDirection,
+                        unitState.CurrentMove.MoveDirection,
                         GameConstants.ChickenUnit.DefaultRectilinearSpeed,
                         timeDelta);
                     var newBeakAngle = GameHelper.GetNewBeakAngle(
                         unit.BeakAngle,
-                        move.CurrentMove.BeakTurn,
+                        unitState.CurrentMove.BeakTurn,
                         timeDelta);
 
                     // TODO: [VM] Check out-of-game-board collision
@@ -438,7 +434,7 @@ namespace SharpestBeak.Common
                         item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
                     if (conflictingChicken != null)
                     {
-                        move.CurrentMove.State = MoveInfoState.Rejected;
+                        unitState.CurrentMove.State = MoveInfoState.Rejected;
                         DebugHelper.WriteLine(
                             "Blocked collision of chicken {{{0}}} with {{{1}}}.",
                             unit,
@@ -448,7 +444,7 @@ namespace SharpestBeak.Common
                     {
                         unit.Position = newPosition;
                         unit.BeakAngle = newBeakAngle;
-                        move.CurrentMove.State = MoveInfoState.Handled;
+                        unitState.CurrentMove.State = MoveInfoState.Handled;
 
                         DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
                     }
@@ -457,7 +453,7 @@ namespace SharpestBeak.Common
 
             this.AliveChickensDirect.RemoveAll(item => item.IsDead);
 
-            //previousMoves = newMoves;
+            previousUnitStates = newUnitStates;
         }
 
         private void DoExecuteLogic(object logicInstance)
