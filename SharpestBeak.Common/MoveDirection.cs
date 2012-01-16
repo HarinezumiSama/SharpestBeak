@@ -5,12 +5,15 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
+    /// <summary>
+    ///     Specifies the move direction relative to beak direction.
+    /// </summary>
     public enum MoveDirection
     {
         None,
         MoveForward,
-        MoveRight,
         MoveBackward,
-        MoveLeft
+        StrafeRight,
+        StrafeLeft
     }
 }

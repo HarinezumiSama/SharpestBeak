@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -8,40 +9,61 @@ namespace SharpestBeak.Common.Elements.Primitives
 {
     public sealed class LinePrimitive : ICollidablePrimitive
     {
+        #region Fields
+
+        private Vector2D? m_direction;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="LinePrimitive"/> class.
         /// </summary>
-        public LinePrimitive(Point2D first, Point2D second)
+        public LinePrimitive(Point2D start, Point2D end)
         {
             #region Argument Check
 
-            if (first.GetDistance(second).IsZero())
+            if (start.GetDistance(end).IsZero())
             {
-                throw new ArgumentException("Line endpoints cannot be the same.", "second");
+                throw new ArgumentException(
+                    string.Format("Line endpoints cannot be the same ({0} and {1}).", start, end),
+                    "end");
             }
 
             #endregion
 
-            this.First = first;
-            this.Second = second;
+            this.Start = start;
+            this.End = end;
         }
 
         #endregion
 
         #region Public Properties
 
-        public Point2D First
+        public Point2D Start
         {
             get;
             private set;
         }
 
-        public Point2D Second
+        public Point2D End
         {
             get;
             private set;
+        }
+
+        public Vector2D Direction
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                if (!m_direction.HasValue)
+                {
+                    m_direction = this.End - this.Start;
+                }
+                return m_direction.Value;
+            }
         }
 
         #endregion
@@ -63,6 +85,12 @@ namespace SharpestBeak.Common.Elements.Primitives
             if (otherLine != null)
             {
                 return CollisionDetector.CheckLineToLineCollision(this, otherLine);
+            }
+
+            var circle = other as CirclePrimitive;
+            if (circle != null)
+            {
+                return CollisionDetector.CheckLineToCircleCollision(this, circle);
             }
 
             throw new NotSupportedException();

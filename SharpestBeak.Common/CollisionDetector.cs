@@ -135,12 +135,12 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var dir1 = line1.Second - line1.First;
-            var dir2 = line2.Second - line2.First;
+            var dir1 = line1.Direction;
+            var dir2 = line2.Direction;
 
             var denominator = dir2.Y * dir1.X - dir2.X * dir1.Y;
-            var numeratorA = dir2.X * (line1.First.Y - line2.First.Y) - dir2.Y * (line1.First.X - line2.First.X);
-            var numeratorB = dir1.X * (line1.First.Y - line2.First.Y) - dir1.Y * (line1.First.X - line2.First.X);
+            var numeratorA = dir2.X * (line1.Start.Y - line2.Start.Y) - dir2.Y * (line1.Start.X - line2.Start.X);
+            var numeratorB = dir1.X * (line1.Start.Y - line2.Start.Y) - dir1.Y * (line1.Start.X - line2.Start.X);
 
             if (denominator.IsZero())
             {
@@ -180,6 +180,40 @@ namespace SharpestBeak.Common
             var difference = radiusSumSqr - centerDistanceSqr;
 
             return difference > 0f || difference.IsZero();
+        }
+
+        internal static bool CheckLineToCircleCollision(LinePrimitive line, CirclePrimitive circle)
+        {
+            #region Argument Check
+
+            if (line == null)
+            {
+                throw new ArgumentNullException("line");
+            }
+            if (circle == null)
+            {
+                throw new ArgumentNullException("circle");
+            }
+
+            #endregion
+
+            var radiusSqr = circle.Radius.Sqr();
+
+            // It's enough to check only one of the line's points
+            if ((line.Start.GetDistanceSquared(circle.Center) - radiusSqr).IsNegativeOrZero())
+            {
+                // The point is inside or on the circle
+                return true;
+            }
+
+            var circleDirection = line.Start - circle.Center;
+
+            var a = line.Direction * line.Direction;
+            var b = 2 * (circleDirection * line.Direction);
+            var c = (circleDirection * circleDirection) - radiusSqr;
+
+            var d = b.Sqr() - 4 * a * c;
+            return d.IsPositiveOrZero();
         }
 
         internal static bool CheckPolygonToPolygonCollision(

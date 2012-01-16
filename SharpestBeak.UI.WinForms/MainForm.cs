@@ -19,7 +19,7 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly Size s_gameBoardSize = new Size(12, 8);
+        private static readonly Size s_gameBoardSize = new Size(24, 16);
         private static readonly int s_chickenUnitCount = 10;
 
         private static readonly int s_cellSize = 48;
@@ -44,23 +44,57 @@ namespace SharpestBeak.UI.WinForms
         {
             #region Manual Test 1
 
-            //var v1 = new Vector2D(1f, 2f);
-            //var v2 = new Vector2D(3f, -2f);
-            //var pv = v1.Project(v2);
-            //var p = v1.ProjectScalar(v2);
-            //var pr = v2.Normalize() * p;
+            {
+                //var v1 = new Vector2D(1f, 2f);
+                //var v2 = new Vector2D(3f, -2f);
+                //var pv = v1.Project(v2);
+                //var p = v1.ProjectScalar(v2);
+                //var pr = v2.Normalize() * p;
+            }
 
             #endregion
 
             #region Manual Test 2
 
-            //var pg1 = new ConvexPolygonPrimitive(new Point2D(2, 1), new Point2D(4, 2), new Point2D(1, 5));
-            //var pg2 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(3, 4));
-            //var pg3 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(0, 0));
-            //var c1 = CollisionDetector.CheckCollision(pg1, pg2);
-            //Debug.WriteLine(c1);
-            //var c2 = CollisionDetector.CheckCollision(pg1, pg3);
-            //Debug.WriteLine(c1);
+            {
+                //var pg1 = new ConvexPolygonPrimitive(new Point2D(2, 1), new Point2D(4, 2), new Point2D(1, 5));
+                //var pg2 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(3, 4));
+                //var pg3 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(0, 0));
+                //var c1 = CollisionDetector.CheckCollision(pg1, pg2);
+                //Debug.WriteLine(c1);
+                //Debug.Assert(!c1);
+                //var c2 = CollisionDetector.CheckCollision(pg1, pg3);
+                //Debug.WriteLine(c2);
+                //Debug.Assert(c2);
+            }
+
+            #endregion
+
+            #region Manual Test 3
+
+            {
+                //var circle = new CirclePrimitive(new Point2D(1f, 2f), 0.5f);
+
+                //var line1 = new LinePrimitive(new Point2D(1.1f, 2.1f), new Point2D(1.2f, 1.9f));
+                //var c1 = CollisionDetector.CheckCollision(circle, line1);
+                //Debug.WriteLine(c1);
+                //Debug.Assert(c1);
+
+                //var line2 = new LinePrimitive(new Point2D(0f, 3f), new Point2D(2f, 0f));
+                //var c2 = CollisionDetector.CheckCollision(circle, line2);
+                //Debug.WriteLine(c2);
+                //Debug.Assert(c2);
+
+                //var line3 = new LinePrimitive(new Point2D(1f, 1.5f), new Point2D(5f, 1.5f));
+                //var c3 = CollisionDetector.CheckCollision(circle, line3);
+                //Debug.WriteLine(c3);
+                //Debug.Assert(c3);
+
+                //var line4 = new LinePrimitive(new Point2D(0f, 1f), new Point2D(1f, 0f));
+                //var c4 = CollisionDetector.CheckCollision(circle, line4);
+                //Debug.WriteLine(c4);
+                //Debug.Assert(!c4);
+            }
 
             #endregion
 
@@ -69,6 +103,7 @@ namespace SharpestBeak.UI.WinForms
             m_gameEngine = new GameEngine(
                 this.PaintGame,
                 s_gameBoardSize,
+                new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount),
                 new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount));
         }
 

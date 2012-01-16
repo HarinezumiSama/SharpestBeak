@@ -33,8 +33,8 @@ namespace SharpestBeak.Common
                 { MoveDirection.None, null },
                 { MoveDirection.MoveForward,  GameAngle.FromDegrees(0f) },
                 { MoveDirection.MoveBackward, GameAngle.FromDegrees(HalfRevolutionDegrees) },
-                { MoveDirection.MoveLeft, GameAngle.FromDegrees(QuarterRevolutionDegrees) },
-                { MoveDirection.MoveRight, GameAngle.FromDegrees(-QuarterRevolutionDegrees) }
+                { MoveDirection.StrafeLeft, GameAngle.FromDegrees(QuarterRevolutionDegrees) },
+                { MoveDirection.StrafeRight, GameAngle.FromDegrees(-QuarterRevolutionDegrees) }
             };
 
         #endregion
@@ -69,6 +69,20 @@ namespace SharpestBeak.Common
             return value >= tolerance;
         }
 
+        public static bool IsPositiveOrZero(this float value, float tolerance = ZeroTolerance)
+        {
+            #region Argument Check
+
+            if (tolerance < 0)
+            {
+                throw new ArgumentOutOfRangeException("tolerance", tolerance, "Tolerance must be positive.");
+            }
+
+            #endregion
+
+            return value > -tolerance;
+        }
+
         public static bool IsNegative(this float value, float tolerance = ZeroTolerance)
         {
             #region Argument Check
@@ -81,6 +95,20 @@ namespace SharpestBeak.Common
             #endregion
 
             return value <= -tolerance;
+        }
+
+        public static bool IsNegativeOrZero(this float value, float tolerance = ZeroTolerance)
+        {
+            #region Argument Check
+
+            if (tolerance < 0)
+            {
+                throw new ArgumentOutOfRangeException("tolerance", tolerance, "Tolerance must be positive.");
+            }
+
+            #endregion
+
+            return value < tolerance;
         }
 
         public static bool IsInRange(this float value, float min, float max, float tolerance = ZeroTolerance)
