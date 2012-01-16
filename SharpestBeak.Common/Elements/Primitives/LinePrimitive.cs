@@ -68,6 +68,15 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #endregion
 
+        #region Public Methods
+
+        public LineSide GetLineSide(Point2D point)
+        {
+            return CollisionDetector.GetLineSide(this, point);
+        }
+
+        #endregion
+
         #region ICollidablePrimitive Members
 
         public bool HasCollision(ICollidablePrimitive other)

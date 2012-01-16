@@ -256,6 +256,19 @@ namespace SharpestBeak.Common
             return DotProduct(left, right);
         }
 
+        /// <summary>
+        ///     Computes the cross product of the specified vectors. 
+        ///     Returns the Z component of the resulting 3D vector (0, 0, Z).
+        /// </summary>
+        /// <param name="left">
+        ///     The first vector of the cross product.
+        /// </param>
+        /// <param name="right">
+        ///     The second vector of the cross product.
+        /// </param>
+        /// <returns>
+        ///     The Z component of the resulting 3D vector (0, 0, Z).
+        /// </returns>
         public static float operator ^(Vector2D left, Vector2D right)
         {
             return CrossProduct(left, right);

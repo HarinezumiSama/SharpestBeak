@@ -263,6 +263,28 @@ namespace SharpestBeak.Common
             return result;
         }
 
+        public static LineSide GetLineSide(Point2D lineStart, Point2D lineEnd, Point2D point)
+        {
+            var lineVector = lineEnd - lineStart;
+            var pointVector = point - lineStart;
+            var product = lineVector ^ pointVector;
+            return (LineSide)Math.Sign(product.IsZero() ? 0f : product);
+        }
+
+        public static LineSide GetLineSide(LinePrimitive line, Point2D point)
+        {
+            #region Argument Check
+
+            if (line == null)
+            {
+                throw new ArgumentNullException("line");
+            }
+
+            #endregion
+
+            return GetLineSide(line.Start, line.End, point);
+        }
+
         #endregion
     }
 }

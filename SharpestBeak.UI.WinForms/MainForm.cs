@@ -98,6 +98,26 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
+            #region Manual Test 4
+
+            {
+                //var line = new LinePrimitive(new Point2D(1f, 1f), new Point2D(2f, 2f));
+
+                //var s1 = CollisionDetector.GetLineSide(line, new Point2D(1.5f, 1.5f));
+                //Debug.WriteLine(s1);
+                //Debug.Assert(s1 == LineSide.OnLine);
+
+                //var s2 = CollisionDetector.GetLineSide(line, new Point2D(0f, 1f));
+                //Debug.WriteLine(s2);
+                //Debug.Assert(s2 == LineSide.Left);
+
+                //var s3 = CollisionDetector.GetLineSide(line, new Point2D(1f, 0f));
+                //Debug.WriteLine(s3);
+                //Debug.Assert(s3 == LineSide.Right);
+            }
+
+            #endregion
+
             InitializeComponent();
 
             m_gameEngine = new GameEngine(
