@@ -25,6 +25,7 @@ namespace SharpestBeak.Common
 
             this.Unit = unit;
             this.UniqueIndex = unit.UniqueIndex;
+            this.Team = unit.Logic.Team;
             this.IsDead = unit.IsDead;
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
@@ -47,6 +48,7 @@ namespace SharpestBeak.Common
             this.Unit = unitState.Unit;
             this.IsDead = unitState.Unit.IsDead;  // IsDead should always be obtained from unit, not from state
             this.UniqueIndex = unitState.UniqueIndex;
+            this.Team = unitState.Team;
             this.Position = unitState.Unit.Position;
             this.BeakAngle = unitState.Unit.BeakAngle;
             this.PreviousMove = unitState.CurrentMove;
@@ -67,6 +69,12 @@ namespace SharpestBeak.Common
         #region Public Properties
 
         public int UniqueIndex
+        {
+            get;
+            private set;
+        }
+
+        public GameTeam Team
         {
             get;
             private set;

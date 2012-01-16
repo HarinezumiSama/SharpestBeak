@@ -26,6 +26,7 @@ namespace SharpestBeak.Common
         private readonly Action<GamePaintEventArgs> m_paintCallback;
         private readonly ThreadSafeValue<ulong> m_moveCount;
         private Thread m_engineThread;
+        private bool m_finalizingStage;
 
         private readonly object m_lastMovesLock = new object();
 
@@ -39,7 +40,8 @@ namespace SharpestBeak.Common
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
             Size size,
-            IEnumerable<ChickenLogicRecord> chickens)
+            ChickenLogicRecord teamA,
+            ChickenLogicRecord teamB)
         {
             #region Fields
 
@@ -47,13 +49,13 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("paintCallback");
             }
-            if (chickens == null)
+            if (teamA == null)
             {
-                throw new ArgumentNullException("chickens");
+                throw new ArgumentNullException("teamA");
             }
-            if (chickens.Any(item => item == null))
+            if (teamB == null)
             {
-                throw new ArgumentException("The collection contains a null element.", "chickens");
+                throw new ArgumentNullException("teamB");
             }
 
             #endregion
@@ -71,7 +73,14 @@ namespace SharpestBeak.Common
             this.LastMoves = new Dictionary<ChickenUnit, ChickenUnitState>();
 
             // Post-initialized properties
-            this.Logics = chickens.Select(item => CreateLogic(item)).ToList().AsReadOnly();
+            this.Logics =
+                new[]
+                {
+                    CreateLogic(teamA, GameTeam.TeamA),
+                    CreateLogic(teamB, GameTeam.TeamB)
+                }
+                .ToList()
+                .AsReadOnly();
             this.AllChickens = this.Logics
                 .SelectMany(item => item.Units)
                 .ToList()
@@ -100,23 +109,11 @@ namespace SharpestBeak.Common
             ResetInternal();
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameEngine"/> class.
-        /// </summary>
-        public GameEngine(
-            Action<GamePaintEventArgs> paintCallback,
-            Size size,
-            params ChickenLogicRecord[] chickens)
-            : this(paintCallback, size, (IEnumerable<ChickenLogicRecord>)chickens)
-        {
-            // Nothing to do
-        }
-
         #endregion
 
         #region Private Methods
 
-        private static ChickenUnitLogic CreateLogic(ChickenLogicRecord logicRecord)
+        private static ChickenUnitLogic CreateLogic(ChickenLogicRecord logicRecord, GameTeam team)
         {
             #region Argument Check
 
@@ -128,7 +125,7 @@ namespace SharpestBeak.Common
             #endregion
 
             var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type);
-            result.CreateUnits(logicRecord.UnitCount);
+            result.InitializeInstance(logicRecord.UnitCount, team);
             return result;
         }
 
@@ -221,6 +218,7 @@ namespace SharpestBeak.Common
         private void ResetInternal()
         {
             m_moveCount.Value = 0;
+            m_finalizingStage = false;
 
             this.AliveChickensDirect.ChangeContents(this.AllChickens);
             this.ShotUnitsDirect.Clear();
@@ -307,27 +305,31 @@ namespace SharpestBeak.Common
 
             var oldShotUnits = this.ShotUnitsDirect.ToArray();
 
-            // Processing new shot units
-            var shootingMoves = newUnitStates.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
-            shootingMoves.DoForEach(
-                item =>
-                {
-                    // Is there any active shot unit from the same chicken unit?
-                    if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
+            // TODO: [VM] Allow to shoot if there are any enemy shots on game board
+            if (!m_finalizingStage)
+            {
+                // Processing new shot units
+                var shootingMoves = newUnitStates.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
+                shootingMoves.DoForEach(
+                    item =>
                     {
-                        if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
+                        // Is there any active shot unit from the same chicken unit?
+                        if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
                         {
-                            DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
-                            return;
+                            if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
+                            {
+                                DebugHelper.WriteLine("New shot from {{{0}}} has been skipped.", item.Unit);
+                                return;
+                            }
                         }
-                    }
 
-                    var shot = new ShotUnit(item.Unit);
-                    this.ShotUnitsDirect.Add(shot);
-                    item.Unit.ShotTimer.Restart();
+                        var shot = new ShotUnit(item.Unit);
+                        this.ShotUnitsDirect.Add(shot);
+                        item.Unit.ShotTimer.Restart();
 
-                    DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
-                });
+                        DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
+                    });
+            }
 
             #region Processing Shot Collisions
 
@@ -357,8 +359,7 @@ namespace SharpestBeak.Common
                     }
                 });
 
-            using (var asw =
-                new AutoStopwatch(s => DebugHelper.WriteLine(s))
+            using (new AutoStopwatch(s => DebugHelper.WriteLine(s))
                 {
                     OutputFormat = "Shot/chicken collision took {0}."
                 })
@@ -452,6 +453,18 @@ namespace SharpestBeak.Common
             }
 
             this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+
+            var aliveTeams = this.AliveChickensDirect.Select(item => item.Logic.Team).Distinct().ToList();
+            if (aliveTeams.Count <= 1)
+            {
+                m_finalizingStage = true;
+                if (!this.ShotUnitsDirect.Any())
+                {
+                    var winningTeam = aliveTeams.SingleOrDefault();
+                    RaiseGameEnded(winningTeam);
+                    return;
+                }
+            }
 
             previousUnitStates = newUnitStates;
         }
@@ -563,6 +576,21 @@ namespace SharpestBeak.Common
             return m_syncLock.ExecuteInReadLock(() => new GamePresentation(this));
         }
 
+        private void OnGameEnded(GameEndedEventArgs e)
+        {
+            var gameEnded = this.GameEnded;
+            if (gameEnded != null)
+            {
+                gameEnded(this, e);
+            }
+        }
+
+        private void RaiseGameEnded(GameTeam winningTeam)
+        {
+            var e = new GameEndedEventArgs(winningTeam);
+            OnGameEnded(e);
+        }
+
         #endregion
 
         #region Internal Properties
@@ -591,27 +619,36 @@ namespace SharpestBeak.Common
             private set;
         }
 
+        internal IList<ChickenUnitLogic> Logics
+        {
+            get;
+            private set;
+        }
+
+        internal IList<ChickenUnit> AliveChickens
+        {
+            get;
+            private set;
+        }
+
+        internal IList<ShotUnit> ShotUnits
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Public Events
+
+        /// <summary>
+        ///     Occurs when the game has ended. <b>NOTE</b>: handlers of this event are called from engine thread!
+        /// </summary>
+        public event EventHandler<GameEndedEventArgs> GameEnded;
+
         #endregion
 
         #region Public Properties
-
-        public IList<ChickenUnitLogic> Logics
-        {
-            get;
-            private set;
-        }
-
-        public IList<ChickenUnit> AliveChickens
-        {
-            get;
-            private set;
-        }
-
-        public IList<ShotUnit> ShotUnits
-        {
-            get;
-            private set;
-        }
 
         public GameCommonData CommonData
         {

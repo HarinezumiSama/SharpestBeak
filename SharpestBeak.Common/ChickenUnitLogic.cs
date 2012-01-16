@@ -76,11 +76,11 @@ namespace SharpestBeak.Common
 
         #region Internal Methods
 
-        internal void CreateUnits(int unitCount)
+        internal void InitializeInstance(int unitCount, GameTeam team)
         {
             #region Argument Check
 
-            if (unitCount < 0)
+            if (unitCount <= 0)
             {
                 throw new ArgumentOutOfRangeException(
                     "unitCount",
@@ -92,6 +92,7 @@ namespace SharpestBeak.Common
 
             m_unitsDirect.ChangeContents(
                 Enumerable.Range(1, unitCount).Select(i => new ChickenUnit(this)));
+            this.Team = team;
         }
 
         internal void Reset()
@@ -115,6 +116,16 @@ namespace SharpestBeak.Common
             {
                 OnMakeMove(state);
             }
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        public GameTeam Team
+        {
+            get;
+            private set;
         }
 
         #endregion

@@ -125,6 +125,7 @@ namespace SharpestBeak.UI.WinForms
                 s_gameBoardSize,
                 new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount),
                 new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount));
+            m_gameEngine.GameEnded += this.GameEngine_GameEnded;
         }
 
         #endregion
@@ -329,10 +330,12 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
+                var brush = chickenUnit.Logic.Team == GameTeam.TeamA ? Brushes.Orange : Brushes.Green;
+
                 var uiPosition = chickenUnit.Position * coefficient;
 
                 graphics.FillEllipse(
-                    Brushes.Green,
+                    brush,
                     uiPosition.X - uiChickenBodyRadius,
                     uiPosition.Y - uiChickenBodyRadius,
                     2f * uiChickenBodyRadius,
@@ -346,7 +349,7 @@ namespace SharpestBeak.UI.WinForms
                 };
                 var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, chickenUnit.BeakAngle);
 
-                graphics.FillPolygon(Brushes.Green, beakPolygonPoints.ToPointF(), FillMode.Winding);
+                graphics.FillPolygon(brush, beakPolygonPoints.ToPointF(), FillMode.Winding);
 
                 var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
@@ -405,6 +408,24 @@ namespace SharpestBeak.UI.WinForms
             {
                 fpsLabel.Text = string.Format("{0:N1} FPS", m_fps);
             }
+        }
+
+        private void GameEngine_GameEnded(object sender, GameEndedEventArgs e)
+        {
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke((Action<object, GameEndedEventArgs>)this.GameEngine_GameEnded, sender, e);
+                return;
+            }
+
+            m_gameEngine.Stop();
+
+            MessageBox.Show(
+                this,
+                "Winning team: " + e.WinningTeam,
+                "Game Ended",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
         }
 
         #endregion

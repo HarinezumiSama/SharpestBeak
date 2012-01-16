@@ -17,7 +17,7 @@ namespace SharpestBeak.Common.Elements.Primitives
         {
             #region Argument Check
 
-            if (radius < 0f || radius.IsZero())
+            if (radius.IsNegativeOrZero())
             {
                 throw new ArgumentOutOfRangeException("radius", radius, "Circle radius must be positive.");
             }

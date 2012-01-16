@@ -60,6 +60,8 @@
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
     <Compile Include="Elements\Primitives\ConvexState.cs" />
     <Compile Include="Elements\Primitives\ConvexPolygonPrimitive.cs" />
+    <Compile Include="GameEndedEventArgs.cs" />
+    <Compile Include="GameTeam.cs" />
     <Compile Include="LineSide.cs" />
     <Compile Include="MoveInfoState.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
