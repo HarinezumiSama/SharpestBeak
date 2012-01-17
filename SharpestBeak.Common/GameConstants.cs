@@ -13,17 +13,17 @@ namespace SharpestBeak.Common
         {
             #region Fields
 
-            public static readonly float BodyCircleRadius = GameConstants.NominalCellSize / 4f;
+            /// <summary>
+            ///     Distance from body circle center to beak tip.
+            /// </summary>
+            public static readonly float BeakOffset = (GameConstants.NominalCellSize / 2f) * 7f / 8f;
 
             /// <summary>
             ///     Length of beak overhang, counting from the body circle.
             /// </summary>
-            public static readonly float BeakOverhang = BodyCircleRadius * 0.75f;
+            public static readonly float BeakOverhang = BeakOffset / 2f;
 
-            /// <summary>
-            ///     Distance from body circle center to beak tip.
-            /// </summary>
-            public static readonly float BeakOffset = BodyCircleRadius + BeakOverhang;
+            public static readonly float BodyCircleRadius = BeakOffset - BeakOverhang;
 
             public static readonly float BeakRayOffset = BodyCircleRadius * 0.75f;
 

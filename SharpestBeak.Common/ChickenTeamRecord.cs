@@ -5,14 +5,14 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public sealed class ChickenLogicRecord
+    public sealed class ChickenTeamRecord
     {
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ChickenLogicRecord"/> class.
+        ///     Initializes a new instance of the <see cref="ChickenTeamRecord"/> class.
         /// </summary>
-        public ChickenLogicRecord(Type type, int unitCount)
+        public ChickenTeamRecord(Type type, int unitCount)
         {
             #region Argument Check
 
@@ -20,7 +20,7 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("type");
             }
-            if (unitCount < 0)
+            if (unitCount <= 0)
             {
                 throw new ArgumentOutOfRangeException(
                     "unitCount",

@@ -19,9 +19,6 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly Size s_gameBoardSize = new Size(24, 16);
-        private static readonly int s_chickenUnitCount = 10;
-
         private static readonly int s_cellSize = 48;
         private static readonly int s_fullCellSize = s_cellSize + 1;
 
@@ -120,17 +117,64 @@ namespace SharpestBeak.UI.WinForms
 
             InitializeComponent();
 
+            var gameBoardSize = Settings.Default.NominalSize;
+            var chickenUnitCount = Settings.Default.TeamUnitCount;
+
             m_gameEngine = new GameEngine(
                 this.PaintGame,
-                s_gameBoardSize,
-                new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount),
-                new ChickenLogicRecord(typeof(RandomChickenLogic), s_chickenUnitCount));
+                gameBoardSize,
+                new ChickenTeamRecord(typeof(RandomChickenLogic), chickenUnitCount),
+                new ChickenTeamRecord(typeof(RandomChickenLogic), chickenUnitCount));
             m_gameEngine.GameEnded += this.GameEngine_GameEnded;
         }
 
         #endregion
 
         #region Private Methods
+
+        private DialogResult ShowMessage(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
+        {
+            return MessageBox.Show(
+                this,
+                text,
+                string.IsNullOrEmpty(caption) ? this.Text : caption + " – " + this.Text,
+                buttons,
+                icon);
+        }
+
+        private void ShowInfoMessage(string text, string caption = null)
+        {
+            ShowMessage(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ShowErrorMessage(string text, string caption = null)
+        {
+            ShowMessage(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+        }
+
+        private void ShowErrorMessage(Exception exception)
+        {
+            #region Argument Check
+
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
+            #endregion
+
+            ShowErrorMessage(
+                string.Format("An error occurred:{0}{1}", Environment.NewLine, exception.ToString()),
+                "Error");
+        }
+
+        private DialogResult ShowQuestion(
+            string text,
+            MessageBoxButtons buttons = MessageBoxButtons.YesNo,
+            string caption = null)
+        {
+            return ShowMessage(text, caption, buttons, MessageBoxIcon.Question);
+        }
 
         private bool InitializeGameUI()
         {
@@ -216,29 +260,69 @@ namespace SharpestBeak.UI.WinForms
 
         private void StartGame()
         {
-            if (m_gameEngine.IsRunning)
+            try
             {
+                if (m_gameEngine.IsRunning)
+                {
+                    return;
+                }
+
+                var winningTeam = m_gameEngine.WinningTeam;
+                if (winningTeam.HasValue)
+                {
+                    var dr = ShowQuestion(
+                        string.Format(
+                            "The game has ended. Winning team: {0}.{1}{1}"
+                                + "Do you wish to restart the game?",
+                            winningTeam.Value,
+                            Environment.NewLine));
+                    if (dr != DialogResult.Yes)
+                    {
+                        return;
+                    }
+
+                    ResetGame();
+                }
+
+                m_totalPaintCount = 0;
+                ResetFpsCounter(true);
+                m_gameEngine.Start();
+                UpdateMoveCountStatus();
+                fpsTimer.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex);
                 return;
             }
-
-            m_totalPaintCount = 0;
-            ResetFpsCounter(true);
-            m_gameEngine.Start();
-            UpdateMoveCountStatus();
-            fpsTimer.Enabled = true;
         }
 
         private void StopGame()
         {
-            if (!m_gameEngine.IsRunning)
+            try
             {
+                if (!m_gameEngine.IsRunning)
+                {
+                    return;
+                }
+
+                fpsTimer.Enabled = false;
+                m_gameEngine.Stop();
+                m_fpsStopwatch.Stop();
+                fpsLabel.Text = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                ShowErrorMessage(ex);
                 return;
             }
+        }
 
-            fpsTimer.Enabled = false;
-            m_gameEngine.Stop();
-            m_fpsStopwatch.Stop();
-            fpsLabel.Text = string.Empty;
+        private void ResetGame()
+        {
+            StopGame();
+            m_gameEngine.Reset();
+            m_gameEngine.CallPaint();
         }
 
         #endregion
@@ -286,9 +370,7 @@ namespace SharpestBeak.UI.WinForms
                     break;
 
                 case Keys.F8:
-                    StopGame();
-                    m_gameEngine.Reset();
-                    m_gameEngine.CallPaint();
+                    ResetGame();
                     break;
             }
         }
@@ -330,7 +412,7 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
-                var brush = chickenUnit.Logic.Team == GameTeam.TeamA ? Brushes.Orange : Brushes.Green;
+                var brush = chickenUnit.Logic.Team == GameTeam.TeamA ? Brushes.LightGreen : Brushes.DarkGreen;
 
                 var uiPosition = chickenUnit.Position * coefficient;
 
@@ -420,12 +502,7 @@ namespace SharpestBeak.UI.WinForms
 
             m_gameEngine.Stop();
 
-            MessageBox.Show(
-                this,
-                "Winning team: " + e.WinningTeam,
-                "Game Ended",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            ShowInfoMessage(string.Format("Winning team: {0}.", e.WinningTeam), "Game Ended");
         }
 
         #endregion

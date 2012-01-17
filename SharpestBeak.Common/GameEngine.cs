@@ -25,6 +25,7 @@ namespace SharpestBeak.Common
         private bool m_disposed;
         private readonly Action<GamePaintEventArgs> m_paintCallback;
         private readonly ThreadSafeValue<ulong> m_moveCount;
+        private readonly ThreadSafeValue<GameTeam?> m_winningTeam;
         private Thread m_engineThread;
         private bool m_finalizingStage;
 
@@ -40,8 +41,8 @@ namespace SharpestBeak.Common
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
             Size size,
-            ChickenLogicRecord teamA,
-            ChickenLogicRecord teamB)
+            ChickenTeamRecord teamA,
+            ChickenTeamRecord teamB)
         {
             #region Fields
 
@@ -70,6 +71,7 @@ namespace SharpestBeak.Common
             // Pre-initialized properties
             this.CommonData = new GameCommonData(size);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
+            m_winningTeam = new ThreadSafeValue<GameTeam?>(m_syncLock);
             this.LastMoves = new Dictionary<ChickenUnit, ChickenUnitState>();
 
             // Post-initialized properties
@@ -113,7 +115,7 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
-        private static ChickenUnitLogic CreateLogic(ChickenLogicRecord logicRecord, GameTeam team)
+        private static ChickenUnitLogic CreateLogic(ChickenTeamRecord logicRecord, GameTeam team)
         {
             #region Argument Check
 
@@ -188,6 +190,11 @@ namespace SharpestBeak.Common
                 throw new InvalidOperationException("Engine is already running.");
             }
 
+            if (m_winningTeam.Value.HasValue)
+            {
+                throw new InvalidOperationException("The game has ended. Reset the game before starting it again.");
+            }
+
             Application.Idle += this.Application_Idle;
 
             m_engineThread = new Thread(this.DoExecuteEngine)
@@ -219,6 +226,7 @@ namespace SharpestBeak.Common
         {
             m_moveCount.Value = 0;
             m_finalizingStage = false;
+            m_winningTeam.Value = null;
 
             this.AliveChickensDirect.ChangeContents(this.AllChickens);
             this.ShotUnitsDirect.Clear();
@@ -277,7 +285,7 @@ namespace SharpestBeak.Common
                     return;
                 }
 
-                this.MoveCount++;
+                m_moveCount.Value++;
                 if (Settings.Default.UsePerformanceCounters)
                 {
                     PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
@@ -587,6 +595,7 @@ namespace SharpestBeak.Common
 
         private void RaiseGameEnded(GameTeam winningTeam)
         {
+            m_winningTeam.Value = winningTeam;
             var e = new GameEndedEventArgs(winningTeam);
             OnGameEnded(e);
         }
@@ -663,11 +672,6 @@ namespace SharpestBeak.Common
             {
                 return m_moveCount.Value;
             }
-            [DebuggerNonUserCode]
-            private set
-            {
-                m_moveCount.Value = value;
-            }
         }
 
         public bool IsRunning
@@ -677,6 +681,12 @@ namespace SharpestBeak.Common
             {
                 return m_syncLock.ExecuteInReadLock(() => m_engineThread != null);
             }
+        }
+
+        public GameTeam? WinningTeam
+        {
+            [DebuggerNonUserCode]
+            get { return m_winningTeam.Value; }
         }
 
         #endregion
@@ -700,8 +710,11 @@ namespace SharpestBeak.Common
                 () => this.Logics.DoForEach(
                     item =>
                     {
-                        item.Thread.Abort();
-                        item.Thread = null;
+                        if (item.Thread != null)
+                        {
+                            item.Thread.Abort();
+                            item.Thread = null;
+                        }
                     }));
 
             m_stopEvent.Set();
@@ -709,13 +722,16 @@ namespace SharpestBeak.Common
             m_syncLock.ExecuteInWriteLock(
                 () =>
                 {
-                    if (!m_engineThread.Join(s_stopTimeout))
+                    if (m_engineThread != null)
                     {
-                        m_engineThread.Abort();
-                        m_engineThread.Join();
-                    }
+                        if (!m_engineThread.Join(s_stopTimeout))
+                        {
+                            m_engineThread.Abort();
+                            m_engineThread.Join();
+                        }
 
-                    m_engineThread = null;
+                        m_engineThread = null;
+                    }
                 });
         }
 
@@ -723,7 +739,7 @@ namespace SharpestBeak.Common
         {
             if (this.IsRunning)
             {
-                throw new InvalidOperationException("Cannot reset game engine since it is running.");
+                throw new InvalidOperationException("Cannot reset game engine while it is running.");
             }
 
             m_syncLock.ExecuteInWriteLock(this.ResetInternal);
