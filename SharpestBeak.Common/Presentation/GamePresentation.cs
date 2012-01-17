@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Elements;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Presentation
 {
     public sealed class GamePresentation
     {

@@ -9,8 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpestBeak.Common;
-using SharpestBeak.Common.Elements;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Presentation;
 using SharpestBeak.UI.WinForms.Properties;
 
 namespace SharpestBeak.UI.WinForms
@@ -22,8 +21,18 @@ namespace SharpestBeak.UI.WinForms
         private static readonly int s_cellSize = 48;
         private static readonly int s_fullCellSize = s_cellSize + 1;
 
+        private static readonly float s_uiCoefficient = (float)s_cellSize / GameConstants.NominalCellSize;
+
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
+
+        private static readonly DrawData s_teamAUnitDrawData = new DrawData(Color.LightGreen, s_uiCoefficient);
+        private static readonly DrawData s_teamBUnitDrawData = new DrawData(Color.DarkGreen, s_uiCoefficient);
+
+        private static readonly DrawData s_teamAShotDrawData = new DrawData(Color.Pink, s_uiCoefficient);
+        private static readonly DrawData s_teamBShotDrawData = new DrawData(Color.DarkRed, s_uiCoefficient);
+
+        private static readonly float s_uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
 
         private readonly GameEngine m_gameEngine;
         private GamePresentation m_lastPresentation;
@@ -481,8 +490,6 @@ namespace SharpestBeak.UI.WinForms
                 return;
             }
 
-            // TODO: [VM] Draw using unit elements
-
             var size = m_lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
 
@@ -512,67 +519,35 @@ namespace SharpestBeak.UI.WinForms
                 graphics.FillRectangle(s_oddCellBrush, backRect);
             }
 
-            // TODO: Move to static read-only fields
-            var coefficient = (float)s_cellSize / GameConstants.NominalCellSize;
-            var uiChickenBodyRadius = GameConstants.ChickenUnit.BodyCircleRadius * coefficient;
-            var uiBeakOffset = GameConstants.ChickenUnit.BeakOffset * coefficient;
-            var uiBeakRayOffset = GameConstants.ChickenUnit.BeakRayOffset * coefficient;
-
             foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
                 var isTeamA = chickenUnit.Logic.Team == GameTeam.TeamA;
-                var brush = isTeamA ? Brushes.LightGreen : Brushes.DarkGreen;
+                var drawData = isTeamA ? s_teamAUnitDrawData : s_teamBUnitDrawData;
 
-                var uiPosition = chickenUnit.Position * coefficient;
-
-                graphics.FillEllipse(
-                    brush,
-                    uiPosition.X - uiChickenBodyRadius,
-                    uiPosition.Y - uiChickenBodyRadius,
-                    2f * uiChickenBodyRadius,
-                    2f * uiChickenBodyRadius);
-
-                var defaultBeakPolygonPoints = new[]
-                {
-                    new Point2D(uiPosition.X, uiPosition.Y - uiBeakRayOffset),
-                    new Point2D(uiPosition.X + uiBeakOffset, uiPosition.Y),
-                    new Point2D(uiPosition.X, uiPosition.Y + uiBeakRayOffset)
-                };
-                var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(uiPosition, chickenUnit.BeakAngle);
-
-                graphics.FillPolygon(brush, beakPolygonPoints.ToPointF(), FillMode.Winding);
+                chickenUnit.GetElement().Draw(graphics, drawData);
 
                 var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
                 {
                     var targetPointBrush = isTeamA ? Brushes.LightBlue : Brushes.DarkBlue;
-                    // TODO: Move to static read-only fields
-                    float uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
                     foreach (var targetPoint in rcl.TargetPoints)
                     {
-                        var tp = targetPoint * coefficient;
+                        var tp = targetPoint * s_uiCoefficient;
                         graphics.FillRectangle(
                             targetPointBrush,
-                            tp.X - uiTargetPointRadius,
-                            tp.Y - uiTargetPointRadius,
-                            2f * uiTargetPointRadius,
-                            2f * uiTargetPointRadius);
+                            tp.X - s_uiTargetPointRadius,
+                            tp.Y - s_uiTargetPointRadius,
+                            2f * s_uiTargetPointRadius,
+                            2f * s_uiTargetPointRadius);
                     }
                 }
             }
 
-            var uiShotRadius = GameConstants.ShotUnit.Radius * coefficient;
+            var uiShotRadius = GameConstants.ShotUnit.Radius * s_uiCoefficient;
             foreach (var shotUnit in m_lastPresentation.Shots)
             {
-                var shotBrush = shotUnit.Owner.Logic.Team == GameTeam.TeamA ? Brushes.Pink : Brushes.DarkRed;
-
-                var uiPosition = shotUnit.Position * coefficient;
-                graphics.FillEllipse(
-                    shotBrush,
-                    uiPosition.X - uiShotRadius,
-                    uiPosition.Y - uiShotRadius,
-                    2f * uiShotRadius,
-                    2f * uiShotRadius);
+                var drawData = shotUnit.Owner.Logic.Team == GameTeam.TeamA ? s_teamAShotDrawData : s_teamBShotDrawData;
+                shotUnit.GetElement().Draw(graphics, drawData);
             }
 
             m_totalPaintCount++;

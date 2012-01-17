@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Presentation.Primitives;
 
-namespace SharpestBeak.Common.Elements
+namespace SharpestBeak.Common.Presentation.Elements
 {
-    public sealed class ChickenElement : ICollidableElement
+    public sealed class ChickenElement : BaseElement, ICollidableElement
     {
         #region Fields
 
@@ -46,6 +46,15 @@ namespace SharpestBeak.Common.Elements
                 new ConvexPolygonPrimitive(beakPolygonPoints)
             }
             .AsReadOnly();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            DrawElement(graphics, data, this);
         }
 
         #endregion

@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Elements.Primitives;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Presentation
 {
-    public interface ICollidablePrimitive : ICollidable
+    public interface ICollidableElement : ICollidable
     {
         #region Properties
 
-        Point2D BasePoint
+        bool HasRoughPrimitives
         {
             get;
         }
@@ -20,7 +18,9 @@ namespace SharpestBeak.Common
 
         #region Methods
 
-        bool HasCollision(ICollidablePrimitive other);
+        IList<ICollidablePrimitive> GetRoughPrimitives();
+
+        IList<ICollidablePrimitive> GetPrimitives();
 
         #endregion
     }

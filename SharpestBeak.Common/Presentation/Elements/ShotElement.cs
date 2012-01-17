@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Presentation.Primitives;
 
-namespace SharpestBeak.Common.Elements
+namespace SharpestBeak.Common.Presentation.Elements
 {
-    public sealed class ShotElement : ICollidableElement
+    public sealed class ShotElement : BaseElement, ICollidableElement
     {
         #region Fields
 
@@ -26,14 +26,18 @@ namespace SharpestBeak.Common.Elements
 
             m_primitives = new List<ICollidablePrimitive>
             {
-                //new ConvexPolygonPrimitive(
-                //    position + new Vector2D(-GameConstants.ShotUnit.Radius, -GameConstants.ShotUnit.Radius),
-                //    position + new Vector2D(GameConstants.ShotUnit.Radius, -GameConstants.ShotUnit.Radius),
-                //    position + new Vector2D(GameConstants.ShotUnit.Radius, GameConstants.ShotUnit.Radius),
-                //    position + new Vector2D(-GameConstants.ShotUnit.Radius, GameConstants.ShotUnit.Radius))
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
             .AsReadOnly();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            DrawElement(graphics, data, this);
         }
 
         #endregion

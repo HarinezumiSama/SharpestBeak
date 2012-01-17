@@ -5,7 +5,8 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using SharpestBeak.Common.Diagnostics;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Presentation;
+using SharpestBeak.Common.Presentation.Primitives;
 using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common

@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Elements.Primitives
+namespace SharpestBeak.Common.Presentation.Primitives
 {
     public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
     {
@@ -34,6 +34,18 @@ namespace SharpestBeak.Common.Elements.Primitives
             this.Center = center;
             this.Radius = radius;
             base.BasePoint = center;
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            var diameter = 2f * this.Radius;
+            var location = new Point2D(this.Center.X - this.Radius, this.Center.Y - this.Radius) * data.Coefficient;
+            var size = (new Vector2D(diameter, diameter) * data.Coefficient);
+            graphics.FillEllipse(data.Brush, new RectangleF(location.ToPointF(), size.ToSizeF()));
         }
 
         #endregion

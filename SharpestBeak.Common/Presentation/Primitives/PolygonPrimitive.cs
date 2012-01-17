@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Elements.Primitives
+namespace SharpestBeak.Common.Presentation.Primitives
 {
     public class PolygonPrimitive : BasePrimitive
     {
@@ -168,6 +169,14 @@ namespace SharpestBeak.Common.Elements.Primitives
 
             throw new InvalidOperationException(
                 string.Format("Unexpected convex computation state: {0}.", sign));
+        }
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            graphics.FillPolygon(
+                data.Brush,
+                this.Vertices.Select(v => v * data.Coefficient).ToPointF(),
+                FillMode.Winding);
         }
 
         #endregion

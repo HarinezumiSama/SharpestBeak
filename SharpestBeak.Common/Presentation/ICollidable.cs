@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Presentation
 {
     public interface ICollidable
     {

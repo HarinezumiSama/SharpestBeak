@@ -7,8 +7,9 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using SharpestBeak.Common.Diagnostics;
-using SharpestBeak.Common.Elements;
-using SharpestBeak.Common.Elements.Primitives;
+using SharpestBeak.Common.Presentation;
+using SharpestBeak.Common.Presentation.Elements;
+using SharpestBeak.Common.Presentation.Primitives;
 using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common

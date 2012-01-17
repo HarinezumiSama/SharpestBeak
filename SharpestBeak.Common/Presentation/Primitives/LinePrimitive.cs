@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Elements.Primitives
+namespace SharpestBeak.Common.Presentation.Primitives
 {
     public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
     {
@@ -36,6 +36,18 @@ namespace SharpestBeak.Common.Elements.Primitives
             this.Start = start;
             this.End = end;
             base.BasePoint = start;
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            graphics.DrawLine(
+                data.Pen,
+                (this.Start * data.Coefficient).ToPointF(),
+                (this.End * data.Coefficient).ToPointF());
         }
 
         #endregion

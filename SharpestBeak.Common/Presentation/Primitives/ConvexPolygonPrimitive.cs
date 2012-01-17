@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Elements.Primitives
+namespace SharpestBeak.Common.Presentation.Primitives
 {
     public sealed class ConvexPolygonPrimitive : PolygonPrimitive, ICollidablePrimitive
     {
