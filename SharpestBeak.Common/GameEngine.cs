@@ -735,6 +735,16 @@ namespace SharpestBeak.Common
             private set;
         }
 
+        // TODO: [VM] Remove this property, or change to some GetExtraBlaBlaBla for logics
+        public IList<ChickenUnitLogic> Teams
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return this.Logics;
+            }
+        }
+
         public ulong MoveCount
         {
             [DebuggerNonUserCode]

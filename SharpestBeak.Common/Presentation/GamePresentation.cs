@@ -24,8 +24,18 @@ namespace SharpestBeak.Common.Presentation
             #endregion
 
             this.CommonData = engine.CommonData;
-            this.Chickens = new List<ChickenUnit>(engine.AliveChickensDirect).AsReadOnly();
-            this.Shots = new List<ShotUnit>(engine.ShotUnitsDirect).AsReadOnly();
+            this.Chickens = engine
+                .AliveChickensDirect
+                .Select(item => new ChickenPresentation(item))
+                .ToList()
+                .AsReadOnly();
+
+            var chickenMap = this.Chickens.ToDictionary(item => item.State.UniqueIndex);
+            this.Shots = engine
+                .ShotUnitsDirect
+                .Select(item => new ShotPresentation(item, chickenMap))
+                .ToList()
+                .AsReadOnly();
         }
 
         #endregion
@@ -38,15 +48,13 @@ namespace SharpestBeak.Common.Presentation
             private set;
         }
 
-        // TODO: [VM] Return ChickenUnitView or something like that
-        public IList<ChickenUnit> Chickens
+        public IList<ChickenPresentation> Chickens
         {
             get;
             private set;
         }
 
-        // TODO: [VM] Return ShotUnitView or something like that
-        public IList<ShotUnit> Shots
+        public IList<ShotPresentation> Shots
         {
             get;
             private set;

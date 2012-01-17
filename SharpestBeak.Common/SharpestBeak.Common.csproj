@@ -58,6 +58,7 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
+    <Compile Include="Presentation\ChickenPresentation.cs" />
     <Compile Include="Presentation\Elements\BaseElement.cs" />
     <Compile Include="Presentation\Primitives\BasePrimitive.cs" />
     <Compile Include="Presentation\ConvexState.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="GameTeam.cs" />
     <Compile Include="LineSide.cs" />
     <Compile Include="MoveInfoState.cs" />
+    <Compile Include="Presentation\ShotPresentation.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
