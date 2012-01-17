@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Fields
 
+        private readonly IList<LinePrimitive> m_edges;
         private ConvexState? m_convexState;
 
         #endregion
@@ -56,7 +58,7 @@ namespace SharpestBeak.Common.Elements.Primitives
             #endregion
 
             this.Vertices = vertices.ToList().AsReadOnly();
-            this.Edges = GetEdges(this.Vertices);
+            m_edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
         }
 
@@ -73,7 +75,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
         #region Protected Methods
 
-        protected static IList<Vector2D> GetEdges(IList<Point2D> vertices)
+        protected static IList<LinePrimitive> GetEdges(IList<Point2D> vertices)
         {
             #region Argument Check
 
@@ -94,12 +96,12 @@ namespace SharpestBeak.Common.Elements.Primitives
             #endregion
 
             var count = vertices.Count;
-            var resultProxy = new List<Vector2D>(count);
+            var resultProxy = new List<LinePrimitive>(count);
             var currentPoint = vertices[0];
             for (int nextIndex = 1; nextIndex <= count; nextIndex++)
             {
                 var nextPoint = nextIndex < count ? vertices[nextIndex] : vertices[0];
-                resultProxy.Add(nextPoint - currentPoint);
+                resultProxy.Add(new LinePrimitive(currentPoint, nextPoint));
                 currentPoint = nextPoint;
             }
             if (resultProxy.Count != count)
@@ -109,7 +111,7 @@ namespace SharpestBeak.Common.Elements.Primitives
             return resultProxy.AsReadOnly();
         }
 
-        protected static ConvexState GetConvexState(IList<Vector2D> edges)
+        protected static ConvexState GetConvexState(IList<LinePrimitive> edges)
         {
             #region Argument Check
 
@@ -134,8 +136,8 @@ namespace SharpestBeak.Common.Elements.Primitives
             {
                 var nextIndex = (index + 1) % edges.Count;
 
-                var edge1 = edges[index];
-                var edge2 = edges[nextIndex];
+                var edge1 = edges[index].Direction;
+                var edge2 = edges[nextIndex].Direction;
 
                 var z = edge1 ^ edge2;
                 if (z.IsPositive())
@@ -177,10 +179,13 @@ namespace SharpestBeak.Common.Elements.Primitives
             private set;
         }
 
-        public IList<Vector2D> Edges
+        public IList<LinePrimitive> Edges
         {
-            get;
-            private set;
+            [DebuggerStepThrough]
+            get
+            {
+                return m_edges;
+            }
         }
 
         public int Count

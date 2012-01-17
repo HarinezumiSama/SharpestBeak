@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,12 @@ namespace SharpestBeak.Common.Elements.Primitives
 {
     public sealed class CirclePrimitive : ICollidablePrimitive
     {
+        #region Fields
+
+        private float m_radiusSqr = float.MinValue;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -42,6 +49,19 @@ namespace SharpestBeak.Common.Elements.Primitives
         {
             get;
             private set;
+        }
+
+        public float RadiusSquared
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                if (m_radiusSqr <= 0f)
+                {
+                    m_radiusSqr = this.Radius.Sqr();
+                }
+                return m_radiusSqr;
+            }
         }
 
         #endregion

@@ -115,6 +115,27 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
+            #region Manual Test 5
+
+            {
+                //var polygon = new ConvexPolygonPrimitive(
+                //    new Point2D(0f, 0f),
+                //    new Point2D(1f, 0f),
+                //    new Point2D(0f, 1f));
+
+                //var p1 = new Point2D(0.5f, 0.5f);
+                //var in1 = CollisionDetector.IsPointInPolygon(p1, polygon);
+                //Debug.WriteLine(in1);
+                //Debug.Assert(in1);
+
+                //var p2 = new Point2D(0f, 1.1f);
+                //var in2 = CollisionDetector.IsPointInPolygon(p2, polygon);
+                //Debug.WriteLine(in2);
+                //Debug.Assert(!in2);
+            }
+
+            #endregion
+
             InitializeComponent();
 
             var gameBoardSize = Settings.Default.NominalSize;
@@ -164,7 +185,7 @@ namespace SharpestBeak.UI.WinForms
             #endregion
 
             ShowErrorMessage(
-                string.Format("An error occurred:{0}{1}", Environment.NewLine, exception.ToString()),
+                string.Format("An error occurred:{0}{0}{1}", Environment.NewLine, exception.ToString()),
                 "Error");
         }
 

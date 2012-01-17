@@ -20,7 +20,7 @@ namespace SharpestBeak.Common
         {
             for (int index = 0; index < polygon.Edges.Count; index++)
             {
-                var direction = polygon.Edges[index].GetNormal();
+                var direction = polygon.Edges[index].Direction.GetNormal();
 
                 var projections = polygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
                 var otherProjections = otherPolygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
@@ -197,12 +197,9 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var radiusSqr = circle.Radius.Sqr();
-
             // It's enough to check only one of the line's points
-            if ((line.Start.GetDistanceSquared(circle.Center) - radiusSqr).IsNegativeOrZero())
+            if (IsPointInCircle(line.Start, circle))
             {
-                // The point is inside or on the circle
                 return true;
             }
 
@@ -210,7 +207,7 @@ namespace SharpestBeak.Common
 
             var a = line.Direction * line.Direction;
             var b = 2 * (circleDirection * line.Direction);
-            var c = (circleDirection * circleDirection) - radiusSqr;
+            var c = (circleDirection * circleDirection) - circle.RadiusSquared;
 
             var d = b.Sqr() - 4 * a * c;
             return d.IsPositiveOrZero();
@@ -283,6 +280,37 @@ namespace SharpestBeak.Common
             #endregion
 
             return GetLineSide(line.Start, line.End, point);
+        }
+
+        // Is the point inside or on the circle?
+        public static bool IsPointInCircle(Point2D point, CirclePrimitive circle)
+        {
+            #region Argument Check
+
+            if (circle == null)
+            {
+                throw new ArgumentNullException("circle");
+            }
+
+            #endregion
+
+            // If a point is on a circle, it is considered to be in this circle
+            return (point.GetDistanceSquared(circle.Center) - circle.RadiusSquared).IsNegativeOrZero();
+        }
+
+        public static bool IsPointInPolygon(Point2D point, ConvexPolygonPrimitive polygon)
+        {
+            #region Argument Check
+
+            if (polygon == null)
+            {
+                throw new ArgumentNullException("polygon");
+            }
+
+            #endregion
+
+            // If a point is on a polygon's line, it is considered to be in this polygon
+            return polygon.Edges.All(edge => GetLineSide(edge, point) != LineSide.Right);
         }
 
         #endregion
