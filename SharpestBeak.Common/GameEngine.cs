@@ -354,7 +354,7 @@ namespace SharpestBeak.Common
                     oldShotUnit.Position,
                     oldShotUnit.Angle,
                     MoveDirection.MoveForward,
-                    GameConstants.ShotUnit.DefaultSpeed,
+                    GameConstants.ShotUnit.DefaultRectilinearSpeed,
                     s_timeDelta);
                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", oldShotUnit);
 

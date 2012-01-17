@@ -55,7 +55,8 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a shot unit, in units per second.
             /// </summary>
-            public static readonly float DefaultSpeed = 2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
+            public static readonly float DefaultRectilinearSpeed =
+                2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
 
             public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d);
 

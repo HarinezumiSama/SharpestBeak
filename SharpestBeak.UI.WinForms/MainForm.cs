@@ -219,6 +219,42 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
+            #region Manual Test (Vector2D.GetAngle)
+
+            {
+                //var v1 = new Vector2D(1f, 1f);
+
+                //var v2 = new Vector2D(0f, 1f);
+                //var angle1to2 = v1.GetAngle(v2);
+                //Debug.WriteLine(angle1to2);
+                //Debug.Assert(angle1to2.DegreeValue == 45f);
+
+                //var v3 = new Vector2D(1f, 0f);
+                //var angle1to3 = v1.GetAngle(v3);
+                //Debug.WriteLine(angle1to3);
+                //Debug.Assert(angle1to3.DegreeValue == -45f);
+
+                //var v4 = new Vector2D(-1f, -1f);
+                //var angle1to4 = v1.GetAngle(v4);
+                //Debug.WriteLine(angle1to4);
+                //Debug.Assert(angle1to4.DegreeValue == 180f);
+
+                //var v5 = new Vector2D(-1f, 0f);
+                //var angle1to5 = v1.GetAngle(v5);
+                //Debug.WriteLine(angle1to5);
+                //Debug.Assert(angle1to5.DegreeValue == 135f);
+                //var angle5to1 = v5.GetAngle(v1);
+                //Debug.WriteLine(angle5to1);
+                //Debug.Assert(angle5to1.DegreeValue == -135f);
+
+                //var v6 = new Vector2D(2f, 2f);
+                //var angle1to6 = v1.GetAngle(v6);
+                //Debug.WriteLine(angle1to6);
+                //Debug.Assert(angle1to6.DegreeValue == 0f);
+            }
+
+            #endregion
+
             InitializeComponent();
 
             var gameBoardSize = Settings.Default.NominalSize;

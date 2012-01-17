@@ -193,6 +193,13 @@ namespace SharpestBeak.Common
             return (this * target) / target.GetLength();
         }
 
+        public GameAngle GetAngle(Vector2D target)
+        {
+            var radianAngle = GameHelper.Atan2(target.m_y, target.m_x) - GameHelper.Atan2(m_y, m_x);
+            var degreeAngle = GameHelper.ToDegrees(radianAngle);
+            return GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(degreeAngle));
+        }
+
         #endregion
 
         #region Operators
@@ -257,7 +264,7 @@ namespace SharpestBeak.Common
         }
 
         /// <summary>
-        ///     Computes the cross product of the specified vectors. 
+        ///     Computes the cross product of the specified vectors.
         ///     Returns the Z component of the resulting 3D vector (0, 0, Z).
         /// </summary>
         /// <param name="left">
