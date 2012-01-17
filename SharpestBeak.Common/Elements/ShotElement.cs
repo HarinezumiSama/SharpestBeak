@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using SharpestBeak.Common.Elements.Primitives;
@@ -47,16 +48,29 @@ namespace SharpestBeak.Common.Elements
 
         #endregion
 
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0}. Position = {1}",
+                GetType().Name,
+                this.Position);
+        }
+
+        #endregion
+
         #region ICollidableElement Members
 
         public bool HasRoughPrimitives
         {
+            [DebuggerStepThrough]
             get { return false; }
         }
 
         public IList<ICollidablePrimitive> GetRoughPrimitives()
         {
-            return m_primitives;
+            throw new NotSupportedException();
         }
 
         public IList<ICollidablePrimitive> GetPrimitives()

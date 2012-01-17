@@ -40,5 +40,14 @@ namespace SharpestBeak.Common.Properties {
                 return ((bool)(this["EnableDebugOutput"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float SlowDownRatio {
+            get {
+                return ((float)(this["SlowDownRatio"]));
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using SharpestBeak.Common.Elements.Primitives;
@@ -31,8 +32,20 @@ namespace SharpestBeak.Common.Elements
             }
             .AsReadOnly();
 
-            // TODO: [VM] More exact presentation (circle + triangle)
-            m_primitives = m_roughPrimitives;
+            var defaultBeakPolygonPoints = new[]
+            {
+                new Point2D(position.X, position.Y - GameConstants.ChickenUnit.BeakRayOffset),
+                new Point2D(position.X + GameConstants.ChickenUnit.BeakOffset, position.Y),
+                new Point2D(position.X, position.Y + GameConstants.ChickenUnit.BeakRayOffset)
+            };
+            var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(Position, beakAngle);
+
+            m_primitives = new List<ICollidablePrimitive>
+            {
+                new CirclePrimitive(position, GameConstants.ChickenUnit.BodyCircleRadius),
+                new ConvexPolygonPrimitive(beakPolygonPoints)
+            }
+            .AsReadOnly();
         }
 
         #endregion
@@ -53,10 +66,24 @@ namespace SharpestBeak.Common.Elements
 
         #endregion
 
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0}. Position = {1}, BeakAngle = {2:D}",
+                GetType().Name,
+                this.Position,
+                this.BeakAngle);
+        }
+
+        #endregion
+
         #region ICollidableElement Members
 
         public bool HasRoughPrimitives
         {
+            [DebuggerStepThrough]
             get { return true; }
         }
 

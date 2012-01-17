@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
@@ -64,17 +66,35 @@ namespace SharpestBeak.Common
 
         #endregion
 
+        #region Constants
+
+        private const float MinSlowDownRatio = 1f / 16f;
+        private const float MaxSlowDownRatio = 16f;
+
+        #endregion
+
         #region Fields
 
-        internal static readonly float SlowDownRatio = 1f;
+        internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
         public static readonly float NominalCellSize = 100f;
 
         public static readonly int MinNominalCellCount = 5;
 
-        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d * SlowDownRatio);
+        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
 
         public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
+
+        #endregion
+
+        #region Private Methods
+
+        [DebuggerNonUserCode]
+        private static float GetSlowDownRatio()
+        {
+            var result = Math.Min(MaxSlowDownRatio, Math.Max(MinSlowDownRatio, Settings.Default.SlowDownRatio));
+            return result;
+        }
 
         #endregion
     }

@@ -92,7 +92,14 @@ namespace SharpestBeak.Common
             if (element.HasRoughPrimitives)
             {
                 var canCollide = false;
-                var roughPrimitives = element.GetRoughPrimitives();
+                var roughPrimitives = element.GetRoughPrimitives().EnsureNotNull();
+                if (!roughPrimitives.Any())
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            "The element {{{0}}} has empty rough primitives collection.",
+                            element));
+                }
                 foreach (var roughPrimitive in roughPrimitives)
                 {
                     if (roughPrimitive.HasCollision(other))
@@ -108,7 +115,14 @@ namespace SharpestBeak.Common
                 }
             }
 
-            var primitives = element.GetPrimitives();
+            var primitives = element.GetPrimitives().EnsureNotNull();
+            if (!primitives.Any())
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        "The element {{{0}}} has empty primitives collection.",
+                        element));
+            }
             foreach (var primitive in primitives)
             {
                 if (CheckPrimitiveCollision(primitive, other))
