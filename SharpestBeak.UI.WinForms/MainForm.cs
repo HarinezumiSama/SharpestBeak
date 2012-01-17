@@ -598,6 +598,7 @@ namespace SharpestBeak.UI.WinForms
             }
 
             m_gameEngine.Stop();
+            m_gameEngine.CallPaint();
 
             ShowInfoMessage(string.Format("Winning team: {0}.", e.WinningTeam), "Game Ended");
         }
