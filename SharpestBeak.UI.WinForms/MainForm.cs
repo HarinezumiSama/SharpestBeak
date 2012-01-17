@@ -481,6 +481,8 @@ namespace SharpestBeak.UI.WinForms
                 return;
             }
 
+            // TODO: [VM] Draw using unit elements
+
             var size = m_lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
 

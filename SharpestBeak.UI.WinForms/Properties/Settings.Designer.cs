@@ -25,7 +25,7 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5, 5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("24, 16")]
         public global::System.Drawing.Size NominalSize {
             get {
                 return ((global::System.Drawing.Size)(this["NominalSize"]));
@@ -34,7 +34,7 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
         public int TeamUnitCount {
             get {
                 return ((int)(this["TeamUnitCount"]));

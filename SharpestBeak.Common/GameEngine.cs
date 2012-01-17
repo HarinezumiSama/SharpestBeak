@@ -815,6 +815,8 @@ namespace SharpestBeak.Common
             CallPaintCallback();
         }
 
+        // TODO: [VM] Implement Pause method
+
         public void CallPaint()
         {
             CallPaintCallback();

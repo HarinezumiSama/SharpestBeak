@@ -3,10 +3,10 @@
   <Profiles />
   <Settings>
     <Setting Name="NominalSize" Type="System.Drawing.Size" Scope="Application">
-      <Value Profile="(Default)">5, 5</Value>
+      <Value Profile="(Default)">24, 16</Value>
     </Setting>
     <Setting Name="TeamUnitCount" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">8</Value>
     </Setting>
     <Setting Name="DrawBoardGrid" Type="System.Boolean" Scope="Application">
       <Value Profile="(Default)">True</Value>
