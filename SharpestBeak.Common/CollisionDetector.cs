@@ -232,6 +232,25 @@ namespace SharpestBeak.Common
                 || polygon.Edges.Any(edge => CheckLineToLineCollision(line, edge));
         }
 
+        internal static bool CheckCircleToPolygonCollision(CirclePrimitive circle, ConvexPolygonPrimitive polygon)
+        {
+            #region Argument Check
+
+            if (circle == null)
+            {
+                throw new ArgumentNullException("circle");
+            }
+            if (polygon == null)
+            {
+                throw new ArgumentNullException("polygon");
+            }
+
+            #endregion
+
+            return IsPointInPolygon(circle.Center, polygon)
+                || polygon.Edges.Any(edge => CheckLineToCircleCollision(edge, circle));
+        }
+
         internal static bool CheckPolygonToPolygonCollision(
             ConvexPolygonPrimitive polygon1,
             ConvexPolygonPrimitive polygon2)

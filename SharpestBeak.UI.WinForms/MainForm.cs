@@ -181,6 +181,35 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
+            #region Manual Test (Collision: circle/polygon)
+
+            {
+                //var polygon = new ConvexPolygonPrimitive(
+                //    new Point2D(0f, 0f),
+                //    new Point2D(1f, 0f),
+                //    new Point2D(0f, 1f));
+
+                //// Circle is inside polygon
+                //var circle1= new CirclePrimitive(new Point2D(0.2f, 0.2f), 0.1f);
+                //var c1 = CollisionDetector.CheckCollision(circle1, polygon);
+                //Debug.WriteLine(c1);
+                //Debug.Assert(c1);
+
+                //// Polygon is inside circle
+                //var circle2 = new CirclePrimitive(new Point2D(0.25f, 0.25f), 5f);
+                //var c2 = CollisionDetector.CheckCollision(circle2, polygon);
+                //Debug.WriteLine(c2);
+                //Debug.Assert(c2);
+
+                //// Regular intersection
+                //var circle3 = new CirclePrimitive(new Point2D(1f, 1f), 1f);
+                //var c3 = CollisionDetector.CheckCollision(circle3, polygon);
+                //Debug.WriteLine(c3);
+                //Debug.Assert(c3);
+            }
+
+            #endregion
+
             InitializeComponent();
 
             var gameBoardSize = Settings.Default.NominalSize;

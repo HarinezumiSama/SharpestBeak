@@ -100,6 +100,12 @@ namespace SharpestBeak.Common.Elements.Primitives
                 return CollisionDetector.CheckLineToPolygonCollision(line, this);
             }
 
+            var circle = other as CirclePrimitive;
+            if (circle != null)
+            {
+                return CollisionDetector.CheckCircleToPolygonCollision(circle, this);
+            }
+
             throw new NotSupportedException();
         }
 
