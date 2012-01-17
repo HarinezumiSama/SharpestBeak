@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -76,6 +77,15 @@ namespace SharpestBeak.Common.Elements.Primitives
         #endregion
 
         #region ICollidablePrimitive Members
+
+        Point2D ICollidablePrimitive.BasePoint
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return this.BasePoint;
+            }
+        }
 
         public bool HasCollision(ICollidablePrimitive other)
         {

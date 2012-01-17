@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
-    public class PolygonPrimitive
+    public class PolygonPrimitive : BasePrimitive
     {
         #region Nested Types
 
@@ -60,6 +60,7 @@ namespace SharpestBeak.Common.Elements.Primitives
             this.Vertices = vertices.ToList().AsReadOnly();
             m_edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
+            base.BasePoint = this.Vertices.First();
         }
 
         /// <summary>

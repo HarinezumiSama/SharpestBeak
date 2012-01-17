@@ -25,7 +25,7 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("24, 16")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5, 5")]
         public global::System.Drawing.Size NominalSize {
             get {
                 return ((global::System.Drawing.Size)(this["NominalSize"]));
@@ -34,10 +34,19 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int TeamUnitCount {
             get {
                 return ((int)(this["TeamUnitCount"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DrawBoardGrid {
+            get {
+                return ((bool)(this["DrawBoardGrid"]));
             }
         }
     }

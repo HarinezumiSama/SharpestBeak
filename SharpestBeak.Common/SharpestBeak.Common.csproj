@@ -58,6 +58,7 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
+    <Compile Include="Elements\Primitives\BasePrimitive.cs" />
     <Compile Include="Elements\Primitives\ConvexState.cs" />
     <Compile Include="Elements\Primitives\ConvexPolygonPrimitive.cs" />
     <Compile Include="GameEndedEventArgs.cs" />

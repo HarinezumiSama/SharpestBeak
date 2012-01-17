@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
-    public sealed class CirclePrimitive : ICollidablePrimitive
+    public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
     {
         #region Fields
 
@@ -33,6 +33,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
             this.Center = center;
             this.Radius = radius;
+            base.BasePoint = center;
         }
 
         #endregion
@@ -67,6 +68,15 @@ namespace SharpestBeak.Common.Elements.Primitives
         #endregion
 
         #region ICollidablePrimitive Members
+
+        Point2D ICollidablePrimitive.BasePoint
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return this.BasePoint;
+            }
+        }
 
         public bool HasCollision(ICollidablePrimitive other)
         {

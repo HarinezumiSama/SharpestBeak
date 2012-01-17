@@ -50,7 +50,7 @@ namespace SharpestBeak.Common
         {
             #region Fields
 
-            public static readonly float Radius = GameConstants.NominalCellSize / 20f;
+            public static readonly float Radius = GameConstants.NominalCellSize / 10f;
 
             /// <summary>
             ///     Standard rectilinear speed of a shot unit, in units per second.

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SharpestBeak.Common.Elements.Primitives
 {
-    public sealed class LinePrimitive : ICollidablePrimitive
+    public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
     {
         #region Fields
 
@@ -35,6 +35,7 @@ namespace SharpestBeak.Common.Elements.Primitives
 
             this.Start = start;
             this.End = end;
+            base.BasePoint = start;
         }
 
         #endregion
@@ -78,6 +79,15 @@ namespace SharpestBeak.Common.Elements.Primitives
         #endregion
 
         #region ICollidablePrimitive Members
+
+        Point2D ICollidablePrimitive.BasePoint
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return this.BasePoint;
+            }
+        }
 
         public bool HasCollision(ICollidablePrimitive other)
         {

@@ -277,16 +277,6 @@ namespace SharpestBeak.Common
             return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
         }
 
-        public static float GetDistanceSquared(this PointF value, PointF otherValue)
-        {
-            return ((otherValue.X - value.X).Sqr() + (otherValue.Y - value.Y).Sqr());
-        }
-
-        public static float GetDistance(this PointF value, PointF otherValue)
-        {
-            return GetDistanceSquared(value, otherValue).Sqrt();
-        }
-
         #endregion
     }
 }

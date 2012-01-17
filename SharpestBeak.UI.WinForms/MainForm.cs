@@ -484,22 +484,33 @@ namespace SharpestBeak.UI.WinForms
             var size = m_lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
 
-            // Drawing grid (for debug only... probably)
-            for (int y = 0; y < size.Height; y++)
+            if (Settings.Default.DrawBoardGrid)
             {
-                for (int x = 0; x < size.Width; x++)
+                for (int y = 0; y < size.Height; y++)
                 {
-                    var cellPoint = new Point(s_cellSize * x, s_cellSize * y);
-                    var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
-                    ControlPaint.DrawFocusRectangle(graphics, cellRect);
+                    for (int x = 0; x < size.Width; x++)
+                    {
+                        var cellPoint = new Point(s_cellSize * x, s_cellSize * y);
+                        var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
+                        ControlPaint.DrawFocusRectangle(graphics, cellRect);
 
-                    var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
-                    var backRect = cellRect;
-                    backRect.Inflate(-1, -1);
-                    graphics.FillRectangle(backBrush, backRect);
+                        var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
+                        var backRect = cellRect;
+                        backRect.Inflate(-1, -1);
+                        graphics.FillRectangle(backBrush, backRect);
+                    }
                 }
             }
+            else
+            {
+                var boardRect = pbGame.Bounds;
+                ControlPaint.DrawFocusRectangle(graphics, boardRect);
+                var backRect = boardRect;
+                backRect.Inflate(-1, -1);
+                graphics.FillRectangle(s_oddCellBrush, backRect);
+            }
 
+            // TODO: Move to static read-only fields
             var coefficient = (float)s_cellSize / GameConstants.NominalCellSize;
             var uiChickenBodyRadius = GameConstants.ChickenUnit.BodyCircleRadius * coefficient;
             var uiBeakOffset = GameConstants.ChickenUnit.BeakOffset * coefficient;
@@ -507,7 +518,8 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in m_lastPresentation.Chickens)
             {
-                var brush = chickenUnit.Logic.Team == GameTeam.TeamA ? Brushes.LightGreen : Brushes.DarkGreen;
+                var isTeamA = chickenUnit.Logic.Team == GameTeam.TeamA;
+                var brush = isTeamA ? Brushes.LightGreen : Brushes.DarkGreen;
 
                 var uiPosition = chickenUnit.Position * coefficient;
 
@@ -531,10 +543,18 @@ namespace SharpestBeak.UI.WinForms
                 var rcl = chickenUnit.Logic as RandomChickenLogic;
                 if (rcl != null)
                 {
+                    var targetPointBrush = isTeamA ? Brushes.LightBlue : Brushes.DarkBlue;
+                    // TODO: Move to static read-only fields
+                    float uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
                     foreach (var targetPoint in rcl.TargetPoints)
                     {
                         var tp = targetPoint * coefficient;
-                        graphics.FillEllipse(Brushes.DarkBlue, tp.X - 5, tp.Y - 5, 10, 10);
+                        graphics.FillRectangle(
+                            targetPointBrush,
+                            tp.X - uiTargetPointRadius,
+                            tp.Y - uiTargetPointRadius,
+                            2f * uiTargetPointRadius,
+                            2f * uiTargetPointRadius);
                     }
                 }
             }
@@ -542,9 +562,11 @@ namespace SharpestBeak.UI.WinForms
             var uiShotRadius = GameConstants.ShotUnit.Radius * coefficient;
             foreach (var shotUnit in m_lastPresentation.Shots)
             {
+                var shotBrush = shotUnit.Owner.Logic.Team == GameTeam.TeamA ? Brushes.Pink : Brushes.DarkRed;
+
                 var uiPosition = shotUnit.Position * coefficient;
                 graphics.FillEllipse(
-                    Brushes.Red,
+                    shotBrush,
                     uiPosition.X - uiShotRadius,
                     uiPosition.Y - uiShotRadius,
                     2f * uiShotRadius,
