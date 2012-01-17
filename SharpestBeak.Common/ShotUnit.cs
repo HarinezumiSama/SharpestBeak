@@ -35,7 +35,7 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var beakTipPosition = owner.GetBeakTipPosition();
+            var beakTipPosition = GameHelper.GetBeakTipPosition(owner.Position, owner.BeakAngle);
 
             this.UniqueIndex = GetUniqueIndex();
             this.Owner = owner;

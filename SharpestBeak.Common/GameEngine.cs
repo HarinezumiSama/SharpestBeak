@@ -82,8 +82,8 @@ namespace SharpestBeak.Common
             this.Logics =
                 new[]
                 {
-                    CreateLogic(teamA, GameTeam.TeamA),
-                    CreateLogic(teamB, GameTeam.TeamB)
+                    CreateLogic(this, teamA, GameTeam.TeamA),
+                    CreateLogic(this, teamB, GameTeam.TeamB)
                 }
                 .ToList()
                 .AsReadOnly();
@@ -125,10 +125,14 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
-        private static ChickenUnitLogic CreateLogic(ChickenTeamRecord logicRecord, GameTeam team)
+        private static ChickenUnitLogic CreateLogic(GameEngine engine, ChickenTeamRecord logicRecord, GameTeam team)
         {
             #region Argument Check
 
+            if (engine == null)
+            {
+                throw new ArgumentNullException("engine");
+            }
             if (logicRecord == null)
             {
                 throw new ArgumentNullException("logicRecord");
@@ -137,7 +141,7 @@ namespace SharpestBeak.Common
             #endregion
 
             var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type);
-            result.InitializeInstance(logicRecord.UnitCount, team);
+            result.InitializeInstance(engine, logicRecord.UnitCount, team);
             return result;
         }
 
@@ -428,7 +432,10 @@ namespace SharpestBeak.Common
                 return;
             }
 
-            this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+            lock (m_lastMovesLock)
+            {
+                this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+            }
 
             var aliveTeams = this.AliveChickensDirect.Select(item => item.Logic.Team).Distinct().ToList();
             if (aliveTeams.Count <= 1)

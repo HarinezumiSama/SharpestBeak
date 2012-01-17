@@ -222,6 +222,19 @@ namespace SharpestBeak.Common
             return result;
         }
 
+        public static Point2D GetBeakTipPosition(Point2D position, GameAngle beakAngle)
+        {
+            return position
+                .OffsetX(GameConstants.ChickenUnit.BeakOffset)
+                .Rotate(position, beakAngle);
+        }
+
+        public static Vector2D GetChickenViewDirection(Point2D position, GameAngle beakAngle)
+        {
+            var beakTipPosition = GetBeakTipPosition(position, beakAngle);
+            return beakTipPosition - position;
+        }
+
         public static PointF Scale(this PointF value, float coefficient)
         {
             return new PointF(value.X * coefficient, value.Y * coefficient);

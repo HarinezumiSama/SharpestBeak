@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpestBeak.Common.View;
 
 namespace SharpestBeak.Common
 {
@@ -29,6 +30,7 @@ namespace SharpestBeak.Common
             this.IsDead = unit.IsDead;
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
+            this.View = new ViewInfo(unit);
         }
 
         /// <summary>
@@ -51,6 +53,7 @@ namespace SharpestBeak.Common
             this.Team = unitState.Team;
             this.Position = unitState.Unit.Position;
             this.BeakAngle = unitState.Unit.BeakAngle;
+            this.View = new ViewInfo(unitState.Unit);
             this.PreviousMove = unitState.CurrentMove;
         }
 
@@ -110,11 +113,27 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        // TODO: Compute details according to actual unit view
+        public ViewInfo View
+        {
+            get;
+            private set;
+        }
 
         #endregion
 
         #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(
+                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
+                this.GetType().Name,
+                this.UniqueIndex,
+                this.Position,
+                this.BeakAngle,
+                this.Team,
+                this.IsDead);
+        }
 
         public void SetCurrentMove(MoveInfo value)
         {

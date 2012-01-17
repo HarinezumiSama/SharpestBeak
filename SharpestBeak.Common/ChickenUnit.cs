@@ -133,18 +133,13 @@ namespace SharpestBeak.Common
         public override string ToString()
         {
             return string.Format(
-                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}",
+                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
                 this.GetType().Name,
                 this.UniqueIndex,
                 this.Position,
-                this.BeakAngle);
-        }
-
-        public Point2D GetBeakTipPosition()
-        {
-            return this.Position
-                .OffsetX(GameConstants.ChickenUnit.BeakOffset)
-                .Rotate(this.Position, this.BeakAngle);
+                this.BeakAngle,
+                this.Logic.Team,
+                this.IsDead);
         }
 
         public ChickenElement GetElement()

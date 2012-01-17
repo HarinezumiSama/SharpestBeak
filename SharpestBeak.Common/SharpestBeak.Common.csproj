@@ -102,6 +102,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShotUnit.cs" />
     <Compile Include="ThreadSafeValue.cs" />
+    <Compile Include="View\ChickenViewData.cs" />
+    <Compile Include="View\ViewInfo.cs" />
+    <Compile Include="View\BaseViewData.cs" />
     <Compile Include="WinApi.cs" />
   </ItemGroup>
   <ItemGroup>

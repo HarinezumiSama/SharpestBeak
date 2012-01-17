@@ -45,6 +45,12 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
+        internal GameEngine Engine
+        {
+            get;
+            private set;
+        }
+
         internal Thread Thread
         {
             get;
@@ -75,10 +81,14 @@ namespace SharpestBeak.Common
 
         #region Internal Methods
 
-        internal void InitializeInstance(int unitCount, GameTeam team)
+        internal void InitializeInstance(GameEngine engine, int unitCount, GameTeam team)
         {
             #region Argument Check
 
+            if (engine == null)
+            {
+                throw new ArgumentNullException("engine");
+            }
             if (unitCount <= 0)
             {
                 throw new ArgumentOutOfRangeException(
@@ -86,9 +96,14 @@ namespace SharpestBeak.Common
                     unitCount,
                     "The number of units must be positive.");
             }
+            if (team == GameTeam.None)
+            {
+                throw new ArgumentException("The team must be specific.", "team");
+            }
 
             #endregion
 
+            this.Engine = engine;
             m_unitsDirect.ChangeContents(
                 Enumerable.Range(1, unitCount).Select(i => new ChickenUnit(this)));
             this.Team = team;
