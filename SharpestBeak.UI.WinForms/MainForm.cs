@@ -39,7 +39,7 @@ namespace SharpestBeak.UI.WinForms
 
         public MainForm()
         {
-            #region Manual Test 1
+            #region Manual Test (Projection)
 
             {
                 //var v1 = new Vector2D(1f, 2f);
@@ -51,23 +51,40 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            #region Manual Test 2
+            #region Manual Test (Collision: polygon/polygon)
 
             {
-                //var pg1 = new ConvexPolygonPrimitive(new Point2D(2, 1), new Point2D(4, 2), new Point2D(1, 5));
-                //var pg2 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(3, 4));
-                //var pg3 = new ConvexPolygonPrimitive(new Point2D(4, 4), new Point2D(5, 6), new Point2D(0, 0));
-                //var c1 = CollisionDetector.CheckCollision(pg1, pg2);
-                //Debug.WriteLine(c1);
-                //Debug.Assert(!c1);
-                //var c2 = CollisionDetector.CheckCollision(pg1, pg3);
-                //Debug.WriteLine(c2);
-                //Debug.Assert(c2);
+                //var pg1 = new ConvexPolygonPrimitive(new Point2D(2f, 1f), new Point2D(4f, 2f), new Point2D(1f, 5f));
+                //var pg2 = new ConvexPolygonPrimitive(new Point2D(4f, 4f), new Point2D(5f, 6f), new Point2D(3f, 4f));
+                //var pg3 = new ConvexPolygonPrimitive(new Point2D(4f, 4f), new Point2D(5f, 6f), new Point2D(0f, 0f));
+
+                //var c1to2 = CollisionDetector.CheckCollision(pg1, pg2);
+                //Debug.WriteLine(c1to2);
+                //Debug.Assert(!c1to2);
+
+                //var c1to3 = CollisionDetector.CheckCollision(pg1, pg3);
+                //Debug.WriteLine(c1to3);
+                //Debug.Assert(c1to3);
+
+                //// One polygon is inside another
+                //var pg4 = new ConvexPolygonPrimitive(
+                //    new Point2D(0f, 0f),
+                //    new Point2D(0f, 10f),
+                //    new Point2D(10f, 10f),
+                //    new Point2D(10f, 0f));
+                //var pg5 = new ConvexPolygonPrimitive(
+                //    new Point2D(1f, 1f),
+                //    new Point2D(1f, 9f),
+                //    new Point2D(9f, 9f),
+                //    new Point2D(9f, 1f));
+                //var c4to5 = CollisionDetector.CheckCollision(pg4, pg5);
+                //Debug.WriteLine(c4to5);
+                //Debug.Assert(c4to5);
             }
 
             #endregion
 
-            #region Manual Test 3
+            #region Manual Test (Collision: line/circle)
 
             {
                 //var circle = new CirclePrimitive(new Point2D(1f, 2f), 0.5f);
@@ -95,7 +112,7 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            #region Manual Test 4
+            #region Manual Test (Collision: point/line)
 
             {
                 //var line = new LinePrimitive(new Point2D(1f, 1f), new Point2D(2f, 2f));
@@ -115,7 +132,7 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            #region Manual Test 5
+            #region Manual Test (Collision: point/polygon)
 
             {
                 //var polygon = new ConvexPolygonPrimitive(
@@ -132,6 +149,34 @@ namespace SharpestBeak.UI.WinForms
                 //var in2 = CollisionDetector.IsPointInPolygon(p2, polygon);
                 //Debug.WriteLine(in2);
                 //Debug.Assert(!in2);
+            }
+
+            #endregion
+
+            #region Manual Test (Collision: line/polygon)
+
+            {
+                //var polygon = new ConvexPolygonPrimitive(
+                //    new Point2D(0f, 0f),
+                //    new Point2D(1f, 0f),
+                //    new Point2D(0f, 1f));
+
+                //// One of the line's ends is on a polygon edge
+                //var line1 = new LinePrimitive(new Point2D(0.5f, 0.5f), new Point2D(1f, 1f));
+                //var c1 = CollisionDetector.CheckCollision(line1, polygon);
+                //Debug.WriteLine(c1);
+                //Debug.Assert(c1);
+
+                //// One of the line's ends is inside polygon
+                //var line2 = new LinePrimitive(new Point2D(0.1f, 0.1f), new Point2D(5f, 15f));
+                //var c2 = CollisionDetector.CheckCollision(line2, polygon);
+                //Debug.WriteLine(c2);
+                //Debug.Assert(c2);
+
+                //var line3 = new LinePrimitive(new Point2D(1f, 1f), new Point2D(2f, 3f));
+                //var c3 = CollisionDetector.CheckCollision(line3, polygon);
+                //Debug.WriteLine(c3);
+                //Debug.Assert(!c3);
             }
 
             #endregion

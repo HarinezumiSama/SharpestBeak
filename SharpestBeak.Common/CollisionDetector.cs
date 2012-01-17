@@ -213,6 +213,25 @@ namespace SharpestBeak.Common
             return d.IsPositiveOrZero();
         }
 
+        internal static bool CheckLineToPolygonCollision(LinePrimitive line, ConvexPolygonPrimitive polygon)
+        {
+            #region Argument Check
+
+            if (line == null)
+            {
+                throw new ArgumentNullException("line");
+            }
+            if (polygon == null)
+            {
+                throw new ArgumentNullException("polygon");
+            }
+
+            #endregion
+
+            return IsPointInPolygon(line.Start, polygon) || IsPointInPolygon(line.End, polygon)
+                || polygon.Edges.Any(edge => CheckLineToLineCollision(line, edge));
+        }
+
         internal static bool CheckPolygonToPolygonCollision(
             ConvexPolygonPrimitive polygon1,
             ConvexPolygonPrimitive polygon2)

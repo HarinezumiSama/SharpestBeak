@@ -94,6 +94,12 @@ namespace SharpestBeak.Common.Elements.Primitives
                 return CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp);
             }
 
+            var line = other as LinePrimitive;
+            if (line != null)
+            {
+                return CollisionDetector.CheckLineToPolygonCollision(line, this);
+            }
+
             throw new NotSupportedException();
         }
 
