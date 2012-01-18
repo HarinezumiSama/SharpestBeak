@@ -35,6 +35,9 @@ namespace SharpestBeak.Common
 
         private readonly object m_lastMovesLock = new object();
 
+        private readonly object m_shotIndexCounterLock = new object();
+        private int m_shotIndexCounter;
+
         #endregion
 
         #region Constructors
@@ -257,6 +260,10 @@ namespace SharpestBeak.Common
             m_moveCount.Value = 0;
             m_finalizingStage = false;
             m_winningTeam.Value = null;
+            lock (m_shotIndexCounterLock)
+            {
+                m_shotIndexCounter = 0;
+            }
 
             this.AliveChickensDirect.ChangeContents(this.AllChickens);
             this.ShotUnitsDirect.Clear();
@@ -264,6 +271,15 @@ namespace SharpestBeak.Common
             PositionChickens();
 
             this.AllChickens.DoForEach(item => item.Logic.Reset());
+        }
+
+        private int GetShotUniqueIndex()
+        {
+            lock (m_shotIndexCounterLock)
+            {
+                m_shotIndexCounter++;
+                return m_shotIndexCounter;
+            }
         }
 
         private void DoExecuteEngine()
@@ -367,7 +383,10 @@ namespace SharpestBeak.Common
                 }
             }
 
-            using (new AutoStopwatch(s => DebugHelper.WriteLine(s)) { OutputFormat = "Shot collisions took {0}." })
+            using (new AutoStopwatch(s => DebugHelper.WriteLine(s))
+                {
+                    OutputFormat = "Shot collisions took {0}."
+                })
             {
                 for (int index = 0; index < oldShotUnits.Length; index++)
                 {
@@ -585,7 +604,7 @@ namespace SharpestBeak.Common
                     }
                 }
 
-                var shot = new ShotUnit(item.Unit);
+                var shot = new ShotUnit(item.Unit, GetShotUniqueIndex());
                 this.ShotUnitsDirect.Add(shot);
                 item.Unit.ShotTimer.Restart();
 
@@ -773,7 +792,10 @@ namespace SharpestBeak.Common
         public GameTeam? WinningTeam
         {
             [DebuggerNonUserCode]
-            get { return m_winningTeam.Value; }
+            get
+            {
+                return m_winningTeam.Value;
+            }
         }
 
         #endregion

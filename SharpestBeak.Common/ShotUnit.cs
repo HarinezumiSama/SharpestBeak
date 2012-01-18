@@ -11,9 +11,6 @@ namespace SharpestBeak.Common
     {
         #region Fields
 
-        private static readonly object s_instanceCountLock = new object();
-        private static ulong s_instanceCount;
-
         private Point2D m_position;
         private ShotElement m_cachedElement;
 
@@ -24,7 +21,7 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotUnit"/> class.
         /// </summary>
-        internal ShotUnit(ChickenUnit owner)
+        internal ShotUnit(ChickenUnit owner, int uniqueIndex)
         {
             #region Argument Check
 
@@ -32,12 +29,19 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("owner");
             }
+            if (uniqueIndex <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "uniqueIndex",
+                    uniqueIndex,
+                    "The unique index must be positive.");
+            }
 
             #endregion
 
             var beakTipPosition = GameHelper.GetBeakTipPosition(owner.Position, owner.BeakAngle);
 
-            this.UniqueIndex = GetUniqueIndex();
+            this.UniqueIndex = uniqueIndex;
             this.Owner = owner;
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
             this.Angle = owner.BeakAngle;
@@ -48,23 +52,10 @@ namespace SharpestBeak.Common
 
         #region Private Methods
 
-        private static ulong GetUniqueIndex()
-        {
-            lock (s_instanceCountLock)
-            {
-                s_instanceCount++;
-                return s_instanceCount;
-            }
-        }
-
-        #region Private Methods
-
         private void ResetCachedElement()
         {
             m_cachedElement = null;
         }
-
-        #endregion
 
         #endregion
 
@@ -80,7 +71,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public ulong UniqueIndex
+        public int UniqueIndex
         {
             get;
             private set;
