@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SharpestBeak.Common.View
 {
-    [DebuggerDisplay("{GetType().Name,nq}. Items.Count = {Items.Count}")]
+    [DebuggerDisplay("{GetType().Name,nq}. Chickens.Count = {Chickens.Count}, Shots.Count = {Shots.Count}")]
     public sealed class ViewInfo
     {
         #region Constructors
@@ -25,25 +25,37 @@ namespace SharpestBeak.Common.View
 
             #endregion
 
-            // [VM] Currently every chicken know about every other chicken
-            var allChickens = unit
-                .Logic
-                .Engine
+            var engine = unit.Logic.Engine;
+
+            // [VM] Currently every chicken knows about every other chicken
+            // [VM] Anyway, each chicken should know everything about teammates
+            var allChickens = engine
                 .AliveChickens
                 .Where(item => !item.IsDead && item != unit)
                 .Select(item => new ChickenViewData(item))
-                .ToArray();
+                .ToList()
+                .AsReadOnly();
+
+            // [VM] Currently every chicken knows about every shot
+            var allShots = engine.ShotUnits.Select(item => new ShotViewData(item)).ToList().AsReadOnly();
 
             // TODO: [VM] Compute details according to actual unit view
 
-            this.Items = allChickens.Cast<BaseViewData>().ToList().AsReadOnly();
+            this.Chickens = allChickens;
+            this.Shots = allShots;
         }
 
         #endregion
 
         #region Public Properties
 
-        public IList<BaseViewData> Items
+        public IList<ChickenViewData> Chickens
+        {
+            get;
+            private set;
+        }
+
+        public IList<ShotViewData> Shots
         {
             get;
             private set;

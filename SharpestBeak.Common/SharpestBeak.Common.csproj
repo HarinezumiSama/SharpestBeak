@@ -103,6 +103,7 @@
     <Compile Include="ShotUnit.cs" />
     <Compile Include="ThreadSafeValue.cs" />
     <Compile Include="View\ChickenViewData.cs" />
+    <Compile Include="View\ShotViewData.cs" />
     <Compile Include="View\ViewInfo.cs" />
     <Compile Include="View\BaseViewData.cs" />
     <Compile Include="WinApi.cs" />

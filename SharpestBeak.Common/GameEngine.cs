@@ -442,7 +442,10 @@ namespace SharpestBeak.Common
                 }
             }
 
-            this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+            lock (m_lastMovesLock)
+            {
+                this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
+            }
 
             #endregion
 
@@ -605,7 +608,10 @@ namespace SharpestBeak.Common
                 }
 
                 var shot = new ShotUnit(item.Unit, GetShotUniqueIndex());
-                this.ShotUnitsDirect.Add(shot);
+                lock (m_lastMovesLock)
+                {
+                    this.ShotUnitsDirect.Add(shot);
+                }
                 item.Unit.ShotTimer.Restart();
 
                 DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
