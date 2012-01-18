@@ -8,6 +8,13 @@ namespace SharpestBeak.Common
 {
     public sealed class ChickenUnitState
     {
+        #region Fields
+
+        private readonly object m_currentMoveLock = new object();
+        private MoveInfo m_currentMove;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -25,7 +32,7 @@ namespace SharpestBeak.Common
             #endregion
 
             this.Unit = unit;
-            this.UniqueIndex = unit.UniqueIndex;
+            this.UniqueId = unit.UniqueId;
             this.Team = unit.Logic.Team;
             this.IsDead = unit.IsDead;
             this.Position = unit.Position;
@@ -49,7 +56,7 @@ namespace SharpestBeak.Common
 
             this.Unit = unitState.Unit;
             this.IsDead = unitState.Unit.IsDead;  // IsDead should always be obtained from unit, not from state
-            this.UniqueIndex = unitState.UniqueIndex;
+            this.UniqueId = unitState.UniqueId;
             this.Team = unitState.Team;
             this.Position = unitState.Unit.Position;
             this.BeakAngle = unitState.Unit.BeakAngle;
@@ -71,7 +78,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public int UniqueIndex
+        public int UniqueId
         {
             get;
             private set;
@@ -109,8 +116,13 @@ namespace SharpestBeak.Common
 
         public MoveInfo CurrentMove
         {
-            get;
-            private set;
+            get
+            {
+                lock (m_currentMoveLock)
+                {
+                    return m_currentMove;
+                }
+            }
         }
 
         public ViewInfo View
@@ -128,7 +140,7 @@ namespace SharpestBeak.Common
             return string.Format(
                 "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
                 this.GetType().Name,
-                this.UniqueIndex,
+                this.UniqueId,
                 this.Position,
                 this.BeakAngle,
                 this.Team,
@@ -137,12 +149,15 @@ namespace SharpestBeak.Common
 
         public void SetCurrentMove(MoveInfo value)
         {
-            if (this.CurrentMove != null)
+            lock (m_currentMoveLock)
             {
-                throw new InvalidOperationException("Cannot reassign already assigned move.");
-            }
+                if (m_currentMove != null)
+                {
+                    throw new InvalidOperationException("Cannot reassign already assigned move.");
+                }
 
-            this.CurrentMove = value;
+                m_currentMove = value;
+            }
         }
 
         #endregion

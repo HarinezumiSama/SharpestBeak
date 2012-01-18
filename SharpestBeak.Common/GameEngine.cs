@@ -18,10 +18,8 @@ namespace SharpestBeak.Common
     {
         #region Fields
 
-        // TODO: [VM] Write RandSeed to debug log
-        private static readonly Random s_random = new Random();
+        private static readonly ThreadSafeRandom s_random = new ThreadSafeRandom();
         private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(5d);
-        private static readonly float s_timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
 
         private readonly ReaderWriterLockSlim m_syncLock =
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -95,7 +93,7 @@ namespace SharpestBeak.Common
                 .SelectMany(item => item.Units)
                 .ToList()
                 .AsReadOnly();
-            this.AllChickens.DoForEach((item, index) => item.UniqueIndex = index + 1);
+            this.AllChickens.DoForEach((item, index) => item.UniqueId = index + 1);
             this.AliveChickensDirect = new List<ChickenUnit>();
             this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
             this.ShotUnitsDirect = new List<ShotUnit>();
@@ -166,12 +164,10 @@ namespace SharpestBeak.Common
                 Point2D newPosition;
                 do
                 {
-                    var discretePosition = new Point(
+                    var nominalPosition = new Point(
                         s_random.Next(this.CommonData.NominalSize.Width),
                         s_random.Next(this.CommonData.NominalSize.Height));
-                    newPosition = new Point2D(
-                        GameConstants.NominalCellSize * discretePosition.X + GameConstants.NominalCellSize / 2,
-                        GameConstants.NominalCellSize * discretePosition.Y + GameConstants.NominalCellSize / 2);
+                    newPosition = GameHelper.NominalToReal(nominalPosition);
                 }
                 while (this.AllChickens.Take(index).Any(
                     item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
@@ -374,7 +370,7 @@ namespace SharpestBeak.Common
                     oldShotUnit.Angle,
                     MoveDirection.MoveForward,
                     GameConstants.ShotUnit.DefaultRectilinearSpeed,
-                    s_timeDelta);
+                    GameConstants.StepTimeDelta);
                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", oldShotUnit);
 
                 if (HasOutOfBoardCollision(oldShotUnit.GetElement()))
@@ -565,7 +561,7 @@ namespace SharpestBeak.Common
                             item.IsDead = true;
                             DebugHelper.WriteLine(
                                 "Chicken #{0} is now dead since logic '{1}' caused an error:{2}{3}",
-                                item.UniqueIndex,
+                                item.UniqueId,
                                 logic.GetType().FullName,
                                 Environment.NewLine,
                                 ex.ToString());
@@ -649,11 +645,11 @@ namespace SharpestBeak.Common
                     unit.BeakAngle,
                     unitState.CurrentMove.MoveDirection,
                     GameConstants.ChickenUnit.DefaultRectilinearSpeed,
-                    s_timeDelta);
+                    GameConstants.StepTimeDelta);
                 var newBeakAngle = GameHelper.GetNewBeakAngle(
                     unit.BeakAngle,
                     unitState.CurrentMove.BeakTurn,
-                    s_timeDelta);
+                    GameConstants.StepTimeDelta);
 
                 var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
                 if (HasOutOfBoardCollision(newPositionElement))

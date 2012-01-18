@@ -37,6 +37,9 @@ namespace SharpestBeak.Common
                 { MoveDirection.StrafeRight, GameAngle.FromDegrees(-QuarterRevolutionDegrees) }
             };
 
+        private static readonly Vector2D s_halfNominalCellOffset =
+            new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
+
         #endregion
 
         #region Public Methods
@@ -166,6 +169,20 @@ namespace SharpestBeak.Common
         public static float Sqrt(this float value)
         {
             return (float)Math.Sqrt(value);
+        }
+
+        /// <summary>
+        ///     Gets the real board coordinates of the center of the nominal cell with the specified coordinates.
+        /// </summary>
+        /// <param name="nominalPoint">
+        ///     The coordinates of the nominal cell to convert.
+        /// </param>
+        /// <returns>
+        ///     The real board coordinates.
+        /// </returns>
+        public static Point2D NominalToReal(Point nominalPoint)
+        {
+            return new Point2D(nominalPoint) * GameConstants.NominalCellSize + s_halfNominalCellOffset;
         }
 
         public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn, float timeDelta)

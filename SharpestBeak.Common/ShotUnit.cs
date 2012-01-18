@@ -21,7 +21,7 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotUnit"/> class.
         /// </summary>
-        internal ShotUnit(ChickenUnit owner, int uniqueIndex)
+        internal ShotUnit(ChickenUnit owner, int uniqueId)
         {
             #region Argument Check
 
@@ -29,19 +29,19 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("owner");
             }
-            if (uniqueIndex <= 0)
+            if (uniqueId <= 0)
             {
                 throw new ArgumentOutOfRangeException(
-                    "uniqueIndex",
-                    uniqueIndex,
-                    "The unique index must be positive.");
+                    "uniqueId",
+                    uniqueId,
+                    "The unique ID must be positive.");
             }
 
             #endregion
 
             var beakTipPosition = GameHelper.GetBeakTipPosition(owner.Position, owner.BeakAngle);
 
-            this.UniqueIndex = uniqueIndex;
+            this.UniqueId = uniqueId;
             this.Owner = owner;
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
             this.Angle = owner.BeakAngle;
@@ -71,7 +71,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public int UniqueIndex
+        public int UniqueId
         {
             get;
             private set;
@@ -121,10 +121,10 @@ namespace SharpestBeak.Common
             return string.Format(
                 "[{0} : #{1}] Position = {2}, Angle = {3:D}, Owner = #{4}, CreationTime = {5:HH:mm:ss.fff}",
                 this.GetType().Name,
-                this.UniqueIndex,
+                this.UniqueId,
                 this.Position,
                 this.Angle,
-                this.Owner.UniqueIndex,
+                this.Owner.UniqueId,
                 this.CreationTime);
         }
 

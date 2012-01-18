@@ -29,7 +29,7 @@ namespace SharpestBeak.Common.Presentation
             #endregion
 
             this.Element = shotUnit.GetElement();
-            var createdChickenPresentation = chickenMap.GetValueOrDefault(shotUnit.Owner.UniqueIndex);
+            var createdChickenPresentation = chickenMap.GetValueOrDefault(shotUnit.Owner.UniqueId);
             this.Owner = createdChickenPresentation ?? new ChickenPresentation(shotUnit.Owner);
         }
 

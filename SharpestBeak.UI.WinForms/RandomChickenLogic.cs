@@ -11,42 +11,15 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        private static readonly BeakTurn[] s_turns = (BeakTurn[])Enum.GetValues(typeof(BeakTurn));
-        private static readonly MoveDirection[] s_moveDirections =
-            (MoveDirection[])Enum.GetValues(typeof(MoveDirection));
-        private static readonly FireMode[] s_fireModes = (FireMode[])Enum.GetValues(typeof(FireMode));
+        private static readonly IList<BeakTurn> s_turns = Helper.GetEnumValues<BeakTurn>().AsReadOnly();
+        private static readonly IList<MoveDirection> s_moveDirections =
+            Helper.GetEnumValues<MoveDirection>().AsReadOnly();
+        private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
 
-        private static readonly Random s_random = new Random();
-        private static readonly object s_randomSyncLock = new object();
+        private static readonly ThreadSafeRandom s_random = new ThreadSafeRandom();
 
-        private readonly Dictionary<int, Point2D> m_targetPoints = new Dictionary<int, Point2D>();
+        private readonly Dictionary<int, Point2D> m_unitIdToTargetPointMap = new Dictionary<int, Point2D>();
         private readonly object m_targetPointsLock = new object();
-
-        #endregion
-
-        #region Private Methods
-
-        private static int GetNextRandom(int maxValue)
-        {
-            lock (s_randomSyncLock)
-            {
-                return s_random.Next(maxValue);
-            }
-        }
-
-        private static T ChooseRandomValue<T>(IList<T> collection)
-        {
-            #region Argument Check
-
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
-
-            #endregion
-
-            return collection[GetNextRandom(collection.Count)];
-        }
 
         #endregion
 
@@ -56,7 +29,7 @@ namespace SharpestBeak.UI.WinForms
         {
             lock (m_targetPointsLock)
             {
-                m_targetPoints.Clear();
+                m_unitIdToTargetPointMap.Clear();
             }
         }
 
@@ -64,7 +37,7 @@ namespace SharpestBeak.UI.WinForms
         {
             lock (m_targetPointsLock)
             {
-                m_targetPoints.Clear();
+                m_unitIdToTargetPointMap.Clear();
             }
         }
 
@@ -76,7 +49,7 @@ namespace SharpestBeak.UI.WinForms
                 {
                     lock (m_targetPointsLock)
                     {
-                        m_targetPoints.Remove(unitState.UniqueIndex);
+                        m_unitIdToTargetPointMap.Remove(unitState.UniqueId);
                     }
                     continue;
                 }
@@ -84,26 +57,24 @@ namespace SharpestBeak.UI.WinForms
                 Point2D targetPoint;
                 lock (m_targetPointsLock)
                 {
-                    targetPoint = m_targetPoints.GetValueOrDefault(unitState.UniqueIndex, unitState.Position);
+                    targetPoint = m_unitIdToTargetPointMap.GetValueOrDefault(unitState.UniqueId, unitState.Position);
                 }
 
                 var needNewTargetPoint =
                     (unitState.PreviousMove != null
                         && unitState.PreviousMove.State == MoveInfoState.Rejected)
                     || unitState.Position.GetDistance(targetPoint)
-                        .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed
-                            * (float)GameConstants.LogicPollFrequency.TotalSeconds);
+                        .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed * GameConstants.StepTimeDelta);
                 if (needNewTargetPoint)
                 {
                     // Choosing new target point
-                    var point = new Point2D(
-                        GetNextRandom(state.Data.NominalSize.Width),
-                        GetNextRandom(state.Data.NominalSize.Height));
-                    targetPoint = point * GameConstants.NominalCellSize
-                        + new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
+                    var point = new Point(
+                        s_random.Next(state.Data.NominalSize.Width),
+                        s_random.Next(state.Data.NominalSize.Height));
+                    targetPoint = GameHelper.NominalToReal(point);
                     lock (m_targetPointsLock)
                     {
-                        m_targetPoints[unitState.UniqueIndex] = targetPoint;
+                        m_unitIdToTargetPointMap[unitState.UniqueId] = targetPoint;
                     }
                 }
 
@@ -115,7 +86,7 @@ namespace SharpestBeak.UI.WinForms
                         unitState.BeakAngle,
                         item,
                         GameConstants.ChickenUnit.DefaultRectilinearSpeed,
-                        (float)GameConstants.LogicPollFrequency.TotalSeconds);
+                        GameConstants.StepTimeDelta);
                     var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
                     if (distanceSquared < move.Item2)
                     {
@@ -131,7 +102,7 @@ namespace SharpestBeak.UI.WinForms
                     new MoveInfo(
                         move.Item1,
                         turn,
-                        GetNextRandom(10) >= 9 ? FireMode.Single : FireMode.None));
+                        s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None));
             }
         }
 
@@ -147,7 +118,7 @@ namespace SharpestBeak.UI.WinForms
             {
                 lock (m_targetPointsLock)
                 {
-                    return m_targetPoints.Values.ToArray();
+                    return m_unitIdToTargetPointMap.Values.ToArray();
                 }
             }
         }

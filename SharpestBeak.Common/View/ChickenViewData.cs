@@ -23,7 +23,7 @@ namespace SharpestBeak.Common.View
 
             #endregion
 
-            this.UniqueIndex = unit.UniqueIndex;
+            this.UniqueId = unit.UniqueId;
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
             this.Team = unit.Logic.Team;
@@ -33,7 +33,7 @@ namespace SharpestBeak.Common.View
 
         #region Public Properties
 
-        public int UniqueIndex
+        public int UniqueId
         {
             get;
             private set;
@@ -66,7 +66,7 @@ namespace SharpestBeak.Common.View
             return string.Format(
                 "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}",
                 this.GetType().Name,
-                this.UniqueIndex,
+                this.UniqueId,
                 this.Position,
                 this.BeakAngle,
                 this.Team);

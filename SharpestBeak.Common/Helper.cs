@@ -25,6 +25,12 @@ namespace SharpestBeak.Common
             return value.ToString("yyyy-MM-dd HH:mm:ss.fff");
         }
 
+        public static List<TEnum> GetEnumValues<TEnum>()
+            where TEnum : struct
+        {
+            return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
+        }
+
         #endregion
     }
 }

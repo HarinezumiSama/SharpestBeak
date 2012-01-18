@@ -78,11 +78,13 @@ namespace SharpestBeak.Common
 
         internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
+        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
+
         public static readonly float NominalCellSize = 100f;
 
         public static readonly int MinNominalCellCount = 5;
 
-        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
+        public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
 
         public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
 

@@ -9,6 +9,6 @@ namespace SharpestBeak.Common
     public enum FireMode
     {
         None = 0,
-        Single
+        Regular
     }
 }

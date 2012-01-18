@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         private static void WriteLineInternal(string message)
         {
-            Debug.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToFixedString(), message));
+            Trace.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToFixedString(), message));
         }
 
         private static void WriteLineInternal(string format, params object[] args)
@@ -42,6 +42,16 @@ namespace SharpestBeak.Common.Diagnostics
                 return;
             }
 
+            WriteLineInternal(format, args);
+        }
+
+        public static void WriteLineForced(string message)
+        {
+            WriteLineInternal(message);
+        }
+
+        public static void WriteLineForced(string format, params object[] args)
+        {
             WriteLineInternal(format, args);
         }
 

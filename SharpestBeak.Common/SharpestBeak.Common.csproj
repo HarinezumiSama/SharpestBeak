@@ -74,6 +74,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ThreadSafeRandom.cs" />
     <Compile Include="Vector2D.cs" />
     <Compile Include="Diagnostics\DebugHelper.cs" />
     <Compile Include="Presentation\Elements\ChickenElement.cs" />

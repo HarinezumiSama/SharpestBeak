@@ -51,7 +51,7 @@ namespace SharpestBeak.UI.WinForms
         internal static void Main()
         {
             AppDomain.CurrentDomain.UnhandledException += Domain_UnhandledException;
-            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+            Application.ThreadException += Application_ThreadException;
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

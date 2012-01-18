@@ -68,7 +68,7 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public int UniqueIndex
+        public int UniqueId
         {
             get;
             internal set;
@@ -135,7 +135,7 @@ namespace SharpestBeak.Common
             return string.Format(
                 "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
                 this.GetType().Name,
-                this.UniqueIndex,
+                this.UniqueId,
                 this.Position,
                 this.BeakAngle,
                 this.Logic.Team,

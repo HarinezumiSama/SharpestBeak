@@ -23,7 +23,7 @@ namespace SharpestBeak.Common.View
 
             #endregion
 
-            this.UniqueIndex = unit.UniqueIndex;
+            this.UniqueId = unit.UniqueId;
             this.Position = unit.Position;
             this.Angle = unit.Angle;
         }
@@ -32,7 +32,7 @@ namespace SharpestBeak.Common.View
 
         #region Public Properties
 
-        public int UniqueIndex
+        public int UniqueId
         {
             get;
             private set;
@@ -59,7 +59,7 @@ namespace SharpestBeak.Common.View
             return string.Format(
                 "[{0} #{1}] Position = {2}, Angle = {3:D}",
                 this.GetType().Name,
-                this.UniqueIndex,
+                this.UniqueId,
                 this.Position,
                 this.Angle);
         }
