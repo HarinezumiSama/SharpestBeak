@@ -27,17 +27,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         private PerformanceCounterHelper()
         {
-            using (new AutoStopwatch(
-                s => DebugHelper.WriteLine(s))
-                {
-                    OutputFormat = string.Format(
-                        "{0} in {1} took {{0}}.",
-                        ((Action)Setup).Method.Name,
-                        MethodBase.GetCurrentMethod().GetQualifiedName())
-                })
-            {
-                Setup();
-            }
+            DebugHelper.CallAndMeasure(this.Setup);
 
             this.CollisionCountPerStep = new PerformanceCounter(
                 CategoryName,
@@ -87,6 +77,7 @@ namespace SharpestBeak.Common.Diagnostics
                 PerformanceCounterCategoryType.Unknown,
                 counters);
 
+            Debug.WriteLine(string.Format("{0} is successfully set up.", this.GetType().FullName));
         }
 
         #endregion

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpestBeak.Common;
+using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Presentation;
 using SharpestBeak.UI.WinForms.Properties;
 
@@ -35,8 +36,10 @@ namespace SharpestBeak.UI.WinForms
         private static readonly float s_uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
 
         private readonly GameEngine m_gameEngine;
+        private readonly object m_lastPresentationLock = new object();
         private GamePresentation m_lastPresentation;
         private ulong m_totalPaintCount;
+        private Bitmap m_gameBoardBackground;
 
         private float m_fps;
         private int m_fpsPaintCount;
@@ -331,6 +334,8 @@ namespace SharpestBeak.UI.WinForms
                 ClearStatusLabels();
                 UpdateMoveCountStatus();
 
+                DebugHelper.CallAndMeasure(this.ResetGameBoardBackground);
+
                 m_gameEngine.CallPaint();
             }
             catch (Exception ex)
@@ -340,21 +345,65 @@ namespace SharpestBeak.UI.WinForms
                     throw;
                 }
 
-                MessageBox.Show(
-                    this,
-                    ex.ToString(),
-                    "Game Initialization Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
+                ShowErrorMessage(ex);
                 return false;
             }
 
             return true;
         }
 
+        private void ResetGameBoardBackground()
+        {
+            Helper.DisposeAndNull(ref m_gameBoardBackground);
+
+            try
+            {
+                var size = m_gameEngine.CommonData.NominalSize;
+
+                m_gameBoardBackground = new Bitmap(s_cellSize * size.Width, s_cellSize * size.Height);
+
+                using (var graphics = Graphics.FromImage(m_gameBoardBackground))
+                {
+                    if (Settings.Default.DrawBoardGrid)
+                    {
+                        for (int y = 0; y < size.Height; y++)
+                        {
+                            for (int x = 0; x < size.Width; x++)
+                            {
+                                var cellPoint = new Point(s_cellSize * x, s_cellSize * y);
+                                var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
+                                ControlPaint.DrawFocusRectangle(graphics, cellRect);
+
+                                var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
+                                var backRect = cellRect;
+                                backRect.Inflate(-1, -1);
+                                graphics.FillRectangle(backBrush, backRect);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var boardRect = new Rectangle(Point.Empty, m_gameBoardBackground.Size);
+                        ControlPaint.DrawFocusRectangle(graphics, boardRect);
+                        var backRect = boardRect;
+                        backRect.Inflate(-1, -1);
+                        graphics.FillRectangle(s_oddCellBrush, backRect);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                Helper.DisposeAndNull(ref m_gameBoardBackground);
+                throw;
+            }
+        }
+
         private void PaintGame(GamePaintEventArgs e)
         {
-            m_lastPresentation = e.Presentation;
+            lock (m_lastPresentationLock)
+            {
+                m_lastPresentation = e.Presentation;
+            }
 
             if (m_gameEngine.MoveCount % 25 == 0)
             {
@@ -432,6 +481,11 @@ namespace SharpestBeak.UI.WinForms
             }
             catch (Exception ex)
             {
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
                 ShowErrorMessage(ex);
                 return;
             }
@@ -453,6 +507,11 @@ namespace SharpestBeak.UI.WinForms
             }
             catch (Exception ex)
             {
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
                 ShowErrorMessage(ex);
                 return;
             }
@@ -521,41 +580,22 @@ namespace SharpestBeak.UI.WinForms
 
         private void pbGame_Paint(object sender, PaintEventArgs e)
         {
-            if (m_lastPresentation == null)
+            GamePresentation lastPresentation;
+            lock (m_lastPresentationLock)
+            {
+                lastPresentation = m_lastPresentation;
+            }
+            if (lastPresentation == null)
             {
                 return;
             }
 
-            var size = m_lastPresentation.CommonData.NominalSize;
+            var size = lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
 
-            if (Settings.Default.DrawBoardGrid)
-            {
-                for (int y = 0; y < size.Height; y++)
-                {
-                    for (int x = 0; x < size.Width; x++)
-                    {
-                        var cellPoint = new Point(s_cellSize * x, s_cellSize * y);
-                        var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
-                        ControlPaint.DrawFocusRectangle(graphics, cellRect);
+            graphics.DrawImageUnscaled(m_gameBoardBackground.EnsureNotNull(), Point.Empty);
 
-                        var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
-                        var backRect = cellRect;
-                        backRect.Inflate(-1, -1);
-                        graphics.FillRectangle(backBrush, backRect);
-                    }
-                }
-            }
-            else
-            {
-                var boardRect = pbGame.Bounds;
-                ControlPaint.DrawFocusRectangle(graphics, boardRect);
-                var backRect = boardRect;
-                backRect.Inflate(-1, -1);
-                graphics.FillRectangle(s_oddCellBrush, backRect);
-            }
-
-            foreach (var chickenUnit in m_lastPresentation.Chickens)
+            foreach (var chickenUnit in lastPresentation.Chickens)
             {
                 var isTeamA = chickenUnit.State.Team == GameTeam.TeamA;
                 var drawData = isTeamA ? s_teamAUnitDrawData : s_teamBUnitDrawData;
@@ -583,7 +623,7 @@ namespace SharpestBeak.UI.WinForms
             }
 
             var uiShotRadius = GameConstants.ShotUnit.Radius * s_uiCoefficient;
-            foreach (var shotUnit in m_lastPresentation.Shots)
+            foreach (var shotUnit in lastPresentation.Shots)
             {
                 var drawData = shotUnit.Owner.State.Team == GameTeam.TeamA ? s_teamAShotDrawData : s_teamBShotDrawData;
                 shotUnit.Element.Draw(graphics, drawData);

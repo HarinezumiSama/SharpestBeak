@@ -18,6 +18,7 @@ namespace SharpestBeak.Common
     {
         #region Fields
 
+        // TODO: [VM] Write RandSeed to debug log
         private static readonly Random s_random = new Random();
         private static readonly TimeSpan s_stopTimeout = TimeSpan.FromSeconds(5d);
         private static readonly float s_timeDelta = (float)GameConstants.LogicPollFrequency.TotalSeconds;
@@ -360,6 +361,8 @@ namespace SharpestBeak.Common
             // Processing new shot units
             var shootingMoves = newUnitStates.Where(item => item.CurrentMove.FireMode != FireMode.None).ToArray();
             ProcessNewShots(oldShotUnits, shootingMoves);
+
+            // TODO: [VM] Optimize process of collision detection: don't check if already checked or smth like that
 
             #region Processing Shot Collisions
 

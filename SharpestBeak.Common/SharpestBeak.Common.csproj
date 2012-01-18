@@ -75,7 +75,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Vector2D.cs" />
-    <Compile Include="DebugHelper.cs" />
+    <Compile Include="Diagnostics\DebugHelper.cs" />
     <Compile Include="Presentation\Elements\ChickenElement.cs" />
     <Compile Include="Presentation\Primitives\CirclePrimitive.cs" />
     <Compile Include="Presentation\Elements\ShotElement.cs" />
