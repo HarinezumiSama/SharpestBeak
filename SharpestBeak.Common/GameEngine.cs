@@ -47,8 +47,8 @@ namespace SharpestBeak.Common
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
             Size size,
-            ChickenTeamRecord teamA,
-            ChickenTeamRecord teamB)
+            ChickenTeamRecord lightTeam,
+            ChickenTeamRecord darkTeam)
         {
             #region Fields
 
@@ -56,13 +56,13 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("paintCallback");
             }
-            if (teamA == null)
+            if (lightTeam == null)
             {
-                throw new ArgumentNullException("teamA");
+                throw new ArgumentNullException("lightTeam");
             }
-            if (teamB == null)
+            if (darkTeam == null)
             {
-                throw new ArgumentNullException("teamB");
+                throw new ArgumentNullException("darkTeam");
             }
 
             #endregion
@@ -84,8 +84,8 @@ namespace SharpestBeak.Common
             this.Logics =
                 new[]
                 {
-                    CreateLogic(this, teamA, GameTeam.TeamA),
-                    CreateLogic(this, teamB, GameTeam.TeamB)
+                    CreateLogic(this, lightTeam, GameTeam.Light),
+                    CreateLogic(this, darkTeam, GameTeam.Dark)
                 }
                 .ToList()
                 .AsReadOnly();
@@ -173,7 +173,7 @@ namespace SharpestBeak.Common
                     item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
 
                 var newAngle = (float)Math.Floor(
-                    GameHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
+                    MathHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
 
                 chicken.Position = newPosition;
                 chicken.BeakAngle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(newAngle));
@@ -241,9 +241,7 @@ namespace SharpestBeak.Common
                         IsBackground = true,
                         Name = string.Format("Logic '{0}'", item.GetType().FullName)
                     };
-                    item.Initialize();
                 });
-            this.ShotUnitsDirect.Clear();
 
             m_stopEvent.Reset();
             CallPaintCallback();
@@ -264,10 +262,11 @@ namespace SharpestBeak.Common
 
             this.AliveChickensDirect.ChangeContents(this.AllChickens);
             this.ShotUnitsDirect.Clear();
+            this.AllChickens.DoForEach(item => item.Reset());
 
             PositionChickens();
 
-            this.AllChickens.DoForEach(item => item.Logic.Reset());
+            this.Logics.DoForEach(item => item.Reset());
         }
 
         private int GetShotUniqueIndex()
@@ -362,7 +361,6 @@ namespace SharpestBeak.Common
 
             #region Processing Shot Collisions
 
-            var explodedShotUnits = new List<ShotUnit>();
             foreach (var oldShotUnit in oldShotUnits)
             {
                 oldShotUnit.Position = GameHelper.GetNewPosition(
@@ -376,7 +374,6 @@ namespace SharpestBeak.Common
                 if (HasOutOfBoardCollision(oldShotUnit.GetElement()))
                 {
                     oldShotUnit.Exploded = true;
-                    explodedShotUnits.Add(oldShotUnit);
 
                     DebugHelper.WriteLine("Shot {{{0}}} has exploded outside of game board.", oldShotUnit);
                 }
@@ -398,10 +395,7 @@ namespace SharpestBeak.Common
                         if (CollisionDetector.CheckCollision(shotUnit.GetElement(), otherShotUnit.GetElement()))
                         {
                             shotUnit.Exploded = true;
-                            explodedShotUnits.Add(shotUnit);
-
                             otherShotUnit.Exploded = true;
-                            explodedShotUnits.Add(otherShotUnit);
 
                             DebugHelper.WriteLine(
                                 "Mutual annihilation of shots {{{0}}} and {{{1}}}.",
@@ -422,7 +416,6 @@ namespace SharpestBeak.Common
                     if (injuredChicken != null)
                     {
                         shotUnit.Exploded = true;
-                        explodedShotUnits.Add(shotUnit);
 
                         injuredChicken.IsDead = true;
                         injuredChicken.KilledBy = shotUnit.Owner;
@@ -441,11 +434,6 @@ namespace SharpestBeak.Common
                 }
             }
 
-            lock (m_lastMovesLock)
-            {
-                this.ShotUnitsDirect.RemoveAll(item => explodedShotUnits.Contains(item));
-            }
-
             #endregion
 
             if (!ProcessChickenUnitMoves(previousUnitStates, aliveChickens))
@@ -456,9 +444,10 @@ namespace SharpestBeak.Common
             lock (m_lastMovesLock)
             {
                 this.AliveChickensDirect.RemoveAll(item => item.IsDead);
+                this.ShotUnitsDirect.RemoveAll(item => item.Exploded);
             }
 
-            var aliveTeams = this.AliveChickensDirect.Select(item => item.Logic.Team).Distinct().ToList();
+            var aliveTeams = this.AliveChickensDirect.Select(item => item.Team).Distinct().ToList();
             if (aliveTeams.Count <= 1)
             {
                 m_finalizingStage = true;
@@ -582,38 +571,38 @@ namespace SharpestBeak.Common
 
         private void ProcessNewShots(IEnumerable<ShotUnit> oldShotUnits, IEnumerable<ChickenUnitState> shootingMoves)
         {
-            foreach (var item in shootingMoves)
+            foreach (var shootingMove in shootingMoves)
             {
                 // Is there any active shot unit from the same chicken unit?
-                if (this.ShotUnitsDirect.Any(s => s.Owner == item.Unit))
+                if (shootingMove.Unit.HasShots())
                 {
-                    if (item.Unit.ShotTimer.Elapsed < GameConstants.ShotUnit.MaximumFrequency)
+                    if (!shootingMove.Unit.CanShootDueToTimer())
                     {
-                        DebugHelper.WriteLine("New shot from {{{0}}} has been skipped - too fast.", item.Unit);
-                        return;
+                        DebugHelper.WriteLine("New shot from {{{0}}} has been skipped - too fast.", shootingMove.Unit);
+                        continue;
                     }
                 }
 
                 if (m_finalizingStage)
                 {
-                    var thisShotTeam = item.Team;
-                    if (!oldShotUnits.Any(su => su.Owner.Logic.Team != thisShotTeam))
+                    var thisShotTeam = shootingMove.Team;
+                    if (!oldShotUnits.Any(su => su.Owner.Team != thisShotTeam))
                     {
                         DebugHelper.WriteLine(
                             "New shot from {{{0}}} has been skipped - finalizing stage and no enemy shots.",
-                            item.Unit);
-                        return;
+                            shootingMove.Unit);
+                        continue;
                     }
                 }
 
-                var shot = new ShotUnit(item.Unit, GetShotUniqueIndex());
+                var shot = new ShotUnit(shootingMove.Unit, GetShotUniqueIndex());
                 lock (m_lastMovesLock)
                 {
                     this.ShotUnitsDirect.Add(shot);
                 }
-                item.Unit.ShotTimer.Restart();
+                shootingMove.Unit.ShotTimer.Restart();
 
-                DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, item.Unit);
+                DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, shootingMove.Unit);
             }
         }
 
@@ -860,7 +849,7 @@ namespace SharpestBeak.Common
             CallPaintCallback();
         }
 
-        // TODO: [VM] Implement Pause method
+        // TODO: [VM] Implement Pause method (?)
 
         public void CallPaint()
         {

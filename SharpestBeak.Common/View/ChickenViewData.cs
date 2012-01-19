@@ -26,7 +26,7 @@ namespace SharpestBeak.Common.View
             this.UniqueId = unit.UniqueId;
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
-            this.Team = unit.Logic.Team;
+            this.Team = unit.Team;
         }
 
         #endregion

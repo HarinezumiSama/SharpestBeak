@@ -24,6 +24,7 @@ namespace SharpestBeak.Common.Presentation
             #endregion
 
             this.CommonData = engine.CommonData;
+
             this.Chickens = engine
                 .AliveChickensDirect
                 .Select(item => new ChickenPresentation(item))

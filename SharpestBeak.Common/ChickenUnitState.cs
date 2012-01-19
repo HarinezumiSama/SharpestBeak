@@ -33,10 +33,11 @@ namespace SharpestBeak.Common
 
             this.Unit = unit;
             this.UniqueId = unit.UniqueId;
-            this.Team = unit.Logic.Team;
+            this.Team = unit.Team;
             this.IsDead = unit.IsDead;
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
+            this.HasShots = unit.HasShots();
             this.View = new ViewInfo(unit);
         }
 
@@ -60,6 +61,7 @@ namespace SharpestBeak.Common
             this.Team = unitState.Team;
             this.Position = unitState.Unit.Position;
             this.BeakAngle = unitState.Unit.BeakAngle;
+            this.HasShots = unitState.Unit.HasShots();
             this.View = new ViewInfo(unitState.Unit);
             this.PreviousMove = unitState.CurrentMove;
         }
@@ -69,6 +71,12 @@ namespace SharpestBeak.Common
         #region Internal Properties
 
         internal ChickenUnit Unit
+        {
+            get;
+            private set;
+        }
+
+        internal bool HasShots
         {
             get;
             private set;
@@ -145,6 +153,11 @@ namespace SharpestBeak.Common
                 this.BeakAngle,
                 this.Team,
                 this.IsDead);
+        }
+
+        public bool CanShoot()
+        {
+            return !this.HasShots || this.Unit.CanShootDueToTimer();
         }
 
         public void SetCurrentMove(MoveInfo value)

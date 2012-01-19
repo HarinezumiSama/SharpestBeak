@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public sealed class EngineMoveInfo
+    internal sealed class EngineMoveInfo
     {
         #region Constructors
 

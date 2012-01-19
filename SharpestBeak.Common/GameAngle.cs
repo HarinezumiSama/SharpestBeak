@@ -14,16 +14,16 @@ namespace SharpestBeak.Common
         {
             var result = value;
             // TODO: [VM] Use tolerance when comparing values
-            while (result > GameHelper.HalfRevolutionDegrees && result > -GameHelper.HalfRevolutionDegrees)
+            while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
             {
-                result -= GameHelper.RevolutionDegrees;
+                result -= MathHelper.RevolutionDegrees;
             }
-            while (result <= -GameHelper.HalfRevolutionDegrees && result <= GameHelper.HalfRevolutionDegrees)
+            while (result <= -MathHelper.HalfRevolutionDegrees && result <= MathHelper.HalfRevolutionDegrees)
             {
-                result += GameHelper.RevolutionDegrees;
+                result += MathHelper.RevolutionDegrees;
             }
 
-            if (result > GameHelper.HalfRevolutionDegrees || result <= -GameHelper.HalfRevolutionDegrees)
+            if (result > MathHelper.HalfRevolutionDegrees || result <= -MathHelper.HalfRevolutionDegrees)
             {
                 throw new InvalidOperationException("Computed angle was not fixed correctly.");
             }

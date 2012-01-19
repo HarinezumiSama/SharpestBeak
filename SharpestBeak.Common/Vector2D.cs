@@ -195,8 +195,8 @@ namespace SharpestBeak.Common
 
         public GameAngle GetAngle(Vector2D target)
         {
-            var radianAngle = GameHelper.Atan2(target.m_y, target.m_x) - GameHelper.Atan2(m_y, m_x);
-            var degreeAngle = GameHelper.ToDegrees(radianAngle);
+            var radianAngle = MathHelper.Atan2(target.m_y, target.m_x) - MathHelper.Atan2(m_y, m_x);
+            var degreeAngle = radianAngle.ToDegrees();
             return GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(degreeAngle));
         }
 

@@ -9,7 +9,7 @@ using SharpestBeak.Common.Presentation.Elements;
 
 namespace SharpestBeak.Common
 {
-    public sealed class ChickenUnit
+    internal sealed class ChickenUnit
     {
         #region Fields
 
@@ -37,6 +37,7 @@ namespace SharpestBeak.Common
 
             this.Logic = logic;
             this.ShotTimer = new Stopwatch();
+            this.Team = logic.Team;
         }
 
         #endregion
@@ -52,6 +53,12 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
+        internal ChickenUnitLogic Logic
+        {
+            get;
+            private set;
+        }
+
         internal Stopwatch ShotTimer
         {
             get;
@@ -60,18 +67,45 @@ namespace SharpestBeak.Common
 
         #endregion
 
-        #region Public Properties
+        #region Internal Methods
 
-        public ChickenUnitLogic Logic
+        internal void Reset()
         {
-            get;
-            private set;
+            this.IsDead = false;
         }
+
+        internal bool HasShots()
+        {
+            // TODO: [VM] Use dictionary instead of list (?)
+            return this.Logic.Engine.ShotUnitsDirect.Any(item => item.Owner == this);
+        }
+
+        internal bool CanSee(Point2D point)
+        {
+            var viewDirection = GameHelper.GetBeakTipPosition(this.Position, this.BeakAngle) - this.Position;
+            var pointDirection = point - this.Position;
+            return viewDirection.GetAngle(pointDirection).DegreeValue.Abs() <= GameConstants.ChickenUnit.ViewAngle;
+        }
+
+        internal bool CanShootDueToTimer()
+        {
+            return this.ShotTimer.Elapsed >= GameConstants.ShotUnit.MaximumFrequency;
+        }
+
+        #endregion
+
+        #region Public Properties
 
         public int UniqueId
         {
             get;
             internal set;
+        }
+
+        public GameTeam Team
+        {
+            get;
+            private set;
         }
 
         public Point2D Position
@@ -138,7 +172,7 @@ namespace SharpestBeak.Common
                 this.UniqueId,
                 this.Position,
                 this.BeakAngle,
-                this.Logic.Team,
+                this.Team,
                 this.IsDead);
         }
 

@@ -37,7 +37,13 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
-            public static readonly float DefaultAngularSpeed = GameHelper.RevolutionDegrees / 4f / SlowDownRatio;
+            public static readonly float DefaultAngularSpeed = MathHelper.RevolutionDegrees / 4f / SlowDownRatio;
+
+            /// <summary>
+            ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
+            ///     (the whole view angle is double this value).
+            /// </summary>
+            public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 8f;
 
             #endregion
         }
@@ -86,7 +92,7 @@ namespace SharpestBeak.Common
 
         public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
 
-        public static readonly float FullRevolutionAngle = GameHelper.RevolutionDegrees;
+        public static readonly float FullRevolutionAngle = MathHelper.RevolutionDegrees;
 
         #endregion
 

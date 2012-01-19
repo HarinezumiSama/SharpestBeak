@@ -26,23 +26,27 @@ namespace SharpestBeak.Common.View
             #endregion
 
             var engine = unit.Logic.Engine;
+            var unitTeam = unit.Team;
 
-            // [VM] Currently every chicken knows about every other chicken
-            // [VM] Anyway, each chicken should know everything about teammates
-            var allChickens = engine
+            // TODO: [VM] Improve computing details according to actual unit view
+            // [VM] Currently, algorithm of determining if other chicken or shot is visible is very simple
+
+            this.Chickens = engine
                 .AliveChickens
-                .Where(item => !item.IsDead && item != unit)
+                .Where(
+                    item => !item.IsDead
+                        && item != unit
+                        && (item.Team == unitTeam || unit.CanSee(item.Position)))
                 .Select(item => new ChickenViewData(item))
                 .ToList()
                 .AsReadOnly();
 
-            // [VM] Currently every chicken knows about every shot
-            var allShots = engine.ShotUnits.Select(item => new ShotViewData(item)).ToList().AsReadOnly();
-
-            // TODO: [VM] Compute details according to actual unit view
-
-            this.Chickens = allChickens;
-            this.Shots = allShots;
+            this.Shots = engine
+                .ShotUnits
+                .Where(item => unit.CanSee(item.Position))
+                .Select(item => new ShotViewData(item))
+                .ToList()
+                .AsReadOnly();
         }
 
         #endregion

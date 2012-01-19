@@ -26,20 +26,28 @@ namespace SharpestBeak.Common
         protected ChickenUnitLogic()
         {
             m_error = new ThreadSafeValue<Exception>(m_lock);
-            //m_moveCount = new ThreadSafeValue<ulong>(m_lock);
 
             this.Units = m_unitsDirect.AsReadOnly();
         }
 
         #endregion
 
+        #region Private Methods
+
+        private GameState GetGameState()
+        {
+            var unitStates = this.Units.Select(item => new ChickenUnitState(item)).ToArray();
+            var result = new GameState(this.Engine, unitStates);
+            return result;
+        }
+
+        #endregion
+
         #region Protected Methods
 
-        protected abstract void OnReset();
+        protected abstract void OnReset(GameState gameState);
 
-        protected abstract void OnInitialize();
-
-        protected abstract void OnMakeMove(GameState state);
+        protected abstract void OnMakeMove(GameState gameState);
 
         #endregion
 
@@ -104,31 +112,25 @@ namespace SharpestBeak.Common
             #endregion
 
             this.Engine = engine;
+            this.Team = team;
+
             m_unitsDirect.ChangeContents(
                 Enumerable.Range(1, unitCount).Select(i => new ChickenUnit(this)));
-            this.Team = team;
         }
 
         internal void Reset()
         {
-            m_unitsDirect.DoForEach(item => item.IsDead = false);
-
-            //this.MoveCount = 0;
             this.Error = null;
 
-            OnReset();
+            var gameState = GetGameState();
+            OnReset(gameState);
         }
 
-        internal void Initialize()
+        internal void MakeMove(GameState gameState)
         {
-            OnInitialize();
-        }
-
-        internal void MakeMove(GameState state)
-        {
-            if (state != null)
+            if (gameState != null)
             {
-                OnMakeMove(state);
+                OnMakeMove(gameState);
             }
         }
 

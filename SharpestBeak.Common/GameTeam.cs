@@ -8,7 +8,7 @@ namespace SharpestBeak.Common
     public enum GameTeam
     {
         None = 0,
-        TeamA,
-        TeamB
+        Light,
+        Dark
     }
 }

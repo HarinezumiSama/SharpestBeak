@@ -597,8 +597,7 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in lastPresentation.Chickens)
             {
-                var isTeamA = chickenUnit.State.Team == GameTeam.TeamA;
-                var drawData = isTeamA ? s_teamAUnitDrawData : s_teamBUnitDrawData;
+                var drawData = chickenUnit.State.Team == GameTeam.Light ? s_teamAUnitDrawData : s_teamBUnitDrawData;
 
                 chickenUnit.Element.Draw(graphics, drawData);
             }
@@ -608,7 +607,7 @@ namespace SharpestBeak.UI.WinForms
                 var rcl = teamLogic as RandomChickenLogic;
                 if (rcl != null)
                 {
-                    var targetPointBrush = teamLogic.Team == GameTeam.TeamA ? Brushes.LightBlue : Brushes.DarkBlue;
+                    var targetPointBrush = teamLogic.Team == GameTeam.Light ? Brushes.LightBlue : Brushes.DarkBlue;
                     foreach (var targetPoint in rcl.TargetPoints)
                     {
                         var tp = targetPoint * s_uiCoefficient;
@@ -625,7 +624,7 @@ namespace SharpestBeak.UI.WinForms
             var uiShotRadius = GameConstants.ShotUnit.Radius * s_uiCoefficient;
             foreach (var shotUnit in lastPresentation.Shots)
             {
-                var drawData = shotUnit.Owner.State.Team == GameTeam.TeamA ? s_teamAShotDrawData : s_teamBShotDrawData;
+                var drawData = shotUnit.Owner.State.Team == GameTeam.Light ? s_teamAShotDrawData : s_teamBShotDrawData;
                 shotUnit.Element.Draw(graphics, drawData);
             }
 

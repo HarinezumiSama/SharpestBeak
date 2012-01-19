@@ -7,7 +7,7 @@ using SharpestBeak.Common.Presentation.Elements;
 
 namespace SharpestBeak.Common
 {
-    public sealed class ShotUnit
+    internal sealed class ShotUnit
     {
         #region Fields
 
