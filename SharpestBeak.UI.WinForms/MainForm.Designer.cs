@@ -1,5 +1,4 @@
-﻿using SharpestBeak.Common;
-namespace SharpestBeak.UI.WinForms
+﻿namespace SharpestBeak.UI.WinForms
 {
     partial class MainForm
     {
@@ -14,12 +13,10 @@ namespace SharpestBeak.UI.WinForms
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && (components != null))
             {
-                Helper.DisposeAndNull(ref components);
-                Helper.DisposeAndNull(ref m_gameBoardBackground);
+                components.Dispose();
             }
-
             base.Dispose(disposing);
         }
 
@@ -31,94 +28,55 @@ namespace SharpestBeak.UI.WinForms
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.pbGame = new System.Windows.Forms.PictureBox();
-            this.mainToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.statusBar = new System.Windows.Forms.StatusStrip();
-            this.turnInfoLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.fpsLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.fpsTimer = new System.Windows.Forms.Timer(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.pbGame)).BeginInit();
-            this.statusBar.SuspendLayout();
+            this.btnPlay = new System.Windows.Forms.Button();
+            this.pgGameSettings = new System.Windows.Forms.PropertyGrid();
             this.SuspendLayout();
             // 
-            // pbGame
+            // btnPlay
             // 
-            this.pbGame.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbGame.Location = new System.Drawing.Point(0, 0);
-            this.pbGame.Name = "pbGame";
-            this.pbGame.Size = new System.Drawing.Size(284, 262);
-            this.pbGame.TabIndex = 0;
-            this.pbGame.TabStop = false;
-            this.pbGame.Paint += new System.Windows.Forms.PaintEventHandler(this.pbGame_Paint);
-            this.pbGame.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pbGame_MouseClick);
+            this.btnPlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPlay.Location = new System.Drawing.Point(12, 177);
+            this.btnPlay.Name = "btnPlay";
+            this.btnPlay.Size = new System.Drawing.Size(75, 23);
+            this.btnPlay.TabIndex = 2;
+            this.btnPlay.Text = "Play";
+            this.btnPlay.UseVisualStyleBackColor = true;
+            this.btnPlay.Click += new System.EventHandler(this.btnPlay_Click);
             // 
-            // mainToolTip
+            // pgGameSettings
             // 
-            this.mainToolTip.AutomaticDelay = 250;
-            this.mainToolTip.AutoPopDelay = 30000;
-            this.mainToolTip.InitialDelay = 250;
-            this.mainToolTip.ReshowDelay = 50;
-            // 
-            // statusBar
-            // 
-            this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.turnInfoLabel,
-            this.fpsLabel});
-            this.statusBar.Location = new System.Drawing.Point(0, 238);
-            this.statusBar.Name = "statusBar";
-            this.statusBar.ShowItemToolTips = true;
-            this.statusBar.Size = new System.Drawing.Size(284, 24);
-            this.statusBar.SizingGrip = false;
-            this.statusBar.TabIndex = 2;
-            // 
-            // turnInfoLabel
-            // 
-            this.turnInfoLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Right;
-            this.turnInfoLabel.Name = "turnInfoLabel";
-            this.turnInfoLabel.Size = new System.Drawing.Size(74, 19);
-            this.turnInfoLabel.Text = "(TurnInfo...)";
-            // 
-            // fpsLabel
-            // 
-            this.fpsLabel.Name = "fpsLabel";
-            this.fpsLabel.Size = new System.Drawing.Size(56, 19);
-            this.fpsLabel.Text = "(Status...)";
-            // 
-            // fpsTimer
-            // 
-            this.fpsTimer.Tick += new System.EventHandler(this.fpsTimer_Tick);
+            this.pgGameSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pgGameSettings.CommandsVisibleIfAvailable = false;
+            this.pgGameSettings.HelpVisible = false;
+            this.pgGameSettings.Location = new System.Drawing.Point(13, 12);
+            this.pgGameSettings.Name = "pgGameSettings";
+            this.pgGameSettings.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+            this.pgGameSettings.Size = new System.Drawing.Size(379, 159);
+            this.pgGameSettings.TabIndex = 3;
+            this.pgGameSettings.ToolbarVisible = false;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.statusBar);
-            this.Controls.Add(this.pbGame);
-            this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
-            this.KeyPreview = true;
-            this.MaximizeBox = false;
+            this.ClientSize = new System.Drawing.Size(404, 212);
+            this.Controls.Add(this.pgGameSettings);
+            this.Controls.Add(this.btnPlay);
+            this.MinimumSize = new System.Drawing.Size(420, 250);
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Sharpest Beak: WinForms UI";
-            ((System.ComponentModel.ISupportInitialize)(this.pbGame)).EndInit();
-            this.statusBar.ResumeLayout(false);
-            this.statusBar.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pbGame;
-        private System.Windows.Forms.ToolTip mainToolTip;
-        private System.Windows.Forms.StatusStrip statusBar;
-        private System.Windows.Forms.ToolStripStatusLabel fpsLabel;
-        private System.Windows.Forms.ToolStripStatusLabel turnInfoLabel;
-        private System.Windows.Forms.Timer fpsTimer;
+        private System.Windows.Forms.Button btnPlay;
+        private System.Windows.Forms.PropertyGrid pgGameSettings;
+
     }
 }

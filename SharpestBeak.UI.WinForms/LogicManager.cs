@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SharpestBeak.UI.WinForms.Properties;
+using SharpestBeak.Common;
 
 namespace SharpestBeak.UI.WinForms
 {
@@ -32,10 +33,19 @@ namespace SharpestBeak.UI.WinForms
                 try
                 {
                     type = Type.GetType(logicQualifiedType, true, false);
+                    if (!typeof(ChickenUnitLogic).IsAssignableFrom(type) || type.IsAbstract
+                        || type.IsGenericTypeDefinition)
+                    {
+                        throw new ApplicationException(
+                            string.Format(
+                                "Type '{0}' must inherit from '{1}' and must be non-abstract and non-generic.",
+                                type.AssemblyQualifiedName,
+                                typeof(ChickenUnitLogic).FullName));
+                    }
                 }
                 catch (Exception ex)
                 {
-                    errors.AppendLine(ex.ToString());
+                    errors.AppendLine("*** " + ex.Message);
                     continue;
                 }
 
@@ -43,7 +53,11 @@ namespace SharpestBeak.UI.WinForms
             }
 
             this.Errors = errors.ToString();
-            this.LogicTypes = logicTypes.AsReadOnly();
+            this.LogicTypes = logicTypes
+                .OrderBy(item => item.Name)
+                .ThenBy(item => item.AssemblyQualifiedName)
+                .ToList()
+                .AsReadOnly();
         }
 
         #endregion
