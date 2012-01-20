@@ -89,12 +89,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TeamSettings.cs" />
-    <Compile Include="TeamSettingsControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TeamSettingsControl.Designer.cs">
-      <DependentUpon>TeamSettingsControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="TurnTestForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,9 +111,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="TeamSettingsControl.resx">
-      <DependentUpon>TeamSettingsControl.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="TurnTestForm.resx">
       <DependentUpon>TurnTestForm.cs</DependentUpon>
     </EmbeddedResource>

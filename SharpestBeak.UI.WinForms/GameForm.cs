@@ -265,9 +265,6 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            var lm = LogicManager.Instance;
-            var logicType = lm.LogicTypes.First();
-
             m_gameEngine = new GameEngine(this.PaintGame, nominalSize, lightTeam, darkTeam);
             m_gameEngine.GameEnded += this.GameEngine_GameEnded;
         }
