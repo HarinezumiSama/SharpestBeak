@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using SharpestBeak.Common;
 using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Presentation;
+using SharpestBeak.Logic.Default;
 using SharpestBeak.UI.WinForms.Properties;
 
 namespace SharpestBeak.UI.WinForms
@@ -263,11 +264,14 @@ namespace SharpestBeak.UI.WinForms
             var gameBoardSize = Settings.Default.NominalSize;
             var chickenUnitCount = Settings.Default.TeamUnitCount;
 
+            var lm = LogicManager.Instance;
+            var logicType = lm.LogicTypes.First();
+
             m_gameEngine = new GameEngine(
                 this.PaintGame,
                 gameBoardSize,
-                new ChickenTeamRecord(typeof(RandomChickenLogic), chickenUnitCount),
-                new ChickenTeamRecord(typeof(RandomChickenLogic), chickenUnitCount));
+                new ChickenTeamRecord(logicType, chickenUnitCount),
+                new ChickenTeamRecord(logicType, chickenUnitCount));
             m_gameEngine.GameEnded += this.GameEngine_GameEnded;
         }
 
@@ -602,6 +606,7 @@ namespace SharpestBeak.UI.WinForms
                 chickenUnit.Element.Draw(graphics, drawData);
             }
 
+            // TODO: [VM] Allow logic to provide some extra data for drawing (think up how to do it secure)
             foreach (var teamLogic in m_gameEngine.Teams)
             {
                 var rcl = teamLogic as RandomChickenLogic;

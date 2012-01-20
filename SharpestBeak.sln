@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.Common", "Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.UI.WinForms", "SharpestBeak.UI.WinForms\SharpestBeak.UI.WinForms.csproj", "{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.Logic.Default", "SharpestBeak.Logic.Default\SharpestBeak.Logic.Default.csproj", "{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,16 @@ Global
 		{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}.Release|x86.ActiveCfg = Release|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

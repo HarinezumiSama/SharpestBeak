@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using SharpestBeak.Common;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.Logic.Default
 {
     public sealed class RandomChickenLogic : ChickenUnitLogic
     {
