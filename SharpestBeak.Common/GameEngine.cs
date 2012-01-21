@@ -409,11 +409,12 @@ namespace SharpestBeak.Common
                 {
                     var shotElement = shotUnit.GetElement();
 
-                    var injuredChicken = aliveChickens
-                        .SingleOrDefault(
+                    var injuredChickens = aliveChickens
+                        .Where(
                             item => !item.IsDead
-                                && CollisionDetector.CheckCollision(shotElement, item.GetElement()));
-                    if (injuredChicken != null)
+                                && CollisionDetector.CheckCollision(shotElement, item.GetElement()))
+                        .ToArray();
+                    foreach (var injuredChicken in injuredChickens)
                     {
                         shotUnit.Exploded = true;
 
