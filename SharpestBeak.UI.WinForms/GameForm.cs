@@ -273,50 +273,6 @@ namespace SharpestBeak.UI.WinForms
 
         #region Private Methods
 
-        private DialogResult ShowMessage(string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon)
-        {
-            return MessageBox.Show(
-                this,
-                text,
-                string.IsNullOrEmpty(caption) ? this.Text : caption + " – " + this.Text,
-                buttons,
-                icon);
-        }
-
-        private void ShowInfoMessage(string text, string caption = null)
-        {
-            ShowMessage(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void ShowErrorMessage(string text, string caption = null)
-        {
-            ShowMessage(text, caption, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-        }
-
-        private void ShowErrorMessage(Exception exception)
-        {
-            #region Argument Check
-
-            if (exception == null)
-            {
-                throw new ArgumentNullException("exception");
-            }
-
-            #endregion
-
-            ShowErrorMessage(
-                string.Format("An error occurred:{0}{0}{1}", Environment.NewLine, exception.ToString()),
-                "Error");
-        }
-
-        private DialogResult ShowQuestion(
-            string text,
-            MessageBoxButtons buttons = MessageBoxButtons.YesNo,
-            string caption = null)
-        {
-            return ShowMessage(text, caption, buttons, MessageBoxIcon.Question);
-        }
-
         private bool InitializeGameUI()
         {
             try
@@ -350,7 +306,7 @@ namespace SharpestBeak.UI.WinForms
                     throw;
                 }
 
-                ShowErrorMessage(ex);
+                this.ShowErrorMessage(ex);
                 return false;
             }
 
@@ -464,7 +420,7 @@ namespace SharpestBeak.UI.WinForms
                 var winningTeam = m_gameEngine.WinningTeam;
                 if (winningTeam.HasValue)
                 {
-                    var dr = ShowQuestion(
+                    var dr = this.ShowQuestion(
                         string.Format(
                             "The game has ended. Winning team: {0}.{1}{1}"
                                 + "Do you wish to restart the game?",
@@ -491,7 +447,7 @@ namespace SharpestBeak.UI.WinForms
                     throw;
                 }
 
-                ShowErrorMessage(ex);
+                this.ShowErrorMessage(ex);
                 return;
             }
         }
@@ -517,7 +473,7 @@ namespace SharpestBeak.UI.WinForms
                     throw;
                 }
 
-                ShowErrorMessage(ex);
+                this.ShowErrorMessage(ex);
                 return;
             }
         }
@@ -681,7 +637,7 @@ namespace SharpestBeak.UI.WinForms
             m_gameEngine.Stop();
             m_gameEngine.CallPaint();
 
-            ShowInfoMessage(string.Format("Winning team: {0}.", e.WinningTeam), "Game Ended");
+            this.ShowInfoMessage(string.Format("Winning team: {0}.", e.WinningTeam), "Game Ended");
         }
 
         #endregion

@@ -50,7 +50,7 @@ namespace SharpestBeak.Common
             ChickenTeamRecord lightTeam,
             ChickenTeamRecord darkTeam)
         {
-            #region Fields
+            #region Argument Check
 
             if (paintCallback == null)
             {
@@ -107,14 +107,16 @@ namespace SharpestBeak.Common
 
             #region Argument Check
 
-            if (this.AllChickens.Count > this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2)
+            var maxChickenCount = this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2;
+            if (this.AllChickens.Count > maxChickenCount)
             {
                 throw new ArgumentException(
                     string.Format(
-                        "Too many chickens ({0}) for the board of nominal size {1}x{2}.",
+                        "Too many chickens ({0}) for the board of nominal size {1}x{2}. Maximum is {3}.",
                         this.AllChickens.Count,
                         this.CommonData.NominalSize.Width,
-                        this.CommonData.NominalSize.Height),
+                        this.CommonData.NominalSize.Height,
+                        maxChickenCount),
                     "size");
             }
 

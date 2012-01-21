@@ -65,28 +65,40 @@ namespace SharpestBeak.UI.WinForms
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-            var lightTeam = m_gameSettings.LightTeam;
-            var darkTeam = m_gameSettings.DarkTeam;
-
-            if (m_gameSettings.NominalSize.Width < GameConstants.MinNominalCellCount
-                || m_gameSettings.NominalSize.Height < GameConstants.MinNominalCellCount
-                || lightTeam.PlayerCount <= 0 || lightTeam.LogicType == null
-                || darkTeam.PlayerCount <= 0 || darkTeam.LogicType == null)
+            try
             {
-                MessageBox.Show(
-                    this,
-                    "Please specify all fields correctly.",
-                    this.Text,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
+                var lightTeam = m_gameSettings.LightTeam;
+                var darkTeam = m_gameSettings.DarkTeam;
+
+                if (m_gameSettings.NominalSize.Width < GameConstants.MinNominalCellCount
+                    || m_gameSettings.NominalSize.Height < GameConstants.MinNominalCellCount
+                    || lightTeam.PlayerCount <= 0 || lightTeam.LogicType == null
+                    || darkTeam.PlayerCount <= 0 || darkTeam.LogicType == null)
+                {
+                    MessageBox.Show(
+                        this,
+                        "Please specify all fields correctly.",
+                        this.Text,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
+                var lightTeamRecord = new ChickenTeamRecord(lightTeam.LogicType, lightTeam.PlayerCount);
+                var darkTeamRecord = new ChickenTeamRecord(darkTeam.LogicType, darkTeam.PlayerCount);
+                using (var gameForm = new GameForm(m_gameSettings.NominalSize, lightTeamRecord, darkTeamRecord))
+                {
+                    gameForm.ShowDialog(this);
+                }
             }
-
-            var lightTeamRecord = new ChickenTeamRecord(lightTeam.LogicType, lightTeam.PlayerCount);
-            var darkTeamRecord = new ChickenTeamRecord(darkTeam.LogicType, darkTeam.PlayerCount);
-            using (var gameForm = new GameForm(m_gameSettings.NominalSize, lightTeamRecord, darkTeamRecord))
+            catch (Exception ex)
             {
-                gameForm.ShowDialog(this);
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
+                this.ShowErrorMessage(ex);
             }
         }
 

@@ -27,12 +27,7 @@ namespace SharpestBeak.UI.WinForms
                     .AppendFormat(exception.ToString());
             }
 
-            MessageBox.Show(
-                form,
-                message.ToString(),
-                "Unhandled error – Sharpest Beak",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Stop);
+            form.ShowErrorMessage(message.ToString(), "Unhandled error", MessageBoxIcon.Stop);
 
             if (!e.IsTerminating)
             {
