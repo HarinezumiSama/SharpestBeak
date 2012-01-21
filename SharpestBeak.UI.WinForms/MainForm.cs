@@ -40,7 +40,8 @@ namespace SharpestBeak.UI.WinForms
             base.OnLoad(e);
 
             pgGameSettings.SelectedObject = m_gameSettings;
-            this.Width = Screen.FromControl(this).WorkingArea.Width / 3;
+            pgGameSettings.ExpandAllGridItems();
+            this.Width = Screen.FromControl(this).WorkingArea.Width / 2;
             this.CenterToScreen();
 
             var logicManagerErrors = LogicManager.Instance.Errors;
