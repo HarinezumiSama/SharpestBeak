@@ -18,6 +18,11 @@ namespace SharpestBeak.UI.WinForms
             {
                 Helper.DisposeAndNull(ref components);
                 Helper.DisposeAndNull(ref m_gameBoardBackground);
+
+                m_lightTeamUnitDrawData.DisposeSafely();
+                m_lightTeamShotDrawData.DisposeSafely();
+                m_darkTeamUnitDrawData.DisposeSafely();
+                m_darkTeamShotDrawData.DisposeSafely();
             }
 
             base.Dispose(disposing);

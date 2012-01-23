@@ -17,6 +17,7 @@ namespace SharpestBeak.UI.WinForms
         /// </summary>
         public GameSettings()
         {
+            this.UICellSize = GameForm.DefaultUICellSize;
             this.NominalSize = Settings.Default.NominalSize;
             this.LightTeam = new TeamSettings() { PlayerCount = Settings.Default.TeamUnitCount };
             this.DarkTeam = new TeamSettings() { PlayerCount = Settings.Default.TeamUnitCount };
@@ -25,6 +26,12 @@ namespace SharpestBeak.UI.WinForms
         #endregion
 
         #region Public Properties
+
+        public int UICellSize
+        {
+            get;
+            set;
+        }
 
         public Size NominalSize
         {

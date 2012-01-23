@@ -18,23 +18,28 @@ namespace SharpestBeak.UI.WinForms
 {
     public partial class GameForm : Form
     {
+        #region Constants
+
+        public const int DefaultUICellSize = 48;
+        public const int MinUICellSize = 8;
+        public const int MaxUICellSize = 128;
+
+        #endregion
+
         #region Fields
-
-        private static readonly int s_cellSize = 48;
-        private static readonly int s_fullCellSize = s_cellSize + 1;
-
-        private static readonly float s_uiCoefficient = (float)s_cellSize / GameConstants.NominalCellSize;
 
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
 
-        private static readonly DrawData s_teamAUnitDrawData = new DrawData(Color.LightGreen, s_uiCoefficient);
-        private static readonly DrawData s_teamBUnitDrawData = new DrawData(Color.DarkGreen, s_uiCoefficient);
-
-        private static readonly DrawData s_teamAShotDrawData = new DrawData(Color.Pink, s_uiCoefficient);
-        private static readonly DrawData s_teamBShotDrawData = new DrawData(Color.DarkRed, s_uiCoefficient);
-
         private static readonly float s_uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
+
+        private readonly int m_uiCellSize;
+        private readonly int m_uiFullCellSize;
+        private readonly float m_uiCoefficient;
+        private readonly DrawData m_lightTeamUnitDrawData;
+        private readonly DrawData m_lightTeamShotDrawData;
+        private readonly DrawData m_darkTeamUnitDrawData;
+        private readonly DrawData m_darkTeamShotDrawData;
 
         private readonly GameEngine m_gameEngine;
         private readonly object m_lastPresentationLock = new object();
@@ -50,13 +55,40 @@ namespace SharpestBeak.UI.WinForms
 
         #region Constructors
 
-        private GameForm()
+        private GameForm(int uiCellSize)
         {
+            #region Argument Check
+
+            if (uiCellSize < MinUICellSize || uiCellSize > MaxUICellSize)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "uiCellSize",
+                    uiCellSize,
+                    string.Format("UI cell size must be in the range {0} to {1}.", MinUICellSize, MaxUICellSize));
+            }
+
+            #endregion
+
             InitializeComponent();
+
+            m_uiCellSize = uiCellSize;
+            m_uiFullCellSize = m_uiCellSize + 1;
+            m_uiCoefficient = (float)m_uiCellSize / GameConstants.NominalCellSize;
+
+            m_lightTeamUnitDrawData = new DrawData(Color.LightGreen, m_uiCoefficient);
+            m_lightTeamShotDrawData = new DrawData(Color.Pink, m_uiCoefficient);
+            m_darkTeamUnitDrawData = new DrawData(Color.DarkGreen, m_uiCoefficient);
+            m_darkTeamShotDrawData = new DrawData(Color.DarkRed, m_uiCoefficient);
         }
 
-        public GameForm(Size nominalSize, ChickenTeamRecord lightTeam, ChickenTeamRecord darkTeam)
-            : this()
+        private GameForm()
+            : this(DefaultUICellSize)
+        {
+            // Nothing to do
+        }
+
+        public GameForm(int uiCellSize, Size nominalSize, ChickenTeamRecord lightTeam, ChickenTeamRecord darkTeam)
+            : this(uiCellSize)
         {
             #region Manual Test (Projection)
 
@@ -279,8 +311,8 @@ namespace SharpestBeak.UI.WinForms
             {
                 var boardSize = m_gameEngine.CommonData.NominalSize;
                 var boxSize = new Size(
-                    boardSize.Width * s_cellSize + 1,
-                    boardSize.Height * s_cellSize + 1);
+                    boardSize.Width * m_uiCellSize + 1,
+                    boardSize.Height * m_uiCellSize + 1);
                 var difference = boxSize - pbGame.ClientSize;
                 this.ClientSize = this.ClientSize + difference + new Size(0, statusBar.Height);
                 if (this.ParentForm != null)
@@ -321,7 +353,7 @@ namespace SharpestBeak.UI.WinForms
             {
                 var size = m_gameEngine.CommonData.NominalSize;
 
-                m_gameBoardBackground = new Bitmap(s_cellSize * size.Width, s_cellSize * size.Height);
+                m_gameBoardBackground = new Bitmap(m_uiCellSize * size.Width, m_uiCellSize * size.Height);
 
                 using (var graphics = Graphics.FromImage(m_gameBoardBackground))
                 {
@@ -331,8 +363,8 @@ namespace SharpestBeak.UI.WinForms
                         {
                             for (int x = 0; x < size.Width; x++)
                             {
-                                var cellPoint = new Point(s_cellSize * x, s_cellSize * y);
-                                var cellRect = new Rectangle(cellPoint, new Size(s_fullCellSize, s_fullCellSize));
+                                var cellPoint = new Point(m_uiCellSize * x, m_uiCellSize * y);
+                                var cellRect = new Rectangle(cellPoint, new Size(m_uiFullCellSize, m_uiFullCellSize));
                                 ControlPaint.DrawFocusRectangle(graphics, cellRect);
 
                                 var backBrush = (x + y) % 2 == 0 ? s_evenCellBrush : s_oddCellBrush;
@@ -558,7 +590,9 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in lastPresentation.Chickens)
             {
-                var drawData = chickenUnit.State.Team == GameTeam.Light ? s_teamAUnitDrawData : s_teamBUnitDrawData;
+                var drawData = chickenUnit.State.Team == GameTeam.Light
+                    ? m_lightTeamUnitDrawData
+                    : m_darkTeamUnitDrawData;
 
                 chickenUnit.Element.Draw(graphics, drawData);
             }
@@ -572,7 +606,7 @@ namespace SharpestBeak.UI.WinForms
                     var targetPointBrush = teamLogic.Team == GameTeam.Light ? Brushes.LightBlue : Brushes.DarkBlue;
                     foreach (var targetPoint in rcl.TargetPoints)
                     {
-                        var tp = targetPoint * s_uiCoefficient;
+                        var tp = targetPoint * m_uiCoefficient;
                         graphics.FillRectangle(
                             targetPointBrush,
                             tp.X - s_uiTargetPointRadius,
@@ -583,10 +617,10 @@ namespace SharpestBeak.UI.WinForms
                 }
             }
 
-            var uiShotRadius = GameConstants.ShotUnit.Radius * s_uiCoefficient;
+            var uiShotRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient;
             foreach (var shotUnit in lastPresentation.Shots)
             {
-                var drawData = shotUnit.Owner.State.Team == GameTeam.Light ? s_teamAShotDrawData : s_teamBShotDrawData;
+                var drawData = shotUnit.Owner.State.Team == GameTeam.Light ? m_lightTeamShotDrawData : m_darkTeamShotDrawData;
                 shotUnit.Element.Draw(graphics, drawData);
             }
 
