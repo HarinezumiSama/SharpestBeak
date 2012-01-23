@@ -33,6 +33,47 @@ namespace SharpestBeak.UI.WinForms
 
         #endregion
 
+        #region Private Methods
+
+        private void DoPlay()
+        {
+            try
+            {
+                var lightTeam = m_gameSettings.LightTeam;
+                var darkTeam = m_gameSettings.DarkTeam;
+
+                var validationMessage = m_gameSettings.Validate();
+                if (!validationMessage.IsNullOrEmpty())
+                {
+                    this.ShowErrorMessage(validationMessage);
+                    return;
+                }
+
+                var lightTeamRecord = new ChickenTeamRecord(lightTeam.LogicType, lightTeam.PlayerCount);
+                var darkTeamRecord = new ChickenTeamRecord(darkTeam.LogicType, darkTeam.PlayerCount);
+
+                using (var gameForm = new GameForm(
+                    m_gameSettings.UICellSize,
+                    m_gameSettings.NominalSize,
+                    lightTeamRecord,
+                    darkTeamRecord))
+                {
+                    gameForm.ShowDialog(this);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
+                this.ShowErrorMessage(ex);
+            }
+        }
+
+        #endregion
+
         #region Protected Methods
 
         protected override void OnLoad(EventArgs e)
@@ -59,52 +100,24 @@ namespace SharpestBeak.UI.WinForms
             }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.F5)
+            {
+                e.Handled = true;
+                DoPlay();
+            }
+
+            base.OnKeyDown(e);
+        }
+
         #endregion
 
         #region Event Handlers
 
         private void btnPlay_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var lightTeam = m_gameSettings.LightTeam;
-                var darkTeam = m_gameSettings.DarkTeam;
-
-                if (m_gameSettings.NominalSize.Width < GameConstants.MinNominalCellCount
-                    || m_gameSettings.NominalSize.Height < GameConstants.MinNominalCellCount
-                    || lightTeam.PlayerCount <= 0 || lightTeam.LogicType == null
-                    || darkTeam.PlayerCount <= 0 || darkTeam.LogicType == null)
-                {
-                    MessageBox.Show(
-                        this,
-                        "Please specify all fields correctly.",
-                        this.Text,
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-
-                var lightTeamRecord = new ChickenTeamRecord(lightTeam.LogicType, lightTeam.PlayerCount);
-                var darkTeamRecord = new ChickenTeamRecord(darkTeam.LogicType, darkTeam.PlayerCount);
-
-            using (var gameForm = new GameForm(
-                m_gameSettings.UICellSize,
-                m_gameSettings.NominalSize,
-                lightTeamRecord,
-                darkTeamRecord))
-                {
-                    gameForm.ShowDialog(this);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex.IsThreadAbort())
-                {
-                    throw;
-                }
-
-                this.ShowErrorMessage(ex);
-            }
+            DoPlay();
         }
 
         #endregion

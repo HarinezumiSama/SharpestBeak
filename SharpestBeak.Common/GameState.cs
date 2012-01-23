@@ -31,7 +31,7 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            this.Data = engine.CommonData;
+            this.Data = engine.Data;
             this.UnitStates = unitStates.ToList().AsReadOnly();
         }
 
@@ -39,7 +39,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public GameCommonData Data
+        public StaticData Data
         {
             get;
             private set;

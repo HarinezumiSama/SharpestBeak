@@ -201,6 +201,19 @@ namespace SharpestBeak.Common
             max = maxProxy.Value;
         }
 
+        public static bool IsInRange<T>(this T value, ValueRange<T> range)
+            where T : struct, IComparable<T>
+        {
+            var comparer = Comparer<T>.Default;
+            return comparer.Compare(value, range.Min) >= 0 && comparer.Compare(value, range.Max) <= 0;
+        }
+
+        public static bool IsInRange<T>(this T value, T min, T max)
+            where T : struct, IComparable<T>
+        {
+            return IsInRange(value, new ValueRange<T>(min, max));
+        }
+
         #endregion
     }
 }

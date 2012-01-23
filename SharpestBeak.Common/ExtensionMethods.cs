@@ -39,6 +39,12 @@ namespace SharpestBeak.Common
         }
 
         [DebuggerNonUserCode]
+        public static bool IsNullOrEmpty(this string value)
+        {
+            return string.IsNullOrEmpty(value);
+        }
+
+        [DebuggerNonUserCode]
         public static bool IsNullOrWhiteSpace(this string value)
         {
             return string.IsNullOrWhiteSpace(value);

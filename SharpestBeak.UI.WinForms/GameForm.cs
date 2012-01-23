@@ -18,24 +18,17 @@ namespace SharpestBeak.UI.WinForms
 {
     public partial class GameForm : Form
     {
-        #region Constants
-
-        public const int DefaultUICellSize = 48;
-        public const int MinUICellSize = 8;
-        public const int MaxUICellSize = 128;
-
-        #endregion
-
         #region Fields
+
+        public static readonly ValueRange<int> UICellSizeRange = new ValueRange<int>(24, 128);
 
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));
 
-        private static readonly float s_uiTargetPointRadius = GameConstants.ShotUnit.Radius / 4f;
-
         private readonly int m_uiCellSize;
         private readonly int m_uiFullCellSize;
         private readonly float m_uiCoefficient;
+        private readonly float m_uiTargetPointRadius;
         private readonly DrawData m_lightTeamUnitDrawData;
         private readonly DrawData m_lightTeamShotDrawData;
         private readonly DrawData m_darkTeamUnitDrawData;
@@ -59,12 +52,15 @@ namespace SharpestBeak.UI.WinForms
         {
             #region Argument Check
 
-            if (uiCellSize < MinUICellSize || uiCellSize > MaxUICellSize)
+            if (!uiCellSize.IsInRange(UICellSizeRange))
             {
                 throw new ArgumentOutOfRangeException(
                     "uiCellSize",
                     uiCellSize,
-                    string.Format("UI cell size must be in the range {0} to {1}.", MinUICellSize, MaxUICellSize));
+                    string.Format(
+                        "UI cell size must be in the range {0} to {1}.",
+                        UICellSizeRange.Min,
+                        UICellSizeRange.Max));
             }
 
             #endregion
@@ -74,6 +70,7 @@ namespace SharpestBeak.UI.WinForms
             m_uiCellSize = uiCellSize;
             m_uiFullCellSize = m_uiCellSize + 1;
             m_uiCoefficient = (float)m_uiCellSize / GameConstants.NominalCellSize;
+            m_uiTargetPointRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient / 2f;
 
             m_lightTeamUnitDrawData = new DrawData(Color.LightGreen, m_uiCoefficient);
             m_lightTeamShotDrawData = new DrawData(Color.Pink, m_uiCoefficient);
@@ -82,7 +79,7 @@ namespace SharpestBeak.UI.WinForms
         }
 
         private GameForm()
-            : this(DefaultUICellSize)
+            : this(UICellSizeRange.Min)
         {
             // Nothing to do
         }
@@ -309,7 +306,7 @@ namespace SharpestBeak.UI.WinForms
         {
             try
             {
-                var boardSize = m_gameEngine.CommonData.NominalSize;
+                var boardSize = m_gameEngine.Data.NominalSize;
                 var boxSize = new Size(
                     boardSize.Width * m_uiCellSize + 1,
                     boardSize.Height * m_uiCellSize + 1);
@@ -351,7 +348,7 @@ namespace SharpestBeak.UI.WinForms
 
             try
             {
-                var size = m_gameEngine.CommonData.NominalSize;
+                var size = m_gameEngine.Data.NominalSize;
 
                 m_gameBoardBackground = new Bitmap(m_uiCellSize * size.Width, m_uiCellSize * size.Height);
 
@@ -497,6 +494,7 @@ namespace SharpestBeak.UI.WinForms
                 m_gameEngine.Stop();
                 m_fpsStopwatch.Stop();
                 fpsLabel.Text = string.Empty;
+                UpdateMoveCountStatus();
             }
             catch (Exception ex)
             {
@@ -539,18 +537,28 @@ namespace SharpestBeak.UI.WinForms
             base.OnFormClosing(e);
         }
 
-        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
         {
-            base.OnPreviewKeyDown(e);
-
             switch (e.KeyData)
             {
+                case Keys.Escape| Keys.Shift:
+                    e.Handled = true;
+                    Close();
+                    break;
+
+                case Keys.Escape:
+                    e.Handled = true;
+                    StopGame();
+                    break;
+
                 case Keys.F1:
+                    e.Handled = true;
                     StopGame();
                     RunTurnTest();
                     break;
 
                 case Keys.F5:
+                    e.Handled = true;
                     if (m_gameEngine.IsRunning)
                     {
                         StopGame();
@@ -562,9 +570,12 @@ namespace SharpestBeak.UI.WinForms
                     break;
 
                 case Keys.F8:
+                    e.Handled = true;
                     ResetGame();
                     break;
             }
+
+            base.OnKeyDown(e);
         }
 
         #endregion
@@ -609,10 +620,10 @@ namespace SharpestBeak.UI.WinForms
                         var tp = targetPoint * m_uiCoefficient;
                         graphics.FillRectangle(
                             targetPointBrush,
-                            tp.X - s_uiTargetPointRadius,
-                            tp.Y - s_uiTargetPointRadius,
-                            2f * s_uiTargetPointRadius,
-                            2f * s_uiTargetPointRadius);
+                            tp.X - m_uiTargetPointRadius,
+                            tp.Y - m_uiTargetPointRadius,
+                            2f * m_uiTargetPointRadius,
+                            2f * m_uiTargetPointRadius);
                     }
                 }
             }

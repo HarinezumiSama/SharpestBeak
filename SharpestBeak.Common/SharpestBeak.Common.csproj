@@ -76,6 +76,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ThreadSafeRandom.cs" />
+    <Compile Include="ValueRange.cs" />
     <Compile Include="Vector2D.cs" />
     <Compile Include="Diagnostics\DebugHelper.cs" />
     <Compile Include="Presentation\Elements\ChickenElement.cs" />
@@ -87,7 +88,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FireMode.cs" />
     <Compile Include="GameAngle.cs" />
-    <Compile Include="GameCommonData.cs" />
+    <Compile Include="StaticData.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameHelper.cs" />

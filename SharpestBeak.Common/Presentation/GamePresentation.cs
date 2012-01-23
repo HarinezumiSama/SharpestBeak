@@ -23,7 +23,7 @@ namespace SharpestBeak.Common.Presentation
 
             #endregion
 
-            this.CommonData = engine.CommonData;
+            this.CommonData = engine.Data;
 
             this.Chickens = engine
                 .AliveChickensDirect
@@ -43,7 +43,7 @@ namespace SharpestBeak.Common.Presentation
 
         #region Public Properties
 
-        public GameCommonData CommonData
+        public StaticData CommonData
         {
             get;
             private set;

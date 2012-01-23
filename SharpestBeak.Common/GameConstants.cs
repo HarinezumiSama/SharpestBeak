@@ -88,7 +88,7 @@ namespace SharpestBeak.Common
 
         public static readonly float NominalCellSize = 100f;
 
-        public static readonly int MinNominalCellCount = 5;
+        public static readonly ValueRange<int> NominalCellCountRange = new ValueRange<int>(5, 128);
 
         public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
 

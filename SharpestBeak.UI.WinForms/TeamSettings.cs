@@ -69,8 +69,59 @@ namespace SharpestBeak.UI.WinForms
 
         #endregion
 
+        #region Private Methods
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializeLogicType()
+        {
+            return false;
+        }
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializePlayerCount()
+        {
+            return false;
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void ValidateInternal(StringBuilder messageBuilder, string prefix)
+        {
+            #region Argument Check
+
+            if (messageBuilder == null)
+            {
+                throw new ArgumentNullException("messageBuilder");
+            }
+            if (string.IsNullOrEmpty(prefix))
+            {
+                throw new ArgumentException("The value can be neither empty string nor null.", "prefix");
+            }
+
+            #endregion
+
+            if (this.LogicType == null)
+            {
+                messageBuilder
+                    .AppendFormat("{0}: logic type must be specified.", prefix)
+                    .AppendLine();
+            }
+
+            if (this.PlayerCount <= 0)
+            {
+                messageBuilder
+                    .AppendFormat("{0}: player count must be positive.", prefix)
+                    .AppendLine();
+            }
+        }
+
+        #endregion
+
         #region Public Properties
 
+        [DisplayName("Logic type")]
         [Editor(typeof(LogicTypeEditor), typeof(UITypeEditor))]
         public Type LogicType
         {
@@ -78,6 +129,7 @@ namespace SharpestBeak.UI.WinForms
             set;
         }
 
+        [DisplayName("Player count")]
         public int PlayerCount
         {
             get;

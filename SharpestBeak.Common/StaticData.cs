@@ -6,23 +6,25 @@ using System.Text;
 
 namespace SharpestBeak.Common
 {
-    public sealed class GameCommonData
+    public sealed class StaticData
     {
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="GameCommonData"/> class.
+        ///     Initializes a new instance of the <see cref="StaticData"/> class.
         /// </summary>
-        internal GameCommonData(Size size)
+        internal StaticData(Size size)
         {
             #region Argument Check
 
-            if (size.Width < GameConstants.MinNominalCellCount || size.Height < GameConstants.MinNominalCellCount)
+            if (!size.Width.IsInRange(GameConstants.NominalCellCountRange)
+                || !size.Height.IsInRange(GameConstants.NominalCellCountRange))
             {
                 throw new ArgumentException(
                     string.Format(
-                        "The board size cannot be less than {0} nominal cells in each dimension.",
-                        GameConstants.MinNominalCellCount),
+                        "Each board size dimension must be in the range {0} to {1}.",
+                        GameConstants.NominalCellCountRange.Min,
+                        GameConstants.NominalCellCountRange.Max),
                     "size");
             }
 

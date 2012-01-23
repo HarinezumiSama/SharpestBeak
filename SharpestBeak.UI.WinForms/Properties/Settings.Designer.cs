@@ -61,5 +61,14 @@ namespace SharpestBeak.UI.WinForms.Properties {
                 return ((global::System.Collections.Specialized.StringCollection)(this["Logics"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("48")]
+        public int UICellSize {
+            get {
+                return ((int)(this["UICellSize"]));
+            }
+        }
     }
 }

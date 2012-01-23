@@ -35,7 +35,7 @@
             // btnPlay
             // 
             this.btnPlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPlay.Location = new System.Drawing.Point(12, 177);
+            this.btnPlay.Location = new System.Drawing.Point(12, 207);
             this.btnPlay.Name = "btnPlay";
             this.btnPlay.Size = new System.Drawing.Size(75, 23);
             this.btnPlay.TabIndex = 2;
@@ -53,7 +53,7 @@
             this.pgGameSettings.Location = new System.Drawing.Point(13, 12);
             this.pgGameSettings.Name = "pgGameSettings";
             this.pgGameSettings.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.pgGameSettings.Size = new System.Drawing.Size(379, 159);
+            this.pgGameSettings.Size = new System.Drawing.Size(379, 189);
             this.pgGameSettings.TabIndex = 3;
             this.pgGameSettings.ToolbarVisible = false;
             // 
@@ -61,10 +61,11 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(404, 212);
+            this.ClientSize = new System.Drawing.Size(404, 242);
             this.Controls.Add(this.pgGameSettings);
             this.Controls.Add(this.btnPlay);
-            this.MinimumSize = new System.Drawing.Size(420, 250);
+            this.KeyPreview = true;
+            this.MinimumSize = new System.Drawing.Size(420, 280);
             this.Name = "MainForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

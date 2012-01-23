@@ -75,7 +75,7 @@ namespace SharpestBeak.Common
             }
 
             // Pre-initialized properties
-            this.CommonData = new GameCommonData(size);
+            this.Data = new StaticData(size);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
             m_winningTeam = new ThreadSafeValue<GameTeam?>(m_syncLock);
             this.LastMoves = new Dictionary<ChickenUnit, ChickenUnitState>();
@@ -101,21 +101,21 @@ namespace SharpestBeak.Common
 
             m_boardPolygon = new ConvexPolygonPrimitive(
                 Point2D.Zero,
-                new Point2D(this.CommonData.RealSize.Width, 0f),
-                new Point2D(this.CommonData.RealSize.Width, this.CommonData.RealSize.Height),
-                new Point2D(0f, this.CommonData.RealSize.Height));
+                new Point2D(this.Data.RealSize.Width, 0f),
+                new Point2D(this.Data.RealSize.Width, this.Data.RealSize.Height),
+                new Point2D(0f, this.Data.RealSize.Height));
 
             #region Argument Check
 
-            var maxChickenCount = this.CommonData.NominalSize.Width * this.CommonData.NominalSize.Height / 2;
+            var maxChickenCount = this.Data.NominalSize.Width * this.Data.NominalSize.Height / 2;
             if (this.AllChickens.Count > maxChickenCount)
             {
                 throw new ArgumentException(
                     string.Format(
                         "Too many chickens ({0}) for the board of nominal size {1}x{2}. Maximum is {3}.",
                         this.AllChickens.Count,
-                        this.CommonData.NominalSize.Width,
-                        this.CommonData.NominalSize.Height,
+                        this.Data.NominalSize.Width,
+                        this.Data.NominalSize.Height,
                         maxChickenCount),
                     "size");
             }
@@ -167,8 +167,8 @@ namespace SharpestBeak.Common
                 do
                 {
                     var nominalPosition = new Point(
-                        s_random.Next(this.CommonData.NominalSize.Width),
-                        s_random.Next(this.CommonData.NominalSize.Height));
+                        s_random.Next(this.Data.NominalSize.Width),
+                        s_random.Next(this.Data.NominalSize.Height));
                     newPosition = GameHelper.NominalToReal(nominalPosition);
                 }
                 while (this.AllChickens.Take(index).Any(
@@ -752,7 +752,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public GameCommonData CommonData
+        public StaticData Data
         {
             get;
             private set;
