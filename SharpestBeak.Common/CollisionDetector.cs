@@ -94,15 +94,16 @@ namespace SharpestBeak.Common
             {
                 var canCollide = false;
                 var roughPrimitives = element.GetRoughPrimitives().EnsureNotNull();
-                if (!roughPrimitives.Any())
+                if (roughPrimitives.Count <= 0)
                 {
                     throw new InvalidOperationException(
                         string.Format(
                             "The element {{{0}}} has empty rough primitives collection.",
                             element));
                 }
-                foreach (var roughPrimitive in roughPrimitives)
+                for (int index = 0; index < roughPrimitives.Count; index++)
                 {
+                    var roughPrimitive = roughPrimitives[index];
                     if (roughPrimitive.HasCollision(other))
                     {
                         canCollide = true;
@@ -117,15 +118,16 @@ namespace SharpestBeak.Common
             }
 
             var primitives = element.GetPrimitives().EnsureNotNull();
-            if (!primitives.Any())
+            if (primitives.Count <= 0)
             {
                 throw new InvalidOperationException(
                     string.Format(
                         "The element {{{0}}} has empty primitives collection.",
                         element));
             }
-            foreach (var primitive in primitives)
+            for (int index = 0; index < primitives.Count; index++)
             {
+                var primitive = primitives[index];
                 if (CheckPrimitiveCollision(primitive, other))
                 {
                     return true;
@@ -243,8 +245,20 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            return IsPointInPolygon(line.Start, polygon) || IsPointInPolygon(line.End, polygon)
-                || polygon.Edges.Any(edge => CheckLineToLineCollision(line, edge));
+            if (IsPointInPolygon(line.Start, polygon) || IsPointInPolygon(line.End, polygon))
+            {
+                return true;
+            }
+
+            for (int index = 0; index < polygon.Edges.Count; index++)
+            {
+                var edge = polygon.Edges[index];
+                if (CheckLineToLineCollision(line, edge))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         internal static bool CheckCircleToPolygonCollision(CirclePrimitive circle, ConvexPolygonPrimitive polygon)
@@ -306,7 +320,7 @@ namespace SharpestBeak.Common
             #endregion
 
             var result = first.HasCollision(second);
-            if (Settings.Default.UsePerformanceCounters)
+            if (SettingsCache.Instance.UsePerformanceCounters)
             {
                 PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
             }
@@ -363,7 +377,15 @@ namespace SharpestBeak.Common
             #endregion
 
             // If a point is on a polygon's line, it is considered to be in this polygon
-            return polygon.Edges.All(edge => GetLineSide(edge, point) != LineSide.Right);
+            for (int index = 0; index < polygon.Edges.Count; index++)
+            {
+                var edge = polygon.Edges[index];
+                if (GetLineSide(edge, point) == LineSide.Right)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion

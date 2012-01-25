@@ -16,6 +16,12 @@ namespace SharpestBeak.Common
 {
     public sealed class GameEngine : IDisposable
     {
+        #region Constants
+
+        public const int InstrumentationMoveCountLimit = 500;
+
+        #endregion
+
         #region Fields
 
         private static readonly ThreadSafeRandom s_random = new ThreadSafeRandom();
@@ -69,7 +75,7 @@ namespace SharpestBeak.Common
 
             m_paintCallback = paintCallback;
 
-            if (Settings.Default.UsePerformanceCounters)
+            if (SettingsCache.Instance.UsePerformanceCounters)
             {
                 PerformanceCounterHelper.Initialize();
             }
@@ -209,8 +215,32 @@ namespace SharpestBeak.Common
             #endregion
 
             var primitives = element.GetPrimitives();
-            return primitives.Any(item => !CollisionDetector.IsPointInPolygon(item.BasePoint, m_boardPolygon))
-                || primitives.Any(p => m_boardPolygon.Edges.Any(e => e.HasCollision(p)));
+
+            // First, checking just base points
+            for (int index = 0; index < primitives.Count; index++)
+            {
+                var primitive = primitives[index];
+                if (!CollisionDetector.IsPointInPolygon(primitive.BasePoint, m_boardPolygon))
+                {
+                    return true;
+                }
+            }
+
+            // Then checking intersection of element's primitives with board borders
+            for (int index = 0; index < primitives.Count; index++)
+            {
+                var primitive = primitives[index];
+                for (int edgeIndex = 0; edgeIndex < m_boardPolygon.Edges.Count; edgeIndex++)
+                {
+                    var edge = m_boardPolygon.Edges[edgeIndex];
+                    if (edge.HasCollision(primitive))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void StartInternal()
@@ -324,15 +354,24 @@ namespace SharpestBeak.Common
                         }
                     });
 
-                if (IsStopping())
+                m_moveCount.Value++;
+                if (SettingsCache.Instance.UsePerformanceCounters)
                 {
+                    PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
+                }
+
+                if (SettingsCache.Instance.InstrumentationMode && m_moveCount.Value >= InstrumentationMoveCountLimit)
+                {
+                    if (!m_winningTeam.Value.HasValue)
+                    {
+                        RaiseGameEnded(GameTeam.None);
+                    }
                     return;
                 }
 
-                m_moveCount.Value++;
-                if (Settings.Default.UsePerformanceCounters)
+                if (IsStopping())
                 {
-                    PerformanceCounterHelper.Instance.CollisionCountPerStepBase.Increment();
+                    return;
                 }
             }
         }
@@ -341,16 +380,22 @@ namespace SharpestBeak.Common
         {
             var aliveChickens = this.AliveChickens
                 .Where(item => item.Logic.Error == null)
-                .ToArray();
+                .ToList();
 
-            List<ChickenUnitState> newUnitStates;
+            var newUnitStates = new List<ChickenUnitState>(aliveChickens.Count);
             lock (m_lastMovesLock)
             {
-                newUnitStates = aliveChickens
-                    .Select(item => this.LastMoves.GetValueOrDefault(item))
-                    .Where(item => item != null && item.CurrentMove != null
-                        && item.CurrentMove.State == MoveInfoState.None)
-                    .ToList();
+                for (int index = 0; index < aliveChickens.Count; index++)
+                {
+                    var aliveChicken = aliveChickens[index];
+                    var unitState = this.LastMoves.GetValueOrDefault(aliveChicken);
+                    if (unitState != null
+                        && unitState.CurrentMove != null
+                        && unitState.CurrentMove.State == MoveInfoState.None)
+                    {
+                        newUnitStates.Add(unitState);
+                    }
+                }
             }
 
             var oldShotUnits = this.ShotUnitsDirect.ToArray();
@@ -411,11 +456,17 @@ namespace SharpestBeak.Common
                 {
                     var shotElement = shotUnit.GetElement();
 
-                    var injuredChickens = aliveChickens
-                        .Where(
-                            item => !item.IsDead
-                                && CollisionDetector.CheckCollision(shotElement, item.GetElement()))
-                        .ToArray();
+                    var injuredChickens = new List<ChickenUnit>(aliveChickens.Count);
+                    for (int index = 0; index < aliveChickens.Count; index++)
+                    {
+                        var aliveChicken = aliveChickens[index];
+                        if (!aliveChicken.IsDead
+                            && CollisionDetector.CheckCollision(shotElement, aliveChicken.GetElement()))
+                        {
+                            injuredChickens.Add(aliveChicken);
+                        }
+                    }
+
                     foreach (var injuredChicken in injuredChickens)
                     {
                         shotUnit.Exploded = true;
@@ -475,6 +526,10 @@ namespace SharpestBeak.Common
 
             while (!IsStopping())
             {
+                if (SettingsCache.Instance.InstrumentationMode && m_moveCount.Value >= InstrumentationMoveCountLimit)
+                {
+                    return;
+                }
                 if (m_disposed)
                 {
                     return;
@@ -610,8 +665,8 @@ namespace SharpestBeak.Common
         }
 
         private bool ProcessChickenUnitMoves(
-            IEnumerable<ChickenUnitState> previousUnitStates,
-            IEnumerable<ChickenUnit> aliveChickens)
+            IList<ChickenUnitState> previousUnitStates,
+            IList<ChickenUnit> aliveChickens)
         {
             if (previousUnitStates == null || !previousUnitStates.Any())
             {
@@ -648,14 +703,26 @@ namespace SharpestBeak.Common
                 {
                     unitState.CurrentMove.State = MoveInfoState.Rejected;
                     DebugHelper.WriteLine(
-                        "Blocked collision of chicken {{{0}}} game board border.",
+                        "Blocked collision of chicken {{{0}}} with game board border.",
                         unit);
                     continue;
                 }
 
-                var otherChickens = aliveChickens.Where(item => item != unit).ToArray();
-                var conflictingChicken = otherChickens.FirstOrDefault(
-                    item => CollisionDetector.CheckCollision(newPositionElement, item.GetElement()));
+                ChickenUnit conflictingChicken = null;
+                for (int index = 0; index < aliveChickens.Count; index++)
+                {
+                    var aliveChicken = aliveChickens[index];
+                    if (aliveChicken == unit)
+                    {
+                        continue;
+                    }
+
+                    if (CollisionDetector.CheckCollision(newPositionElement, aliveChicken.GetElement()))
+                    {
+                        conflictingChicken = aliveChicken;
+                        break;
+                    }
+                }
                 if (conflictingChicken != null)
                 {
                     unitState.CurrentMove.State = MoveInfoState.Rejected;
@@ -688,6 +755,7 @@ namespace SharpestBeak.Common
 
         private void RaiseGameEnded(GameTeam winningTeam)
         {
+            // TODO: [VM] Fix double message
             m_winningTeam.Value = winningTeam;
             var e = new GameEndedEventArgs(winningTeam);
             OnGameEnded(e);

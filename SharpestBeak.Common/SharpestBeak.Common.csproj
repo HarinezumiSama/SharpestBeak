@@ -75,6 +75,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="SettingsCache.cs" />
     <Compile Include="ThreadSafeRandom.cs" />
     <Compile Include="ValueRange.cs" />
     <Compile Include="Vector2D.cs" />

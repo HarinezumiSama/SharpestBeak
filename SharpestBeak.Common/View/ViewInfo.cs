@@ -31,22 +31,29 @@ namespace SharpestBeak.Common.View
             // TODO: [VM] Improve computing details according to actual unit view
             // [VM] Currently, algorithm of determining if other chicken or shot is visible is very simple
 
-            this.Chickens = engine
-                .AliveChickens
-                .Where(
-                    item => !item.IsDead
-                        && item != unit
-                        && (item.Team == unitTeam || unit.CanSee(item.Position)))
-                .Select(item => new ChickenViewData(item))
-                .ToList()
-                .AsReadOnly();
+            var chickens = new List<ChickenViewData>(engine.AliveChickens.Count);
+            for (int index = 0; index < engine.AliveChickens.Count; index++)
+            {
+                var aliveChicken = engine.AliveChickens[index];
+                if (!aliveChicken.IsDead
+                    && aliveChicken != unit
+                    && (aliveChicken.Team == unitTeam || unit.CanSee(aliveChicken.Position)))
+                {
+                    chickens.Add(new ChickenViewData(aliveChicken));
+                }
+            }
+            this.Chickens = chickens.AsReadOnly();
 
-            this.Shots = engine
-                .ShotUnits
-                .Where(item => unit.CanSee(item.Position))
-                .Select(item => new ShotViewData(item))
-                .ToList()
-                .AsReadOnly();
+            var shots = new List<ShotViewData>(engine.ShotUnits.Count);
+            for (int index = 0; index < engine.ShotUnits.Count; index++)
+            {
+                var shotUnit = engine.ShotUnits[index];
+                if (unit.CanSee(shotUnit.Position))
+                {
+                    shots.Add(new ShotViewData(shotUnit));
+                }
+            }
+            this.Shots = shots.AsReadOnly();
         }
 
         #endregion

@@ -27,7 +27,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         public static void WriteLine(string message)
         {
-            if (!Settings.Default.EnableDebugOutput)
+            if (!SettingsCache.Instance.EnableDebugOutput)
             {
                 return;
             }
@@ -37,7 +37,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         public static void WriteLine(string format, params object[] args)
         {
-            if (!Settings.Default.EnableDebugOutput)
+            if (!SettingsCache.Instance.EnableDebugOutput)
             {
                 return;
             }
@@ -57,7 +57,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         public static void CallAndMeasure(Action action)
         {
-            if (!Settings.Default.EnableDebugOutput)
+            if (!SettingsCache.Instance.EnableDebugOutput)
             {
                 action();
                 return;
@@ -75,7 +75,7 @@ namespace SharpestBeak.Common.Diagnostics
 
         public static T CallAndMeasure<T>(Func<T> action)
         {
-            if (!Settings.Default.EnableDebugOutput)
+            if (!SettingsCache.Instance.EnableDebugOutput)
             {
                 return action();
             }

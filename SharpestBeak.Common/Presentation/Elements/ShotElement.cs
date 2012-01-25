@@ -24,7 +24,7 @@ namespace SharpestBeak.Common.Presentation.Elements
         {
             this.Position = position;
 
-            m_primitives = new List<ICollidablePrimitive>
+            m_primitives = new List<ICollidablePrimitive>(1)
             {
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
@@ -69,7 +69,10 @@ namespace SharpestBeak.Common.Presentation.Elements
         public bool HasRoughPrimitives
         {
             [DebuggerStepThrough]
-            get { return false; }
+            get
+            {
+                return false;
+            }
         }
 
         public IList<ICollidablePrimitive> GetRoughPrimitives()
