@@ -64,7 +64,7 @@ namespace SharpestBeak.Common
             public static readonly float DefaultRectilinearSpeed =
                 2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
 
-            public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d);
+            public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d * SlowDownRatio);
 
             #endregion
         }
