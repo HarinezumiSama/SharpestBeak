@@ -13,27 +13,27 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="StaticData"/> class.
         /// </summary>
-        internal StaticData(Size size)
+        internal StaticData(Size nominalSize)
         {
             #region Argument Check
 
-            if (!size.Width.IsInRange(GameConstants.NominalCellCountRange)
-                || !size.Height.IsInRange(GameConstants.NominalCellCountRange))
+            if (!nominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
+                || !nominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
             {
                 throw new ArgumentException(
                     string.Format(
-                        "Each board size dimension must be in the range {0} to {1}.",
+                        "Each nominal board size dimension must be in the range {0} to {1}.",
                         GameConstants.NominalCellCountRange.Min,
                         GameConstants.NominalCellCountRange.Max),
-                    "size");
+                    "nominalSize");
             }
 
             #endregion
 
-            this.NominalSize = size;
+            this.NominalSize = nominalSize;
             this.RealSize = new SizeF(
-                GameConstants.NominalCellSize * size.Width,
-                GameConstants.NominalCellSize * size.Height);
+                GameConstants.NominalCellSize * nominalSize.Width,
+                GameConstants.NominalCellSize * nominalSize.Height);
         }
 
         #endregion

@@ -52,7 +52,7 @@ namespace SharpestBeak.Common
         /// </summary>
         public GameEngine(
             Action<GamePaintEventArgs> paintCallback,
-            Size size,
+            Size nominalSize,
             ChickenTeamRecord lightTeam,
             ChickenTeamRecord darkTeam)
         {
@@ -81,7 +81,7 @@ namespace SharpestBeak.Common
             }
 
             // Pre-initialized properties
-            this.Data = new StaticData(size);
+            this.Data = new StaticData(nominalSize);
             m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
             m_winningTeam = new ThreadSafeValue<GameTeam?>(m_syncLock);
             this.LastMoves = new Dictionary<ChickenUnit, ChickenUnitState>();
@@ -105,11 +105,12 @@ namespace SharpestBeak.Common
             this.ShotUnitsDirect = new List<ShotUnit>();
             this.ShotUnits = this.ShotUnitsDirect.AsReadOnly();
 
+            var realSize = this.Data.RealSize;
             m_boardPolygon = new ConvexPolygonPrimitive(
                 Point2D.Zero,
-                new Point2D(this.Data.RealSize.Width, 0f),
-                new Point2D(this.Data.RealSize.Width, this.Data.RealSize.Height),
-                new Point2D(0f, this.Data.RealSize.Height));
+                new Point2D(realSize.Width, 0f),
+                new Point2D(realSize),
+                new Point2D(0f, realSize.Height));
 
             #region Argument Check
 
@@ -264,8 +265,7 @@ namespace SharpestBeak.Common
                 Name = GetType().FullName,
                 IsBackground = true
             };
-            this.Logics
-                .DoForEach(
+            this.Logics.DoForEach(
                 item =>
                 {
                     item.Thread = new Thread(this.DoExecuteLogic)
