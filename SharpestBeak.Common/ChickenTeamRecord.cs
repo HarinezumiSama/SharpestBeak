@@ -20,12 +20,15 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("type");
             }
-            if (unitCount <= 0)
+            if (!unitCount.IsInRange(GameConstants.TeamPlayerUnitCountRange))
             {
                 throw new ArgumentOutOfRangeException(
                     "unitCount",
                     unitCount,
-                    "The number of units must be positive.");
+                    string.Format(
+                        "The number of units must be in the range {0} to {1}.",
+                        GameConstants.TeamPlayerUnitCountRange.Min,
+                        GameConstants.TeamPlayerUnitCountRange.Max));
             }
 
             #endregion

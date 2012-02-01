@@ -42,7 +42,7 @@ namespace SharpestBeak.UI.WinForms
                 }
 
                 var lb = new ListBox();
-                lb.Items.AddRange(LogicManager.Instance.LogicTypes.Cast<object>().ToArray());
+                lb.Items.AddRange(LogicManager.Instance.Logics.Cast<object>().ToArray());
                 lb.SelectedItem = value;
                 lb.SelectionMode = SelectionMode.One;
                 lb.Click += (sender, e) => wfes.CloseDropDown();
@@ -64,7 +64,7 @@ namespace SharpestBeak.UI.WinForms
         /// </summary>
         public TeamSettings()
         {
-            this.LogicType = LogicManager.Instance.LogicTypes.FirstOrDefault();
+            this.Logic = LogicManager.Instance.Logics.FirstOrDefault();
         }
 
         #endregion
@@ -102,10 +102,10 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            if (this.LogicType == null)
+            if (this.Logic == null)
             {
                 messageBuilder
-                    .AppendFormat("{0}: logic type must be specified.", prefix)
+                    .AppendFormat("{0}: logic must be specified.", prefix)
                     .AppendLine();
             }
 
@@ -121,9 +121,9 @@ namespace SharpestBeak.UI.WinForms
 
         #region Public Properties
 
-        [DisplayName("Logic type")]
+        [DisplayName("Logic")]
         [Editor(typeof(LogicTypeEditor), typeof(UITypeEditor))]
-        public Type LogicType
+        public LogicInfo Logic
         {
             get;
             set;
@@ -142,9 +142,9 @@ namespace SharpestBeak.UI.WinForms
 
         public override string ToString()
         {
-            var logicType = this.LogicType;
-            var logic = logicType == null ? "?" : logicType.Name;
-            return string.Format("{{{0} x {1}}}", logic, this.PlayerCount);
+            var logicType = this.Logic;
+            var logic = logicType == null ? "?" : logicType.Caption;
+            return string.Format("{{{0}x {1}}}", this.PlayerCount, logic);
         }
 
         #endregion

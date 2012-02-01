@@ -14,6 +14,8 @@ using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
+    // TODO: Capture the game to allow playback
+
     public sealed class GameEngine : IDisposable
     {
         #region Constants
@@ -86,8 +88,8 @@ namespace SharpestBeak.Common
 
             // Pre-initialized properties
             this.Data = new StaticData(nominalSize);
-            m_moveCount = new ThreadSafeValue<ulong>(m_syncLock);
-            m_winningTeam = new ThreadSafeValue<GameTeam?>(m_syncLock);
+            m_moveCount = new ThreadSafeValue<ulong>();
+            m_winningTeam = new ThreadSafeValue<GameTeam?>();
 
             // Post-initialized properties
             this.Logics =
@@ -155,7 +157,7 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type);
+            var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type).EnsureNotNull();
             result.InitializeInstance(engine, logicRecord.UnitCount, team);
             return result;
         }
@@ -880,7 +882,7 @@ namespace SharpestBeak.Common
 
             Application.Idle -= this.Application_Idle;
 
-            m_syncLock.ExecuteInReadLock(
+            m_syncLock.ExecuteInWriteLock(
                 () => this.Logics.DoForEach(
                     item =>
                     {
@@ -941,12 +943,6 @@ namespace SharpestBeak.Common
             {
                 m_stopEvent.DisposeSafely();
                 m_makeMoveEvent.DisposeSafely();
-
-                foreach (var item in this.AllChickens)
-                {
-                    item.Logic.DisposeSafely();
-                }
-                m_moveCount.DisposeSafely();
 
                 m_disposed = true;
             }

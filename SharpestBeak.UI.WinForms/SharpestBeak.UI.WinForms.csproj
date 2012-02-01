@@ -97,6 +97,9 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\Icons\SharpestBeak-32.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -112,6 +115,7 @@
   <ItemGroup>
     <Compile Include="FormExtensions.cs" />
     <Compile Include="GameSettings.cs" />
+    <Compile Include="LogicInfo.cs" />
     <Compile Include="LogicManager.cs" />
     <Compile Include="GameForm.cs">
       <SubType>Form</SubType>
@@ -136,6 +140,7 @@
     </Compile>
     <EmbeddedResource Include="GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -165,30 +170,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\ChickenUpRight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenDownLeft.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenDownRight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenLeft.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenRight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenUp.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenUpLeft.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ChickenDown.png" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SharpestBeak.Common\SharpestBeak.Common.csproj">
       <Project>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</Project>
       <Name>SharpestBeak.Common</Name>
@@ -197,6 +178,9 @@
       <Project>{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}</Project>
       <Name>SharpestBeak.Logic.Default</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

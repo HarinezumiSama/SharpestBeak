@@ -9,6 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.Logic.Default"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{74DBEB17-0010-43FE-85B5-1F60F268FE07}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{1B4E8F1C-ABF0-46E1-A144-FCE92F0B908A}"
+	ProjectSection(SolutionItems) = preProject
+		Icons\SharpestBeak-16.ico = Icons\SharpestBeak-16.ico
+		Icons\SharpestBeak-16.png = Icons\SharpestBeak-16.png
+		Icons\SharpestBeak-256.png = Icons\SharpestBeak-256.png
+		Icons\SharpestBeak-32.ico = Icons\SharpestBeak-32.ico
+		Icons\SharpestBeak-32.png = Icons\SharpestBeak-32.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,5 +53,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B4E8F1C-ABF0-46E1-A144-FCE92F0B908A} = {74DBEB17-0010-43FE-85B5-1F60F268FE07}
 	EndGlobalSection
 EndGlobal

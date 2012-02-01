@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpestBeak.Common;
+using SharpestBeak.UI.WinForms.Properties;
 
 namespace SharpestBeak.UI.WinForms
 {
@@ -49,8 +50,8 @@ namespace SharpestBeak.UI.WinForms
                     return;
                 }
 
-                var lightTeamRecord = new ChickenTeamRecord(lightTeam.LogicType, lightTeam.PlayerCount);
-                var darkTeamRecord = new ChickenTeamRecord(darkTeam.LogicType, darkTeam.PlayerCount);
+                var lightTeamRecord = new ChickenTeamRecord(lightTeam.Logic.Type, lightTeam.PlayerCount);
+                var darkTeamRecord = new ChickenTeamRecord(darkTeam.Logic.Type, darkTeam.PlayerCount);
 
                 using (var gameForm = new GameForm(
                     m_gameSettings.UICellSize,
@@ -70,6 +71,20 @@ namespace SharpestBeak.UI.WinForms
 
                 this.ShowErrorMessage(ex);
             }
+        }
+
+        private void SetPreset(int uiCellSize, Size nominalSize, int playerCount)
+        {
+            m_gameSettings.UICellSize = uiCellSize;
+            m_gameSettings.NominalSize = nominalSize;
+            m_gameSettings.DarkTeam.PlayerCount = playerCount;
+            m_gameSettings.LightTeam.PlayerCount = playerCount;
+            pgGameSettings.Refresh();
+        }
+
+        private void SetPreset(int uiCellSize, int nominalSizeDimension, int playerCount)
+        {
+            SetPreset(uiCellSize, new Size(nominalSizeDimension, nominalSizeDimension), playerCount);
         }
 
         #endregion
@@ -115,9 +130,30 @@ namespace SharpestBeak.UI.WinForms
 
         #region Event Handlers
 
-        private void btnPlay_Click(object sender, EventArgs e)
+        private void playToolButton_Click(object sender, EventArgs e)
         {
             DoPlay();
+        }
+
+        private void presetDefaultMenuItem_Click(object sender, EventArgs e)
+        {
+            var settings = Settings.Default;
+            SetPreset(settings.UICellSize, settings.NominalSize, settings.TeamUnitCount);
+        }
+
+        private void presetSmallMenuItem_Click(object sender, EventArgs e)
+        {
+            SetPreset(GameForm.UICellSizeRange.Max, GameConstants.NominalCellCountRange.Min, 1);
+        }
+
+        private void presetMediumMenuItem_Click(object sender, EventArgs e)
+        {
+            SetPreset(GameForm.UICellSizeRange.Max / 2, 8, 2);
+        }
+
+        private void presetLargeMenuItem_Click(object sender, EventArgs e)
+        {
+            SetPreset(48, new Size(24, 16), 8);
         }
 
         #endregion

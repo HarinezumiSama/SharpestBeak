@@ -105,6 +105,11 @@ namespace SharpestBeak.Logic.Default
             }
         }
 
+        protected override string GetCaption()
+        {
+            return "Random Chicken Logic";
+        }
+
         #endregion
 
         #region Public Properties

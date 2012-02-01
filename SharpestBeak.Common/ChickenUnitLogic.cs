@@ -7,14 +7,13 @@ using System.Threading;
 
 namespace SharpestBeak.Common
 {
-    public abstract class ChickenUnitLogic : IDisposable
+    public abstract class ChickenUnitLogic
     {
         #region Fields
 
-        private readonly ReaderWriterLockSlim m_lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         private readonly List<ChickenUnit> m_unitsDirect = new List<ChickenUnit>();
-
         private readonly ThreadSafeValue<Exception> m_error;
+        private readonly Lazy<string> m_caption;
 
         #endregion
 
@@ -25,9 +24,10 @@ namespace SharpestBeak.Common
         /// </summary>
         protected ChickenUnitLogic()
         {
-            m_error = new ThreadSafeValue<Exception>(m_lock);
+            m_error = new ThreadSafeValue<Exception>();
 
             this.Units = m_unitsDirect.AsReadOnly();
+            m_caption = new Lazy<string>(this.GetCaption);
 
             this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(m_unitsDirect.Count);
             this.UnitsStatesLock = new object();
@@ -57,6 +57,11 @@ namespace SharpestBeak.Common
         protected abstract void OnReset(GameState gameState);
 
         protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
+
+        protected virtual string GetCaption()
+        {
+            return GetType().Name;
+        }
 
         #endregion
 
@@ -177,16 +182,10 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
+        public string Caption
         {
-            m_lock.DisposeSafely();
-            m_error.DisposeSafely();
-            //m_moveCount.DisposeSafely();
-            //m_currentMove.DisposeSafely();
+            [DebuggerNonUserCode]
+            get { return m_caption.Value; }
         }
 
         #endregion

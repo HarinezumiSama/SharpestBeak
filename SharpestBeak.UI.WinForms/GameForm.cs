@@ -296,6 +296,16 @@ namespace SharpestBeak.UI.WinForms
 
             m_gameEngine = new GameEngine(this.PaintGame, nominalSize, lightTeam, darkTeam);
             m_gameEngine.GameEnded += this.GameEngine_GameEnded;
+
+            this.Text = string.Format(
+                "{0} [{1}x{2}] [L:{3}x{4} vs D:{5}x{6}]",
+                this.Text,
+                nominalSize.Width,
+                nominalSize.Height,
+                lightTeam.UnitCount,
+                lightTeam.Type.Name,
+                darkTeam.UnitCount,
+                darkTeam.Type.Name);
         }
 
         #endregion
@@ -409,12 +419,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void UpdateMoveCountStatus()
         {
-            //turnInfoLabel.Text = string.Format(
-            //    "Move count: {0}, collision checks: {1}",
-            //    m_gameEngine.MoveCount,
-            //    CollisionDetector.CallCount);
             turnInfoLabel.Text = string.Format("Move count: {0}", m_gameEngine.MoveCount);
-
             turnInfoLabel.Invalidate();
         }
 
@@ -562,6 +567,7 @@ namespace SharpestBeak.UI.WinForms
                     RunTurnTest();
                     break;
 
+                case Keys.Space:
                 case Keys.F5:
                     e.Handled = true;
                     if (m_gameEngine.IsRunning)

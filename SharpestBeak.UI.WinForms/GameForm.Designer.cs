@@ -37,6 +37,7 @@ namespace SharpestBeak.UI.WinForms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameForm));
             this.pbGame = new System.Windows.Forms.PictureBox();
             this.mainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.statusBar = new System.Windows.Forms.StatusStrip();
@@ -70,14 +71,14 @@ namespace SharpestBeak.UI.WinForms
             // statusBar
             // 
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.turnInfoLabel,
-            this.lightTeamLabel,
-            this.darkTeamLabel,
-            this.fpsLabel});
-            this.statusBar.Location = new System.Drawing.Point(0, 238);
+                this.turnInfoLabel,
+                this.lightTeamLabel,
+                this.darkTeamLabel,
+                this.fpsLabel});
+            this.statusBar.Location = new System.Drawing.Point(0, 240);
             this.statusBar.Name = "statusBar";
             this.statusBar.ShowItemToolTips = true;
-            this.statusBar.Size = new System.Drawing.Size(284, 24);
+            this.statusBar.Size = new System.Drawing.Size(284, 22);
             this.statusBar.SizingGrip = false;
             this.statusBar.TabIndex = 2;
             // 
@@ -120,6 +121,7 @@ namespace SharpestBeak.UI.WinForms
             this.Controls.Add(this.pbGame);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -133,7 +135,6 @@ namespace SharpestBeak.UI.WinForms
             this.statusBar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion

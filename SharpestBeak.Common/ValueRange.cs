@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -64,7 +65,21 @@ namespace SharpestBeak.Common
 
         public override string ToString()
         {
-            return string.Format("[{0} .. {1}]", m_min, m_max);
+            return string.Format(CultureInfo.InvariantCulture, "[{0} .. {1}]", m_min, m_max);
+        }
+
+        /// <summary>
+        ///     Determines whether the specified value belongs to this range.
+        /// </summary>
+        /// <param name="value">
+        ///     The value to check.
+        /// </param>
+        /// <returns>
+        ///     <b>true</b> if the specified value belongs to this range; otherwise, <b>false</b>.
+        /// </returns>
+        public bool Belongs(T value)
+        {
+            return MathHelper.IsInRange(value, this);
         }
 
         #endregion

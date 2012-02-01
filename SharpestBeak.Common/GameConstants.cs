@@ -98,6 +98,8 @@ namespace SharpestBeak.Common
 
         public static readonly float FullRevolutionAngle = MathHelper.RevolutionDegrees;
 
+        public static readonly ValueRange<int> TeamPlayerUnitCountRange = new ValueRange<int>(1, int.MaxValue);
+
         #endregion
 
         #region Private Methods
