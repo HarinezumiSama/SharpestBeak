@@ -381,7 +381,7 @@ namespace SharpestBeak.Common
                     return;
                 }
 
-                if (IsStopping())
+                if (IsStopping() || m_winningTeam.Value.HasValue)
                 {
                     return;
                 }
@@ -760,7 +760,8 @@ namespace SharpestBeak.Common
 
         private void RaiseGameEnded(GameTeam winningTeam)
         {
-            // TODO: [VM] Fix double message
+            UpdateLastGamePresentation();
+
             m_winningTeam.Value = winningTeam;
             var e = new GameEndedEventArgs(winningTeam);
             OnGameEnded(e);
