@@ -25,7 +25,8 @@ namespace SharpestBeak.Common.Presentation
             #endregion
 
             this.Element = chickenUnit.GetElement();
-            this.State = new ChickenUnitState(chickenUnit);
+            this.UniqueId = chickenUnit.UniqueId;
+            this.Team = chickenUnit.Team;
         }
 
         #endregion
@@ -38,7 +39,13 @@ namespace SharpestBeak.Common.Presentation
             private set;
         }
 
-        public ChickenUnitState State
+        public int UniqueId
+        {
+            get;
+            private set;
+        }
+
+        public GameTeam Team
         {
             get;
             private set;

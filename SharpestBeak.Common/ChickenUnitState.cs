@@ -8,19 +8,12 @@ namespace SharpestBeak.Common
 {
     public sealed class ChickenUnitState
     {
-        #region Fields
-
-        private readonly object m_currentMoveLock = new object();
-        private MoveInfo m_currentMove;
-
-        #endregion
-
         #region Constructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenUnitState"/> class.
         /// </summary>
-        internal ChickenUnitState(ChickenUnit unit)
+        internal ChickenUnitState(ChickenUnit unit, MoveInfo previousMove)
         {
             #region Argument Check
 
@@ -38,32 +31,8 @@ namespace SharpestBeak.Common
             this.Position = unit.Position;
             this.BeakAngle = unit.BeakAngle;
             this.HasShots = unit.HasShots();
+            this.PreviousMove = previousMove;
             this.View = new ViewInfo(unit);
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ChickenUnitState"/> class.
-        /// </summary>
-        internal ChickenUnitState(ChickenUnitState unitState)
-        {
-            #region Argument Check
-
-            if (unitState == null)
-            {
-                throw new ArgumentNullException("unitState");
-            }
-
-            #endregion
-
-            this.Unit = unitState.Unit;
-            this.IsDead = unitState.Unit.IsDead;  // IsDead should always be obtained from unit, not from state
-            this.UniqueId = unitState.UniqueId;
-            this.Team = unitState.Team;
-            this.Position = unitState.Unit.Position;
-            this.BeakAngle = unitState.Unit.BeakAngle;
-            this.HasShots = unitState.Unit.HasShots();
-            this.View = new ViewInfo(unitState.Unit);
-            this.PreviousMove = unitState.CurrentMove;
         }
 
         #endregion
@@ -119,18 +88,7 @@ namespace SharpestBeak.Common
         public MoveInfo PreviousMove
         {
             get;
-            internal set;
-        }
-
-        public MoveInfo CurrentMove
-        {
-            get
-            {
-                lock (m_currentMoveLock)
-                {
-                    return m_currentMove;
-                }
-            }
+            private set;
         }
 
         public ViewInfo View
@@ -158,19 +116,6 @@ namespace SharpestBeak.Common
         public bool CanShoot()
         {
             return !this.HasShots || this.Unit.CanShootDueToTimer();
-        }
-
-        public void SetCurrentMove(MoveInfo value)
-        {
-            lock (m_currentMoveLock)
-            {
-                if (m_currentMove != null)
-                {
-                    throw new InvalidOperationException("Cannot reassign already assigned move.");
-                }
-
-                m_currentMove = value;
-            }
         }
 
         #endregion

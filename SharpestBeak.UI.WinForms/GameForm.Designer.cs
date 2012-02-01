@@ -41,6 +41,8 @@ namespace SharpestBeak.UI.WinForms
             this.mainToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.turnInfoLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lightTeamLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.darkTeamLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.fpsLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.fpsTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pbGame)).BeginInit();
@@ -69,6 +71,8 @@ namespace SharpestBeak.UI.WinForms
             // 
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.turnInfoLabel,
+            this.lightTeamLabel,
+            this.darkTeamLabel,
             this.fpsLabel});
             this.statusBar.Location = new System.Drawing.Point(0, 238);
             this.statusBar.Name = "statusBar";
@@ -84,10 +88,23 @@ namespace SharpestBeak.UI.WinForms
             this.turnInfoLabel.Size = new System.Drawing.Size(74, 19);
             this.turnInfoLabel.Text = "(TurnInfo...)";
             // 
+            // lightTeamLabel
+            // 
+            this.lightTeamLabel.Name = "lightTeamLabel";
+            this.lightTeamLabel.Size = new System.Drawing.Size(54, 19);
+            this.lightTeamLabel.Text = "Light: XX";
+            // 
+            // darkTeamLabel
+            // 
+            this.darkTeamLabel.Name = "darkTeamLabel";
+            this.darkTeamLabel.Size = new System.Drawing.Size(51, 19);
+            this.darkTeamLabel.Text = "Dark: XX";
+            // 
             // fpsLabel
             // 
+            this.fpsLabel.BorderSides = System.Windows.Forms.ToolStripStatusLabelBorderSides.Left;
             this.fpsLabel.Name = "fpsLabel";
-            this.fpsLabel.Size = new System.Drawing.Size(56, 19);
+            this.fpsLabel.Size = new System.Drawing.Size(60, 19);
             this.fpsLabel.Text = "(Status...)";
             // 
             // fpsTimer
@@ -127,5 +144,7 @@ namespace SharpestBeak.UI.WinForms
         private System.Windows.Forms.ToolStripStatusLabel fpsLabel;
         private System.Windows.Forms.ToolStripStatusLabel turnInfoLabel;
         private System.Windows.Forms.Timer fpsTimer;
+        private System.Windows.Forms.ToolStripStatusLabel lightTeamLabel;
+        private System.Windows.Forms.ToolStripStatusLabel darkTeamLabel;
     }
 }

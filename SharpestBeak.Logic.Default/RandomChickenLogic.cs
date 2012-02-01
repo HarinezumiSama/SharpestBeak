@@ -51,7 +51,7 @@ namespace SharpestBeak.Logic.Default
             }
         }
 
-        protected override void OnMakeMove(GameState gameState)
+        protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
             foreach (var unitState in gameState.UnitStates)
             {
@@ -87,8 +87,7 @@ namespace SharpestBeak.Logic.Default
                         unitState.Position,
                         unitState.BeakAngle,
                         item,
-                        GameConstants.ChickenUnit.DefaultRectilinearSpeed,
-                        GameConstants.StepTimeDelta);
+                        GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
                     var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
                     if (distanceSquared < move.Item2)
                     {
@@ -102,7 +101,7 @@ namespace SharpestBeak.Logic.Default
                 var fireMode = unitState.CanShoot() && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
 
                 var moveInfo = new MoveInfo(move.Item1, turn, fireMode);
-                unitState.SetCurrentMove(moveInfo);
+                moves.Set(unitState, moveInfo);
             }
         }
 

@@ -399,6 +399,11 @@ namespace SharpestBeak.UI.WinForms
             {
                 UpdateMoveCountStatus();
             }
+
+            var countMap = e.Presentation.Chickens.GroupBy(item => item.Team).ToDictionary(item => item.Key, item => item.Count());
+            lightTeamLabel.Text = string.Format("Light: {0}", countMap.GetValueOrDefault(GameTeam.Light));
+            darkTeamLabel.Text = string.Format("Dark: {0}", countMap.GetValueOrDefault(GameTeam.Dark));
+
             pbGame.Invalidate();
         }
 
@@ -541,7 +546,7 @@ namespace SharpestBeak.UI.WinForms
         {
             switch (e.KeyData)
             {
-                case Keys.Escape| Keys.Shift:
+                case Keys.Escape | Keys.Shift:
                     e.Handled = true;
                     Close();
                     break;
@@ -601,7 +606,7 @@ namespace SharpestBeak.UI.WinForms
 
             foreach (var chickenUnit in lastPresentation.Chickens)
             {
-                var drawData = chickenUnit.State.Team == GameTeam.Light
+                var drawData = chickenUnit.Team == GameTeam.Light
                     ? m_lightTeamUnitDrawData
                     : m_darkTeamUnitDrawData;
 
@@ -631,7 +636,9 @@ namespace SharpestBeak.UI.WinForms
             var uiShotRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient;
             foreach (var shotUnit in lastPresentation.Shots)
             {
-                var drawData = shotUnit.Owner.State.Team == GameTeam.Light ? m_lightTeamShotDrawData : m_darkTeamShotDrawData;
+                var drawData = shotUnit.Owner.Team == GameTeam.Light
+                    ? m_lightTeamShotDrawData
+                    : m_darkTeamShotDrawData;
                 shotUnit.Element.Draw(graphics, drawData);
             }
 

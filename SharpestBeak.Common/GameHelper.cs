@@ -80,8 +80,7 @@ namespace SharpestBeak.Common
             Point2D oldPosition,
             GameAngle currentAngle,
             MoveDirection direction,
-            float speed,
-            float timeDelta)
+            float distance)
         {
             var relativeAngle = s_directionMap[direction];
             if (relativeAngle == null)
@@ -90,7 +89,6 @@ namespace SharpestBeak.Common
             }
 
             var actualAngle = currentAngle + relativeAngle.Value;
-            var distance = timeDelta * speed;
 
             var result = GetNewPosition(oldPosition, actualAngle, distance);
             return result;

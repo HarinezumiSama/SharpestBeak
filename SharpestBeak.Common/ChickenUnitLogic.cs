@@ -28,6 +28,12 @@ namespace SharpestBeak.Common
             m_error = new ThreadSafeValue<Exception>(m_lock);
 
             this.Units = m_unitsDirect.AsReadOnly();
+
+            this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(m_unitsDirect.Count);
+            this.UnitsStatesLock = new object();
+
+            this.UnitsMoves = new Dictionary<ChickenUnit, MoveInfo>(m_unitsDirect.Count);
+            this.UnitsMovesLock = new object();
         }
 
         #endregion
@@ -36,8 +42,11 @@ namespace SharpestBeak.Common
 
         private GameState GetGameState()
         {
-            var unitStates = this.Units.Select(item => new ChickenUnitState(item)).ToArray();
-            var result = new GameState(this.Engine, unitStates);
+            GameState result;
+            lock (this.UnitsStatesLock)
+            {
+                result = new GameState(this.Engine, this.UnitsStates.Values);
+            }
             return result;
         }
 
@@ -47,7 +56,7 @@ namespace SharpestBeak.Common
 
         protected abstract void OnReset(GameState gameState);
 
-        protected abstract void OnMakeMove(GameState gameState);
+        protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
 
         #endregion
 
@@ -80,6 +89,30 @@ namespace SharpestBeak.Common
         }
 
         internal IList<ChickenUnit> Units
+        {
+            get;
+            private set;
+        }
+
+        internal Dictionary<ChickenUnit, ChickenUnitState> UnitsStates
+        {
+            get;
+            private set;
+        }
+
+        internal object UnitsStatesLock
+        {
+            get;
+            private set;
+        }
+
+        internal Dictionary<ChickenUnit, MoveInfo> UnitsMoves
+        {
+            get;
+            private set;
+        }
+
+        internal object UnitsMovesLock
         {
             get;
             private set;
@@ -126,12 +159,12 @@ namespace SharpestBeak.Common
             OnReset(gameState);
         }
 
-        internal void MakeMove(GameState gameState)
+        internal LogicMoveResult MakeMove()
         {
-            if (gameState != null)
-            {
-                OnMakeMove(gameState);
-            }
+            var gameState = GetGameState();
+            var result = new LogicMoveResult(gameState.UnitStates.Count);
+            OnMakeMove(gameState, result);
+            return result;
         }
 
         #endregion

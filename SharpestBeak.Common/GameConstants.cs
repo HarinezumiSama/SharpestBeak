@@ -45,6 +45,8 @@ namespace SharpestBeak.Common
             /// </summary>
             public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 8f;
 
+            public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
+
             #endregion
         }
 
@@ -65,6 +67,8 @@ namespace SharpestBeak.Common
                 2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
 
             public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d * SlowDownRatio);
+
+            public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
 
             #endregion
         }

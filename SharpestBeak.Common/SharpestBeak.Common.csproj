@@ -58,6 +58,7 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
+    <Compile Include="LogicMoveResult.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Presentation\ChickenPresentation.cs" />
     <Compile Include="Presentation\Elements\BaseElement.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="Presentation\Elements\ShotElement.cs" />
     <Compile Include="Presentation\Primitives\PolygonPrimitive.cs" />
     <Compile Include="Presentation\Primitives\LinePrimitive.cs" />
-    <Compile Include="EngineMoveInfo.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FireMode.cs" />
     <Compile Include="GameAngle.cs" />
