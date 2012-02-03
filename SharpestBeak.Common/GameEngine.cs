@@ -587,10 +587,7 @@ namespace SharpestBeak.Common
                     unit.BeakAngle,
                     moveInfo.MoveDirection,
                     GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
-                var newBeakAngle = GameHelper.GetNewBeakAngle(
-                    unit.BeakAngle,
-                    moveInfo.BeakTurn,
-                    GameConstants.StepTimeDelta);
+                var newBeakAngle = GameHelper.GetNewBeakAngle(unit.BeakAngle, moveInfo.BeakTurn);
 
                 var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
                 if (HasOutOfBoardCollision(newPositionElement))

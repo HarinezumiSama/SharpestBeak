@@ -13,6 +13,12 @@ namespace SharpestBeak.Common
 {
     public static class CollisionDetector
     {
+        #region Fields
+
+        private static readonly ValueRange<float> s_lineCollisionRange = new ValueRange<float>(0f, 1f);
+
+        #endregion
+
         #region Private Methods
 
         private static bool HasSeparatingAxis(
@@ -174,7 +180,7 @@ namespace SharpestBeak.Common
             var a = numeratorA / denominator;
             var b = numeratorB / denominator;
 
-            return a.IsInRange(0f, 1f) && b.IsInRange(0f, 1f);
+            return a.IsInRange(s_lineCollisionRange) && b.IsInRange(s_lineCollisionRange);
         }
 
         internal static bool CheckCircleToCircleCollision(CirclePrimitive circle1, CirclePrimitive circle2)

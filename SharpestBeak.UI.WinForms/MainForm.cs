@@ -148,12 +148,12 @@ namespace SharpestBeak.UI.WinForms
 
         private void presetMediumMenuItem_Click(object sender, EventArgs e)
         {
-            SetPreset(GameForm.UICellSizeRange.Max / 2, 8, 2);
+            SetPreset(GameForm.UICellSizeRange.Max / 2, 8, 4);
         }
 
         private void presetLargeMenuItem_Click(object sender, EventArgs e)
         {
-            SetPreset(48, new Size(24, 16), 8);
+            SetPreset(48, new Size(24, 16), 16);
         }
 
         #endregion

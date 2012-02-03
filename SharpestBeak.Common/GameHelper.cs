@@ -42,30 +42,15 @@ namespace SharpestBeak.Common
             return new Point2D(nominalPoint) * GameConstants.NominalCellSize + s_halfNominalCellOffset;
         }
 
-        public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn, float timeDelta)
+        public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn)
         {
-            int beakTurnOffset = (int)beakTurn;
-
-            #region Argument Check
-
-            if (Math.Abs(beakTurnOffset) > 1)
-            {
-                throw new ArgumentOutOfRangeException("beakTurn", beakTurn, "Invalid beak turn.");
-            }
-            if (timeDelta < 0)
-            {
-                throw new ArgumentOutOfRangeException("timeDelta", timeDelta, "Time delta cannot be negative.");
-            }
-
-            #endregion
-
-            if (beakTurnOffset == 0)
+            if (beakTurn.Value.IsZero())
             {
                 return oldBeakAngle;
             }
 
             var proxyResult = GameAngle.NormalizeDegreeAngle(oldBeakAngle.DegreeValue
-                + timeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed * beakTurnOffset);
+                + GameConstants.StepTimeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed * beakTurn.Value);
             return GameAngle.FromDegrees(proxyResult);
         }
 
@@ -146,10 +131,17 @@ namespace SharpestBeak.Common
             return value > 0 ? positive : negative;
         }
 
-        public static BeakTurn GetBeakTurn(GameAngle currentAngle, GameAngle targetAngle)
+        public static float GetBeakTurn(GameAngle currentAngle, GameAngle targetAngle)
         {
             var difference = (targetAngle - currentAngle).DegreeValue;
-            return MapValueSign(difference, BeakTurn.None, BeakTurn.Clockwise, BeakTurn.CounterClockwise);
+            return difference / GameConstants.ChickenUnit.DefaultAngularStep;
+        }
+
+        public static BeakTurn GetBeakTurnNormalized(GameAngle currentAngle, GameAngle targetAngle)
+        {
+            var turn = GetBeakTurn(currentAngle, targetAngle);
+            var normalizedTurn = turn.ReduceToRange(BeakTurn.ValueRange);
+            return new BeakTurn(normalizedTurn);
         }
 
         #endregion

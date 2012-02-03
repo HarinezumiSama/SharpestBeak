@@ -126,23 +126,6 @@ namespace SharpestBeak.Common
             return value < tolerance;
         }
 
-        public static bool IsInRange(this float value, float min, float max, float tolerance = ZeroTolerance)
-        {
-            #region Argument Check
-
-            if (min > max)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "min",
-                    min,
-                    "Range minimum is greater than its maximum.");
-            }
-
-            #endregion
-
-            return (value > min && value < max) || (value - min).IsZero(tolerance) || (value - max).IsZero(tolerance);
-        }
-
         public static bool IsValidDegreeAngle(this float angle)
         {
             return angle > -MathHelper.HalfRevolutionDegrees && angle <= MathHelper.HalfRevolutionDegrees;
@@ -208,10 +191,39 @@ namespace SharpestBeak.Common
             return comparer.Compare(value, range.Min) >= 0 && comparer.Compare(value, range.Max) <= 0;
         }
 
-        public static bool IsInRange<T>(this T value, T min, T max)
+        public static bool IsInRange(this float value, ValueRange<float> range, float tolerance = ZeroTolerance)
+        {
+            return (value - range.Min).IsPositiveOrZero(tolerance)
+                && (value - range.Max).IsNegativeOrZero(tolerance);
+        }
+
+        public static T ReduceToRange<T>(this T value, ValueRange<T> range)
             where T : struct, IComparable<T>
         {
-            return IsInRange(value, new ValueRange<T>(min, max));
+            if (Comparer<T>.Default.Compare(value, range.Min) <= 0)
+            {
+                return range.Min;
+            }
+            if (Comparer<T>.Default.Compare(value, range.Max) >= 0)
+            {
+                return range.Max;
+            }
+
+            return value;
+        }
+
+        public static float ReduceToRange(this float value, ValueRange<float> range, float tolerance = ZeroTolerance)
+        {
+            if ((value - range.Min).IsNegativeOrZero(tolerance))
+            {
+                return range.Min;
+            }
+            if ((value - range.Max).IsPositiveOrZero(tolerance))
+            {
+                return range.Max;
+            }
+
+            return value;
         }
 
         #endregion

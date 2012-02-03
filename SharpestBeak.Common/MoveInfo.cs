@@ -20,10 +20,6 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentOutOfRangeException("moveDirection", moveDirection, "Invalid move action.");
             }
-            if (!Enum.IsDefined(typeof(BeakTurn), beakTurn))
-            {
-                throw new ArgumentOutOfRangeException("beakTurn", beakTurn, "Invalid beak turn.");
-            }
             if (!Enum.IsDefined(typeof(FireMode), fireMode))
             {
                 throw new ArgumentOutOfRangeException("fireMode", fireMode, "Invalid fire mode.");

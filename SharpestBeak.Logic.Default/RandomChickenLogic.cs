@@ -11,7 +11,6 @@ namespace SharpestBeak.Logic.Default
     {
         #region Fields
 
-        private static readonly IList<BeakTurn> s_turns = Helper.GetEnumValues<BeakTurn>().AsReadOnly();
         private static readonly IList<MoveDirection> s_moveDirections =
             Helper.GetEnumValues<MoveDirection>().AsReadOnly();
         private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
@@ -97,7 +96,7 @@ namespace SharpestBeak.Logic.Default
 
                 var targetOffset = targetPoint - unitState.Position;
                 var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
-                var turn = GameHelper.GetBeakTurn(unitState.BeakAngle, targetAngle);
+                var turn = GameHelper.GetBeakTurnNormalized(unitState.BeakAngle, targetAngle);
                 var fireMode = unitState.CanShoot() && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
 
                 var moveInfo = new MoveInfo(move.Item1, turn, fireMode);

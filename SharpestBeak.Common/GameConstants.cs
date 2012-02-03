@@ -13,6 +13,12 @@ namespace SharpestBeak.Common
 
         public static class ChickenUnit
         {
+            #region Constants
+
+            private const float c_internalSpeedCoefficient = 1f;
+
+            #endregion
+
             #region Fields
 
             /// <summary>
@@ -32,12 +38,14 @@ namespace SharpestBeak.Common
             /// <summary>
             ///     Standard rectilinear speed of a chicken unit, in units per second.
             /// </summary>
-            public static readonly float DefaultRectilinearSpeed = GameConstants.NominalCellSize / SlowDownRatio;
+            public static readonly float DefaultRectilinearSpeed =
+                GameConstants.NominalCellSize * c_internalSpeedCoefficient / SlowDownRatio;
 
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
-            public static readonly float DefaultAngularSpeed = MathHelper.RevolutionDegrees / 4f / SlowDownRatio;
+            public static readonly float DefaultAngularSpeed =
+                MathHelper.RevolutionDegrees * c_internalSpeedCoefficient / 4f / SlowDownRatio;
 
             /// <summary>
             ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
@@ -46,6 +54,8 @@ namespace SharpestBeak.Common
             public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 8f;
 
             public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
+
+            public static readonly float DefaultAngularStep = DefaultAngularSpeed * StepTimeDelta;
 
             #endregion
         }
@@ -64,7 +74,7 @@ namespace SharpestBeak.Common
             ///     Standard rectilinear speed of a shot unit, in units per second.
             /// </summary>
             public static readonly float DefaultRectilinearSpeed =
-                2f * GameConstants.ChickenUnit.DefaultRectilinearSpeed;
+                GameConstants.ChickenUnit.DefaultRectilinearSpeed * 4f;
 
             public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d * SlowDownRatio);
 
