@@ -79,27 +79,11 @@ namespace SharpestBeak.Logic.Default
                     targetPoint = ChooseTargetPoint(gameState, unitState);
                 }
 
-                var move = Tuple.Create(MoveDirection.None, float.MaxValue);
-                foreach (var item in s_moveDirections)
-                {
-                    var potentialMovePoint = GameHelper.GetNewPosition(
-                        unitState.Position,
-                        unitState.BeakAngle,
-                        item,
-                        GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
-                    var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
-                    if (distanceSquared < move.Item2)
-                    {
-                        move = Tuple.Create(item, distanceSquared);
-                    }
-                }
-
-                var targetOffset = targetPoint - unitState.Position;
-                var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
-                var turn = GameHelper.GetBeakTurnNormalized(unitState.BeakAngle, targetAngle);
+                var move = GameHelper.GetBestMoveDirection(unitState.Position, unitState.BeakAngle, targetPoint);
+                var turn = GameHelper.GetBestBeakTurnNormalized(unitState.Position, unitState.BeakAngle, targetPoint);
                 var fireMode = unitState.CanShoot() && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
 
-                var moveInfo = new MoveInfo(move.Item1, turn, fireMode);
+                var moveInfo = new MoveInfo(move, turn, fireMode);
                 moves.Set(unitState, moveInfo);
             }
         }

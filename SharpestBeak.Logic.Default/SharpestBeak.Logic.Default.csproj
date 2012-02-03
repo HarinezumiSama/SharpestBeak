@@ -80,6 +80,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AimingChickenLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomChickenLogic.cs" />
   </ItemGroup>

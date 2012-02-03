@@ -24,6 +24,26 @@ namespace SharpestBeak.Common
         private static readonly Vector2D s_halfNominalCellOffset =
             new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
 
+        private static readonly IList<MoveDirection> s_moveDirections =
+            Helper.GetEnumValues<MoveDirection>().AsReadOnly();
+        private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
+
+        #endregion
+
+        #region Public Properties
+
+        public static IList<MoveDirection> MoveDirections
+        {
+            [DebuggerStepThrough]
+            get { return s_moveDirections; }
+        }
+
+        public static IList<FireMode> FireModes
+        {
+            [DebuggerStepThrough]
+            get { return s_fireModes; }
+        }
+
         #endregion
 
         #region Public Methods
@@ -137,11 +157,51 @@ namespace SharpestBeak.Common
             return difference / GameConstants.ChickenUnit.DefaultAngularStep;
         }
 
+        public static BeakTurn NormalizeBeakTurn(this float absoluteBeakTurn)
+        {
+            var normalizedTurn = absoluteBeakTurn.ReduceToRange(BeakTurn.ValueRange);
+            return new BeakTurn(normalizedTurn);
+        }
+
         public static BeakTurn GetBeakTurnNormalized(GameAngle currentAngle, GameAngle targetAngle)
         {
-            var turn = GetBeakTurn(currentAngle, targetAngle);
-            var normalizedTurn = turn.ReduceToRange(BeakTurn.ValueRange);
-            return new BeakTurn(normalizedTurn);
+            var absoluteBeakTurn = GetBeakTurn(currentAngle, targetAngle);
+            return NormalizeBeakTurn(absoluteBeakTurn);
+        }
+
+        public static MoveDirection GetBestMoveDirection(Point2D position, GameAngle beakAngle, Point2D targetPoint)
+        {
+            var resultProxy = Tuple.Create(MoveDirection.None, float.MaxValue);
+            foreach (var item in s_moveDirections)
+            {
+                var potentialMovePoint = GameHelper.GetNewPosition(
+                    position,
+                    beakAngle,
+                    item,
+                    GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
+                if (distanceSquared < resultProxy.Item2)
+                {
+                    resultProxy = Tuple.Create(item, distanceSquared);
+                }
+            }
+
+            return resultProxy.Item1;
+        }
+
+        public static float GetBestBeakTurn(Point2D position, GameAngle beakAngle, Point2D targetPoint)
+        {
+            var targetOffset = targetPoint - position;
+            var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
+            var result = GameHelper.GetBeakTurn(beakAngle, targetAngle);
+            return result;
+        }
+
+        public static BeakTurn GetBestBeakTurnNormalized(Point2D position, GameAngle beakAngle, Point2D targetPoint)
+        {
+            var absoluteBeakTurn = GetBestBeakTurn(position, beakAngle, targetPoint);
+            var result = NormalizeBeakTurn(absoluteBeakTurn);
+            return result;
         }
 
         #endregion
