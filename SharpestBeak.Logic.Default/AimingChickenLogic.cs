@@ -17,7 +17,7 @@ namespace SharpestBeak.Logic.Default
 
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
-            foreach (var unitState in gameState.UnitStates)
+            foreach (var unitState in gameState.UnitStates.Where(item => !item.IsDead))
             {
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
                 foreach (var otherUnit in unitState.View.Chickens.Where(item => item.Team != this.Team))
@@ -48,7 +48,9 @@ namespace SharpestBeak.Logic.Default
                 if (best == null)
                 {
                     move = new MoveInfo(
-                        MoveDirection.None,
+                        unitState.PreviousMove == null || unitState.PreviousMove.State != MoveInfoState.Rejected
+                            ? MoveDirection.MoveForward
+                            : MoveDirection.None,
                         BeakTurn.FullyClockwise,
                         FireMode.None);
                 }

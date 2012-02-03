@@ -562,6 +562,7 @@ namespace SharpestBeak.Common
         {
             // TODO: [VM] Use bisection to get conflicting units closer to each other
             // TODO: [VM] Optimize number of collision checks!
+            // TODO: [VM] Divide move: eg. unit couldn't move but could turn beak or vice versa
 
             for (int unitIndex = 0; unitIndex < aliveChickens.Count; unitIndex++)
             {
