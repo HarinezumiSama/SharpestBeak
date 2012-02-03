@@ -420,7 +420,7 @@ namespace SharpestBeak.Common
             }
 
             // Processing new shot units
-            var shootingMoves = moveInfos.Where(item => item.Value.FireMode != FireMode.None);
+            var shootingMoves = moveInfos.Where(item => !item.Key.IsDead && item.Value.FireMode != FireMode.None);
             ProcessNewShots(shootingMoves, newShotUnits);
 
             #region Processing Shot Collisions

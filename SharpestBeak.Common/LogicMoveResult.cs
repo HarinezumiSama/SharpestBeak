@@ -42,7 +42,7 @@ namespace SharpestBeak.Common
 
             #endregion
 
-            if (move == null)
+            if (move == null || unitState.IsDead)
             {
                 this.InnerMap.Remove(unitState.Unit);
             }
