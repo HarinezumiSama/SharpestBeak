@@ -26,7 +26,20 @@ namespace SharpestBeak.Common
 
         private static readonly IList<MoveDirection> s_moveDirections =
             Helper.GetEnumValues<MoveDirection>().AsReadOnly();
+        private static readonly IList<MoveDirection> s_activeMoveDirections = GetActiveMoveDirections();
+
         private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
+
+        #endregion
+
+        #region Private Methods
+
+        private static IList<MoveDirection> GetActiveMoveDirections()
+        {
+            var resultProxy = new HashSet<MoveDirection>(Helper.GetEnumValues<MoveDirection>());
+            resultProxy.Remove(MoveDirection.None);
+            return resultProxy.ToList().AsReadOnly();
+        }
 
         #endregion
 
@@ -35,13 +48,28 @@ namespace SharpestBeak.Common
         public static IList<MoveDirection> MoveDirections
         {
             [DebuggerStepThrough]
-            get { return s_moveDirections; }
+            get
+            {
+                return s_moveDirections;
+            }
+        }
+
+        public static IList<MoveDirection> ActiveMoveDirections
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return s_activeMoveDirections;
+            }
         }
 
         public static IList<FireMode> FireModes
         {
             [DebuggerStepThrough]
-            get { return s_fireModes; }
+            get
+            {
+                return s_fireModes;
+            }
         }
 
         #endregion

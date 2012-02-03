@@ -8,6 +8,13 @@ namespace SharpestBeak.Logic.Default
 {
     public sealed class AimingChickenLogic : ChickenUnitLogic
     {
+        #region Fields
+
+        private readonly Dictionary<int, HashSet<MoveDirection>> m_blockedDirectionMap =
+            new Dictionary<int, HashSet<MoveDirection>>();
+
+        #endregion
+
         #region Protected Methods
 
         protected override void OnReset(GameState gameState)
@@ -19,6 +26,27 @@ namespace SharpestBeak.Logic.Default
         {
             foreach (var unitState in gameState.UnitStates.Where(item => !item.IsDead))
             {
+                if (unitState.PreviousMove != null && unitState.PreviousMove.State == MoveInfoState.Rejected)
+                {
+                    var blockedDirections = m_blockedDirectionMap.GetValueOrDefault(unitState.UniqueId);
+                    if (blockedDirections == null)
+                    {
+                        blockedDirections = new HashSet<MoveDirection>();
+                        m_blockedDirectionMap[unitState.UniqueId] = blockedDirections;
+                    }
+                    blockedDirections.Add(unitState.PreviousMove.MoveDirection);
+
+                    var moveDirection = GameHelper
+                        .ActiveMoveDirections
+                        .FirstOrDefault(item => !blockedDirections.Contains(item));
+                    var unblockingMove = moveDirection == MoveDirection.None
+                        ? new MoveInfo(MoveDirection.None, BeakTurn.FullyClockwise, FireMode.None)
+                        : new MoveInfo(moveDirection, BeakTurn.None, FireMode.None);
+                    moves.Set(unitState, unblockingMove);
+                    continue;
+                }
+                m_blockedDirectionMap.Remove(unitState.UniqueId);
+
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
                 foreach (var otherUnit in unitState.View.Chickens.Where(item => item.Team != this.Team))
                 {
