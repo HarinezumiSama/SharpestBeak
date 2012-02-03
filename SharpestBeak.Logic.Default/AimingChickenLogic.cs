@@ -19,10 +19,10 @@ namespace SharpestBeak.Logic.Default
         {
             foreach (var unitState in gameState.UnitStates)
             {
-                var list = new List<Tuple<ChickenViewData, MoveDirection, float>>();
+                var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
                 foreach (var otherUnit in unitState.View.Chickens.Where(item => item.Team != this.Team))
                 {
-                    var move = GameHelper.GetBestMoveDirection(
+                    var moveDirection = GameHelper.GetBestMoveDirection(
                         unitState.Position,
                         unitState.BeakAngle,
                         otherUnit.Position);
@@ -31,12 +31,36 @@ namespace SharpestBeak.Logic.Default
                         unitState.BeakAngle,
                         otherUnit.Position);
 
-                    list.Add(Tuple.Create(otherUnit, move, turn));
+                    list.Add(
+                        Tuple.Create(
+                            otherUnit,
+                            moveDirection,
+                            turn,
+                            unitState.Position.GetDistanceSquared(otherUnit.Position)));
                 }
 
-                //var best = list.FirstOrDefault(
-                //    item => 
-                //    //item => item.Item3.IsInRange(BeakTurn.ValueRange));
+                var best = list
+                    .OrderBy(item => item.Item4)
+                    .ThenBy(item => item.Item3)
+                    .FirstOrDefault();
+
+                MoveInfo move;
+                if (best == null)
+                {
+                    move = new MoveInfo(
+                        MoveDirection.None,
+                        BeakTurn.FullyClockwise,
+                        FireMode.None);
+                }
+                else
+                {
+                    move = new MoveInfo(
+                        best.Item2,
+                        GameHelper.NormalizeBeakTurn(best.Item3),
+                        FireMode.Regular);
+                }
+
+                moves.Set(unitState, move);
             }
         }
 
