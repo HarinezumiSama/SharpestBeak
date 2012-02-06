@@ -110,7 +110,7 @@
     <Compile Include="GameEndedEventArgs.cs" />
     <Compile Include="GameTeam.cs" />
     <Compile Include="LineSide.cs" />
-    <Compile Include="MoveInfoState.cs" />
+    <Compile Include="MoveInfoStates.cs" />
     <Compile Include="Presentation\ShotPresentation.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>

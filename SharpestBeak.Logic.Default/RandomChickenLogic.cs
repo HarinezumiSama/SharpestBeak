@@ -69,9 +69,7 @@ namespace SharpestBeak.Logic.Default
                     targetPoint = m_unitIdToTargetPointMap.GetValueOrDefault(unitState.UniqueId, unitState.Position);
                 }
 
-                var needNewTargetPoint =
-                    (unitState.PreviousMove != null
-                        && unitState.PreviousMove.State == MoveInfoState.Rejected)
+                var needNewTargetPoint = unitState.PreviousMoveState.IsRejected()
                     || unitState.Position.GetDistance(targetPoint)
                         .IsZero(GameConstants.ChickenUnit.DefaultRectilinearSpeed * GameConstants.StepTimeDelta);
                 if (needNewTargetPoint)

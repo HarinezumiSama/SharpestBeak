@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,12 @@ namespace SharpestBeak.Common
 {
     public sealed class MoveInfo
     {
+        #region Fields
+
+        private static readonly MoveInfo s_empty = new MoveInfo(MoveDirection.None, BeakTurn.None, FireMode.None);
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -30,12 +37,17 @@ namespace SharpestBeak.Common
             this.MoveDirection = moveDirection;
             this.BeakTurn = beakTurn;
             this.FireMode = fireMode;
-            this.State = MoveInfoState.None;
         }
 
         #endregion
 
         #region Public Properties
+
+        public static MoveInfo Empty
+        {
+            [DebuggerStepThrough]
+            get { return s_empty; }
+        }
 
         public MoveDirection MoveDirection
         {
@@ -55,12 +67,6 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        public MoveInfoState State
-        {
-            get;
-            internal set;
-        }
-
         #endregion
 
         #region Public Methods
@@ -68,13 +74,11 @@ namespace SharpestBeak.Common
         public override string ToString()
         {
             return string.Format(
-                "{0} [{5}]. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}, State = {4}",
+                "{0}. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}",
                 GetType().Name,
                 this.BeakTurn,
                 this.MoveDirection,
-                this.FireMode,
-                this.State,
-                System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(this));
+                this.FireMode);
         }
 
         #endregion

@@ -26,7 +26,7 @@ namespace SharpestBeak.Logic.Default
         {
             foreach (var unitState in gameState.UnitStates.Where(item => !item.IsDead))
             {
-                if (unitState.PreviousMove != null && unitState.PreviousMove.State == MoveInfoState.Rejected)
+                if (unitState.PreviousMoveState.IsRejected())
                 {
                     var blockedDirections = m_blockedDirectionMap.GetValueOrDefault(unitState.UniqueId);
                     if (blockedDirections == null)
@@ -76,9 +76,9 @@ namespace SharpestBeak.Logic.Default
                 if (best == null)
                 {
                     move = new MoveInfo(
-                        unitState.PreviousMove == null || unitState.PreviousMove.State != MoveInfoState.Rejected
-                            ? MoveDirection.MoveForward
-                            : MoveDirection.None,
+                        unitState.PreviousMoveState.IsRejected()
+                            ? MoveDirection.None
+                            : MoveDirection.MoveForward,
                         BeakTurn.FullyClockwise,
                         FireMode.None);
                 }

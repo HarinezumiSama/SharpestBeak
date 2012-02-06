@@ -13,13 +13,17 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenUnitState"/> class.
         /// </summary>
-        internal ChickenUnitState(ChickenUnit unit, MoveInfo previousMove)
+        internal ChickenUnitState(ChickenUnit unit, MoveInfo previousMove, MoveInfoStates previousMoveState)
         {
             #region Argument Check
 
             if (unit == null)
             {
                 throw new ArgumentNullException("unit");
+            }
+            if (previousMove == null)
+            {
+                throw new ArgumentNullException("previousMove");
             }
 
             #endregion
@@ -32,6 +36,7 @@ namespace SharpestBeak.Common
             this.BeakAngle = unit.BeakAngle;
             this.HasShots = unit.HasShots();
             this.PreviousMove = previousMove;
+            this.PreviousMoveState = previousMoveState;
             this.View = new ViewInfo(unit);
         }
 
@@ -86,6 +91,12 @@ namespace SharpestBeak.Common
         }
 
         public MoveInfo PreviousMove
+        {
+            get;
+            private set;
+        }
+
+        public MoveInfoStates PreviousMoveState
         {
             get;
             private set;

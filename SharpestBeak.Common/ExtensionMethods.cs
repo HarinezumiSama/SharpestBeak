@@ -314,6 +314,11 @@ namespace SharpestBeak.Common
             return (method.DeclaringType ?? method.ReflectedType).Name + Type.Delimiter + method.Name;
         }
 
+        public static bool IsRejected(this MoveInfoStates value)
+        {
+            return (value & MoveInfoStates.RejectedMask) != 0;
+        }
+
         #endregion
     }
 }
