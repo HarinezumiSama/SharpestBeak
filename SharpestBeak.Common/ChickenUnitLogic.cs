@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace SharpestBeak.Common
 {
-    public abstract class ChickenUnitLogic
+    public abstract class ChickenUnitLogic : IDisposable
     {
         #region Fields
 
@@ -25,6 +25,7 @@ namespace SharpestBeak.Common
         protected ChickenUnitLogic()
         {
             m_error = new ThreadSafeValue<Exception>();
+            this.MakeMoveEvent = new AutoResetEvent(false);
 
             this.Units = m_unitsDirect.AsReadOnly();
             m_caption = new Lazy<string>(this.GetCaption);
@@ -77,6 +78,12 @@ namespace SharpestBeak.Common
         {
             get;
             set;
+        }
+
+        internal AutoResetEvent MakeMoveEvent
+        {
+            get;
+            private set;
         }
 
         internal Exception Error
@@ -185,7 +192,19 @@ namespace SharpestBeak.Common
         public string Caption
         {
             [DebuggerNonUserCode]
-            get { return m_caption.Value; }
+            get
+            {
+                return m_caption.Value;
+            }
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            this.MakeMoveEvent.DisposeSafely();
         }
 
         #endregion

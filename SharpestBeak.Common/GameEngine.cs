@@ -32,7 +32,8 @@ namespace SharpestBeak.Common
         private readonly ReaderWriterLockSlim m_syncLock =
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly ManualResetEvent m_stopEvent = new ManualResetEvent(false);
-        private readonly AutoResetEvent m_makeMoveEvent = new AutoResetEvent(false);
+        private readonly ChickenUnitLogic m_lightTeamLogic;
+        private readonly ChickenUnitLogic m_darkTeamLogic;
         private bool m_disposed;
         private readonly Action<GamePaintEventArgs> m_paintCallback;
         private readonly ThreadSafeValue<ulong> m_moveCount;
@@ -95,12 +96,9 @@ namespace SharpestBeak.Common
             m_winningTeam = new ThreadSafeValue<GameTeam?>();
 
             // Post-initialized properties
-            this.Logics =
-                new[]
-                {
-                    CreateLogic(this, lightTeam, GameTeam.Light),
-                    CreateLogic(this, darkTeam, GameTeam.Dark)
-                }
+            m_lightTeamLogic = CreateLogic(this, lightTeam, GameTeam.Light);
+            m_darkTeamLogic = CreateLogic(this, darkTeam, GameTeam.Dark);
+            this.Logics = new[] { m_lightTeamLogic, m_darkTeamLogic }
                 .ToList()
                 .AsReadOnly();
             this.AllChickens = this.Logics
@@ -349,7 +347,8 @@ namespace SharpestBeak.Common
                     return;
                 }
 
-                m_makeMoveEvent.Set();
+                m_lightTeamLogic.MakeMoveEvent.Set();
+                m_darkTeamLogic.MakeMoveEvent.Set();
                 sw.Restart();
                 while (sw.Elapsed < GameConstants.LogicPollFrequency)
                 {
@@ -359,7 +358,8 @@ namespace SharpestBeak.Common
                     }
                     Thread.Yield();
                 }
-                m_makeMoveEvent.Reset();
+                m_lightTeamLogic.MakeMoveEvent.Reset();
+                m_darkTeamLogic.MakeMoveEvent.Reset();
 
                 using (SettingsCache.Instance.EnableDebugOutput
                     ? new AutoStopwatch(s => DebugHelper.WriteLine(s))
@@ -697,7 +697,7 @@ namespace SharpestBeak.Common
 
                 try
                 {
-                    while (!m_makeMoveEvent.WaitOne(0))
+                    while (!logic.MakeMoveEvent.WaitOne(0))
                     {
                         if (IsStopping())
                         {
@@ -943,7 +943,8 @@ namespace SharpestBeak.Common
             try
             {
                 m_stopEvent.DisposeSafely();
-                m_makeMoveEvent.DisposeSafely();
+                m_lightTeamLogic.DisposeSafely();
+                m_darkTeamLogic.DisposeSafely();
 
                 m_disposed = true;
             }
