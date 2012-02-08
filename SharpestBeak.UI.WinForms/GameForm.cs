@@ -429,14 +429,6 @@ namespace SharpestBeak.UI.WinForms
             turnInfoLabel.Text = string.Empty;
         }
 
-        private void RunTurnTest()
-        {
-            using (var form = new TurnTestForm())
-            {
-                form.ShowDialog(this);
-            }
-        }
-
         private void ResetFpsCounter(bool fullReset)
         {
             if (fullReset)
@@ -559,12 +551,6 @@ namespace SharpestBeak.UI.WinForms
                 case Keys.Escape:
                     e.Handled = true;
                     StopGame();
-                    break;
-
-                case Keys.F1:
-                    e.Handled = true;
-                    StopGame();
-                    RunTurnTest();
                     break;
 
                 case Keys.Space:
