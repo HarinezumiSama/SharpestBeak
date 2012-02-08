@@ -14,7 +14,9 @@ using SharpestBeak.Common.Properties;
 
 namespace SharpestBeak.Common
 {
-    // TODO: Capture the game to allow playback
+    // TODO: [VM] Capture the game to allow playback
+
+    // TODO: [VM] Implement custom chicken unit positioning (or even allow game frame snapshot as a start of a game)
 
     public sealed class GameEngine : IDisposable
     {
@@ -32,18 +34,21 @@ namespace SharpestBeak.Common
         private readonly ReaderWriterLockSlim m_syncLock =
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly ManualResetEvent m_stopEvent = new ManualResetEvent(false);
+        private readonly IList<ChickenUnit> m_allChickens;
+        private readonly List<ChickenUnit> m_aliveChickensDirect;
+        private readonly List<ShotUnit> m_shotUnitsDirect;
+        private readonly IList<ChickenUnitLogic> m_logics;
         private readonly ChickenUnitLogic m_lightTeamLogic;
         private readonly ChickenUnitLogic m_darkTeamLogic;
         private bool m_disposed;
         private readonly Action<GamePaintEventArgs> m_paintCallback;
-        private readonly ThreadSafeValue<ulong> m_moveCount;
+        private readonly ThreadSafeValue<long> m_moveCount;
         private readonly ThreadSafeValue<GameTeam?> m_winningTeam;
         private readonly ConvexPolygonPrimitive m_boardPolygon;
         private Thread m_engineThread;
         private bool m_finalizingStage;
 
-        private readonly object m_lastGamePresentationLock = new object();
-        private GamePresentation m_lastGamePresentation;
+        private readonly ThreadSafeValue<GamePresentation> m_lastGamePresentation;
 
         private readonly Dictionary<ChickenUnit, MoveInfo> m_moveInfos;
         private readonly Dictionary<ChickenUnit, MoveInfoStates> m_moveInfoStates;
@@ -92,29 +97,33 @@ namespace SharpestBeak.Common
 
             // Pre-initialized properties
             this.Data = new StaticData(nominalSize);
-            m_moveCount = new ThreadSafeValue<ulong>();
+            m_moveCount = new ThreadSafeValue<long>();
             m_winningTeam = new ThreadSafeValue<GameTeam?>();
+            m_lastGamePresentation = new ThreadSafeValue<GamePresentation>();
 
             // Post-initialized properties
             m_lightTeamLogic = CreateLogic(this, lightTeam, GameTeam.Light);
             m_darkTeamLogic = CreateLogic(this, darkTeam, GameTeam.Dark);
-            this.Logics = new[] { m_lightTeamLogic, m_darkTeamLogic }
+            m_logics = new[] { m_lightTeamLogic, m_darkTeamLogic }
                 .ToList()
                 .AsReadOnly();
-            this.AllChickens = this.Logics
+
+            m_allChickens = m_logics
                 .SelectMany(item => item.Units)
                 .ToList()
                 .AsReadOnly();
-            this.AllChickens.DoForEach((item, index) => item.UniqueId = index + 1);
-            this.AliveChickensDirect = new List<ChickenUnit>();
-            this.AliveChickens = this.AliveChickensDirect.AsReadOnly();
-            this.ShotUnitsDirect = new List<ShotUnit>();
-            this.ShotUnits = this.ShotUnitsDirect.AsReadOnly();
+            m_allChickens.DoForEach((item, index) => item.UniqueId = index + 1);
 
-            m_moveInfos = new Dictionary<ChickenUnit, MoveInfo>(this.AllChickens.Count);
-            m_moveInfoStates = new Dictionary<ChickenUnit, MoveInfoStates>(this.AllChickens.Count);
-            m_previousMoves = new Dictionary<ChickenUnit, MoveInfo>(this.AllChickens.Count);
-            m_newShotUnits = new List<ShotUnit>(this.AllChickens.Count);
+            m_aliveChickensDirect = new List<ChickenUnit>();
+            this.AliveChickens = m_aliveChickensDirect.AsReadOnly();
+
+            m_shotUnitsDirect = new List<ShotUnit>(m_allChickens.Count);
+            this.ShotUnits = m_shotUnitsDirect.AsReadOnly();
+
+            m_moveInfos = new Dictionary<ChickenUnit, MoveInfo>(m_allChickens.Count);
+            m_moveInfoStates = new Dictionary<ChickenUnit, MoveInfoStates>(m_allChickens.Count);
+            m_previousMoves = new Dictionary<ChickenUnit, MoveInfo>(m_allChickens.Count);
+            m_newShotUnits = new List<ShotUnit>(m_allChickens.Count);
 
             var realSize = this.Data.RealSize;
             m_boardPolygon = new ConvexPolygonPrimitive(
@@ -126,12 +135,12 @@ namespace SharpestBeak.Common
             #region Argument Check
 
             var maxChickenCount = this.Data.NominalSize.Width * this.Data.NominalSize.Height / 2;
-            if (this.AllChickens.Count > maxChickenCount)
+            if (m_allChickens.Count > maxChickenCount)
             {
                 throw new ArgumentException(
                     string.Format(
                         "Too many chickens ({0}) for the board of nominal size {1}x{2}. Maximum is {3}.",
-                        this.AllChickens.Count,
+                        m_allChickens.Count,
                         this.Data.NominalSize.Width,
                         this.Data.NominalSize.Height,
                         maxChickenCount),
@@ -177,9 +186,9 @@ namespace SharpestBeak.Common
 
         private void PositionChickens()
         {
-            for (int index = 0; index < this.AllChickens.Count; index++)
+            for (int index = 0; index < m_allChickens.Count; index++)
             {
-                var chicken = this.AllChickens[index];
+                var chicken = m_allChickens[index];
 
                 Point2D newPosition;
                 do
@@ -189,7 +198,7 @@ namespace SharpestBeak.Common
                         s_random.Next(this.Data.NominalSize.Height));
                     newPosition = GameHelper.NominalToReal(nominalPosition);
                 }
-                while (this.AllChickens.Take(index).Any(
+                while (m_allChickens.Take(index).Any(
                     item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
 
                 var newAngle = (float)Math.Floor(
@@ -202,12 +211,12 @@ namespace SharpestBeak.Common
 
         private void CallPaintCallback()
         {
-            GamePresentation presentation;
-            lock (m_lastGamePresentationLock)
+            if (m_paintCallback == null)
             {
-                presentation = m_lastGamePresentation;
+                return;
             }
 
+            var presentation = m_lastGamePresentation.Value;
             m_paintCallback(new GamePaintEventArgs(presentation));
         }
 
@@ -282,7 +291,7 @@ namespace SharpestBeak.Common
                 Name = GetType().FullName,
                 IsBackground = true
             };
-            this.Logics.DoForEach(
+            m_logics.DoForEach(
                 item =>
                 {
                     item.Thread = new Thread(this.DoExecuteLogic)
@@ -296,12 +305,12 @@ namespace SharpestBeak.Common
             CallPaintCallback();
             m_engineThread.Start();
 
-            this.Logics.DoForEach(item => item.Thread.Start(item));
+            m_logics.DoForEach(item => item.Thread.Start(item));
         }
 
         private void ResetInternal()
         {
-            m_moveCount.Value = 0;
+            m_moveCount.Value = 0L;
             m_finalizingStage = false;
             m_winningTeam.Value = null;
             lock (m_shotIndexCounterLock)
@@ -309,15 +318,15 @@ namespace SharpestBeak.Common
                 m_shotIndexCounter = 0;
             }
 
-            this.AliveChickensDirect.ChangeContents(this.AllChickens);
-            this.ShotUnitsDirect.Clear();
-            this.AllChickens.DoForEach(item => item.Reset());
+            m_aliveChickensDirect.ChangeContents(m_allChickens);
+            m_shotUnitsDirect.Clear();
+            m_allChickens.DoForEach(item => item.Reset());
             m_previousMoves.Clear();
 
             PositionChickens();
             UpdateUnitStates();
 
-            this.Logics.DoForEach(item => item.Reset());
+            m_logics.DoForEach(item => item.Reset());
 
             UpdateLastGamePresentation();
         }
@@ -372,7 +381,10 @@ namespace SharpestBeak.Common
                 }
 
                 // Wrap with lock
-                m_moveCount.Value++;
+                lock (m_moveCount.Lock)
+                {
+                    m_moveCount.Value++;
+                }
 
                 if (SettingsCache.Instance.UsePerformanceCounters)
                 {
@@ -403,9 +415,9 @@ namespace SharpestBeak.Common
 
             m_moveInfos.Clear();
             m_previousMoves.Clear();
-            for (int logicIndex = 0; logicIndex < this.Logics.Count; logicIndex++)
+            for (int logicIndex = 0; logicIndex < m_logics.Count; logicIndex++)
             {
-                var logic = this.Logics[logicIndex];
+                var logic = m_logics[logicIndex];
 
                 lock (logic.UnitsMovesLock)
                 {
@@ -428,7 +440,7 @@ namespace SharpestBeak.Common
 
             #region Processing Shot Collisions
 
-            foreach (var shotUnit in this.ShotUnitsDirect)
+            foreach (var shotUnit in m_shotUnitsDirect)
             {
                 shotUnit.Position = GameHelper.GetNewPosition(
                     shotUnit.Position,
@@ -446,13 +458,13 @@ namespace SharpestBeak.Common
             }
 
             var injuredChickens = new List<ChickenUnit>(aliveChickens.Count);
-            for (int index = 0; index < this.ShotUnitsDirect.Count; index++)
+            for (int index = 0; index < m_shotUnitsDirect.Count; index++)
             {
-                var shotUnit = this.ShotUnitsDirect[index];
+                var shotUnit = m_shotUnitsDirect[index];
 
-                for (int otherIndex = index + 1; otherIndex < this.ShotUnitsDirect.Count; otherIndex++)
+                for (int otherIndex = index + 1; otherIndex < m_shotUnitsDirect.Count; otherIndex++)
                 {
-                    var otherShotUnit = this.ShotUnitsDirect[otherIndex];
+                    var otherShotUnit = m_shotUnitsDirect[otherIndex];
 
                     if (CollisionDetector.CheckCollision(shotUnit.GetElement(), otherShotUnit.GetElement()))
                     {
@@ -503,14 +515,14 @@ namespace SharpestBeak.Common
 
             UpdateLastGamePresentation();
 
-            this.AliveChickensDirect.RemoveAll(item => item.IsDead);
-            this.ShotUnitsDirect.RemoveAll(item => item.Exploded);
+            m_aliveChickensDirect.RemoveAll(item => item.IsDead);
+            m_shotUnitsDirect.RemoveAll(item => item.Exploded);
 
-            var aliveTeams = this.AliveChickensDirect.Select(item => item.Team).Distinct().ToList();
+            var aliveTeams = m_aliveChickensDirect.Select(item => item.Team).Distinct().ToList();
             if (aliveTeams.Count <= 1)
             {
                 m_finalizingStage = true;
-                if (!this.ShotUnitsDirect.Any())
+                if (!m_shotUnitsDirect.Any())
                 {
                     var winningTeam = aliveTeams.SingleOrDefault();
                     RaiseGameEnded(winningTeam);
@@ -526,20 +538,16 @@ namespace SharpestBeak.Common
             {
                 var unit = shootingMovePair.Key;
 
-                // Is there any active shot unit from the same chicken unit?
-                if (unit.HasShots())
+                if (!unit.CanShoot())
                 {
-                    if (!unit.CanShootDueToTimer())
-                    {
-                        DebugHelper.WriteLine("New shot from {{{0}}} has been skipped - too fast.", unit);
-                        continue;
-                    }
+                    DebugHelper.WriteLine("New shot from {{{0}}} has been skipped - too fast.", unit);
+                    continue;
                 }
 
                 if (m_finalizingStage)
                 {
                     var thisShotTeam = unit.Team;
-                    if (!this.ShotUnitsDirect.Any(su => su.Owner.Team != thisShotTeam))
+                    if (!m_shotUnitsDirect.Any(su => su.Owner.Team != thisShotTeam))
                     {
                         DebugHelper.WriteLine(
                             "New shot from {{{0}}} has been skipped - finalizing stage and no enemy shots.",
@@ -550,11 +558,11 @@ namespace SharpestBeak.Common
 
                 var shot = new ShotUnit(unit, GetShotUniqueIndex());
                 m_newShotUnits.Add(shot);
-                unit.ShotTimer.Restart();
+                unit.ShotEngineStepIndex = m_moveCount.Value;
 
                 DebugHelper.WriteLine("New shot {{{0}}} has been made by {{{1}}}.", shot, unit);
             }
-            this.ShotUnitsDirect.AddRange(m_newShotUnits);
+            m_shotUnitsDirect.AddRange(m_newShotUnits);
         }
 
         private bool ProcessChickenUnitMoves(IList<ChickenUnit> aliveChickens)
@@ -640,9 +648,9 @@ namespace SharpestBeak.Common
 
         private bool UpdateUnitStates()
         {
-            for (int logicIndex = 0; logicIndex < this.Logics.Count; logicIndex++)
+            for (int logicIndex = 0; logicIndex < m_logics.Count; logicIndex++)
             {
-                var logic = this.Logics[logicIndex];
+                var logic = m_logics[logicIndex];
 
                 lock (logic.UnitsStatesLock)
                 {
@@ -670,10 +678,8 @@ namespace SharpestBeak.Common
 
         private void UpdateLastGamePresentation()
         {
-            lock (m_lastGamePresentationLock)
-            {
-                m_lastGamePresentation = new GamePresentation(this);
-            }
+            var lastGamePresentation = new GamePresentation(this);
+            m_lastGamePresentation.Value = lastGamePresentation;
         }
 
         private void DoExecuteLogic(object logicInstance)
@@ -774,30 +780,6 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
-        internal List<ChickenUnit> AliveChickensDirect
-        {
-            get;
-            private set;
-        }
-
-        internal IList<ChickenUnit> AllChickens
-        {
-            get;
-            private set;
-        }
-
-        internal List<ShotUnit> ShotUnitsDirect
-        {
-            get;
-            private set;
-        }
-
-        internal IList<ChickenUnitLogic> Logics
-        {
-            get;
-            private set;
-        }
-
         internal IList<ChickenUnit> AliveChickens
         {
             get;
@@ -835,11 +817,11 @@ namespace SharpestBeak.Common
             [DebuggerNonUserCode]
             get
             {
-                return this.Logics;
+                return m_logics;
             }
         }
 
-        public ulong MoveCount
+        public long MoveCount
         {
             [DebuggerNonUserCode]
             get
@@ -884,7 +866,7 @@ namespace SharpestBeak.Common
             Application.Idle -= this.Application_Idle;
 
             m_syncLock.ExecuteInWriteLock(
-                () => this.Logics.DoForEach(
+                () => m_logics.DoForEach(
                     item =>
                     {
                         if (item.Thread != null)

@@ -15,7 +15,7 @@ namespace SharpestBeak.Common
         {
             #region Constants
 
-            private const float c_internalSpeedCoefficient = 1f;
+            private const float InternalSpeedCoefficient = 1f;
 
             #endregion
 
@@ -39,13 +39,13 @@ namespace SharpestBeak.Common
             ///     Standard rectilinear speed of a chicken unit, in units per second.
             /// </summary>
             public static readonly float DefaultRectilinearSpeed =
-                GameConstants.NominalCellSize * c_internalSpeedCoefficient / SlowDownRatio;
+                GameConstants.NominalCellSize * InternalSpeedCoefficient / SlowDownRatio;
 
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
             public static readonly float DefaultAngularSpeed =
-                MathHelper.RevolutionDegrees * c_internalSpeedCoefficient / 4f / SlowDownRatio;
+                MathHelper.RevolutionDegrees * InternalSpeedCoefficient / 4f / SlowDownRatio;
 
             /// <summary>
             ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
@@ -68,15 +68,19 @@ namespace SharpestBeak.Common
         {
             #region Fields
 
+            public static readonly double s_maximumFrequencyMsec = 500d * SlowDownRatio;
+
             public static readonly float Radius = GameConstants.NominalCellSize / 10f;
 
             /// <summary>
             ///     Standard rectilinear speed of a shot unit, in units per second.
             /// </summary>
             public static readonly float DefaultRectilinearSpeed =
-                GameConstants.ChickenUnit.DefaultRectilinearSpeed * 4f;
+                GameConstants.ChickenUnit.DefaultRectilinearSpeed * ShotToChickenRectilinearSpeedRatio;
 
-            public static readonly TimeSpan MaximumFrequency = TimeSpan.FromMilliseconds(500d * SlowDownRatio);
+            public static readonly int MaximumFrequency = Math.Max(
+                1,
+                (int)(s_maximumFrequencyMsec / s_logicPollFrequencyMsec));
 
             public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
 
@@ -91,14 +95,17 @@ namespace SharpestBeak.Common
 
         private const float MinSlowDownRatio = 1f / 16f;
         private const float MaxSlowDownRatio = 16f;
+        private const float ShotToChickenRectilinearSpeedRatio = 4f;
 
         #endregion
 
         #region Fields
 
+        private static readonly double s_logicPollFrequencyMsec = 20d;
+
         internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
-        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d);
+        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(s_logicPollFrequencyMsec);
 
         public static readonly float NominalCellSize = 100f;
 

@@ -94,6 +94,11 @@ namespace SharpestBeak.Logic.Default
             }
         }
 
+        protected override string GetCaption()
+        {
+            return "Aiming Chicken Logic";
+        }
+
         #endregion
     }
 }

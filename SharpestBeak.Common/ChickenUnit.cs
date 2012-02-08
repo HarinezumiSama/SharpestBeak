@@ -36,8 +36,10 @@ namespace SharpestBeak.Common
             #endregion
 
             this.Logic = logic;
-            this.ShotTimer = new Stopwatch();
+            this.Engine = logic.Engine.EnsureNotNull();
             this.Team = logic.Team;
+
+            Reset();
         }
 
         #endregion
@@ -59,10 +61,16 @@ namespace SharpestBeak.Common
             private set;
         }
 
-        internal Stopwatch ShotTimer
+        internal GameEngine Engine
         {
             get;
             private set;
+        }
+
+        internal long ShotEngineStepIndex
+        {
+            get;
+            set;
         }
 
         #endregion
@@ -72,12 +80,7 @@ namespace SharpestBeak.Common
         internal void Reset()
         {
             this.IsDead = false;
-        }
-
-        internal bool HasShots()
-        {
-            // TODO: [VM] Use dictionary instead of list (?)
-            return this.Logic.Engine.ShotUnitsDirect.Any(item => item.Owner == this);
+            this.ShotEngineStepIndex = -1;
         }
 
         internal bool CanSee(Point2D point)
@@ -87,9 +90,10 @@ namespace SharpestBeak.Common
             return viewDirection.GetAngle(pointDirection).DegreeValue.Abs() <= GameConstants.ChickenUnit.ViewAngle;
         }
 
-        internal bool CanShootDueToTimer()
+        internal bool CanShoot()
         {
-            return this.ShotTimer.Elapsed >= GameConstants.ShotUnit.MaximumFrequency;
+            return !this.Engine.ShotUnits.Any(item => item.Owner == this)
+                || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
         }
 
         #endregion

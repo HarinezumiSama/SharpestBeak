@@ -32,9 +32,8 @@ namespace SharpestBeak.Common.View
             // [VM] Currently, algorithm of determining if other chicken or shot is visible is very simple
 
             var chickens = new List<ChickenViewData>(engine.AliveChickens.Count);
-            for (int index = 0; index < engine.AliveChickens.Count; index++)
+            foreach (var aliveChicken in engine.AliveChickens)
             {
-                var aliveChicken = engine.AliveChickens[index];
                 if (!aliveChicken.IsDead
                     && aliveChicken != unit
                     && (aliveChicken.Team == unitTeam || unit.CanSee(aliveChicken.Position)))
@@ -45,9 +44,8 @@ namespace SharpestBeak.Common.View
             this.Chickens = chickens.AsReadOnly();
 
             var shots = new List<ShotViewData>(engine.ShotUnits.Count);
-            for (int index = 0; index < engine.ShotUnits.Count; index++)
+            foreach (var shotUnit in engine.ShotUnits)
             {
-                var shotUnit = engine.ShotUnits[index];
                 if (unit.CanSee(shotUnit.Position))
                 {
                     shots.Add(new ShotViewData(shotUnit));

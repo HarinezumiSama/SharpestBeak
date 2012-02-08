@@ -13,12 +13,6 @@ namespace SharpestBeak.UI.WinForms
 {
     public partial class MainForm : Form
     {
-        #region Constants
-
-        private const int c_defaultPlayerCount = 8;
-
-        #endregion
-
         #region Fields
 
         private readonly GameSettings m_gameSettings = new GameSettings();
@@ -154,6 +148,11 @@ namespace SharpestBeak.UI.WinForms
         private void presetLargeMenuItem_Click(object sender, EventArgs e)
         {
             SetPreset(48, new Size(24, 16), 16);
+        }
+
+        private void extraLargeMenuItem_Click(object sender, EventArgs e)
+        {
+            SetPreset(GameForm.UICellSizeRange.Min, new Size(48, 24), 32);
         }
 
         #endregion

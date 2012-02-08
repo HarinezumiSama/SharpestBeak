@@ -20,7 +20,7 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
-        public static readonly ValueRange<int> UICellSizeRange = new ValueRange<int>(24, 128);
+        public static readonly ValueRange<int> UICellSizeRange = new ValueRange<int>(32, 128);
 
         private static readonly Brush s_evenCellBrush = new SolidBrush(SystemColors.Window);
         private static readonly Brush s_oddCellBrush = new SolidBrush(ControlPaint.Dark(SystemColors.Window, 0.05f));

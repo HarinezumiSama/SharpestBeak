@@ -25,19 +25,10 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("24, 16")]
+        [global::System.Configuration.DefaultSettingValueAttribute("16, 16")]
         public global::System.Drawing.Size NominalSize {
             get {
                 return ((global::System.Drawing.Size)(this["NominalSize"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
-        public int TeamUnitCount {
-            get {
-                return ((int)(this["TeamUnitCount"]));
             }
         }
         
@@ -52,22 +43,32 @@ namespace SharpestBeak.UI.WinForms.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
-<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-  <string>SharpestBeak.Logic.Default.RandomChickenLogic, SharpestBeak.Logic.Default</string>
-</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Logics {
+        [global::System.Configuration.DefaultSettingValueAttribute("48")]
+        public int UICellSize {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Logics"]));
+                return ((int)(this["UICellSize"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("48")]
-        public int UICellSize {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int TeamUnitCount {
             get {
-                return ((int)(this["UICellSize"]));
+                return ((int)(this["TeamUnitCount"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>SharpestBeak.Logic.Default.RandomChickenLogic, SharpestBeak.Logic.Default</string>
+  <string>SharpestBeak.Logic.Default.AimingChickenLogic, SharpestBeak.Logic.Default</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Logics {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Logics"]));
             }
         }
     }

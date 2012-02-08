@@ -26,14 +26,14 @@ namespace SharpestBeak.Common.Presentation
             this.CommonData = engine.Data;
 
             this.Chickens = engine
-                .AliveChickensDirect
+                .AliveChickens
                 .Select(item => new ChickenPresentation(item))
                 .ToList()
                 .AsReadOnly();
 
             var chickenMap = this.Chickens.ToDictionary(item => item.UniqueId);
             this.Shots = engine
-                .ShotUnitsDirect
+                .ShotUnits
                 .Select(item => new ShotPresentation(item, chickenMap))
                 .ToList()
                 .AsReadOnly();

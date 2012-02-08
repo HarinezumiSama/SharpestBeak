@@ -79,7 +79,7 @@ namespace SharpestBeak.Logic.Default
 
                 var move = GameHelper.GetBestMoveDirection(unitState.Position, unitState.BeakAngle, targetPoint);
                 var turn = GameHelper.GetBestBeakTurnNormalized(unitState.Position, unitState.BeakAngle, targetPoint);
-                var fireMode = unitState.CanShoot() && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
+                var fireMode = unitState.CanShoot && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
 
                 var moveInfo = new MoveInfo(move, turn, fireMode);
                 moves.Set(unitState, moveInfo);

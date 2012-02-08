@@ -8,7 +8,7 @@ namespace SharpestBeak.Common
     // while in UI (0,0) is the top left corner. That's why Clockwise in engine means CounterClockwise in UI
     // and vice versa.
 
-    // TODO: Fix the problem with engine and UI coordinate system conflict
+    // TODO: [VM] Fix the problem with engine and UI coordinate system conflict
 
     [Serializable]
     public struct BeakTurn : IEquatable<BeakTurn>, IComparable<BeakTurn>

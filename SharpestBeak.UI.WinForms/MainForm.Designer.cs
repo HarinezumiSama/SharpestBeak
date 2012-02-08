@@ -39,6 +39,7 @@
             this.presetSmallMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.presetMediumMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.presetLargeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extraLargeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -91,7 +92,8 @@
             this.toolStripSeparator1,
             this.presetSmallMenuItem,
             this.presetMediumMenuItem,
-            this.presetLargeMenuItem});
+            this.presetLargeMenuItem,
+            this.extraLargeMenuItem});
             this.presetToolButton.Image = ((System.Drawing.Image)(resources.GetObject("presetToolButton.Image")));
             this.presetToolButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.presetToolButton.Name = "presetToolButton";
@@ -103,20 +105,20 @@
             this.presetDefaultMenuItem.Name = "presetDefaultMenuItem";
             this.presetDefaultMenuItem.ShortcutKeyDisplayString = "";
             this.presetDefaultMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.presetDefaultMenuItem.Size = new System.Drawing.Size(159, 22);
-            this.presetDefaultMenuItem.Text = "Default";
+            this.presetDefaultMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.presetDefaultMenuItem.Text = "&Default";
             this.presetDefaultMenuItem.Click += new System.EventHandler(this.presetDefaultMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(156, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(168, 6);
             // 
             // presetSmallMenuItem
             // 
             this.presetSmallMenuItem.Name = "presetSmallMenuItem";
             this.presetSmallMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1)));
-            this.presetSmallMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.presetSmallMenuItem.Size = new System.Drawing.Size(171, 22);
             this.presetSmallMenuItem.Text = "&Small";
             this.presetSmallMenuItem.Click += new System.EventHandler(this.presetSmallMenuItem_Click);
             // 
@@ -124,7 +126,7 @@
             // 
             this.presetMediumMenuItem.Name = "presetMediumMenuItem";
             this.presetMediumMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2)));
-            this.presetMediumMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.presetMediumMenuItem.Size = new System.Drawing.Size(171, 22);
             this.presetMediumMenuItem.Text = "&Medium";
             this.presetMediumMenuItem.Click += new System.EventHandler(this.presetMediumMenuItem_Click);
             // 
@@ -132,9 +134,17 @@
             // 
             this.presetLargeMenuItem.Name = "presetLargeMenuItem";
             this.presetLargeMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D3)));
-            this.presetLargeMenuItem.Size = new System.Drawing.Size(159, 22);
+            this.presetLargeMenuItem.Size = new System.Drawing.Size(171, 22);
             this.presetLargeMenuItem.Text = "&Large";
             this.presetLargeMenuItem.Click += new System.EventHandler(this.presetLargeMenuItem_Click);
+            // 
+            // extraLargeMenuItem
+            // 
+            this.extraLargeMenuItem.Name = "extraLargeMenuItem";
+            this.extraLargeMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D4)));
+            this.extraLargeMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.extraLargeMenuItem.Text = "E&xtra Large";
+            this.extraLargeMenuItem.Click += new System.EventHandler(this.extraLargeMenuItem_Click);
             // 
             // MainForm
             // 
@@ -169,6 +179,7 @@
         private System.Windows.Forms.ToolStripMenuItem presetLargeMenuItem;
         private System.Windows.Forms.ToolStripButton playToolButton;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem extraLargeMenuItem;
 
     }
 }
