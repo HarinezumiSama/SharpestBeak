@@ -95,7 +95,6 @@ namespace SharpestBeak.Common
 
         private const float MinSlowDownRatio = 1f / 16f;
         private const float MaxSlowDownRatio = 16f;
-        private const float ShotToChickenRectilinearSpeedRatio = 4f;
 
         #endregion
 
@@ -106,6 +105,8 @@ namespace SharpestBeak.Common
         internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
         internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(s_logicPollFrequencyMsec);
+
+        public static readonly float ShotToChickenRectilinearSpeedRatio = 4f;
 
         public static readonly float NominalCellSize = 100f;
 

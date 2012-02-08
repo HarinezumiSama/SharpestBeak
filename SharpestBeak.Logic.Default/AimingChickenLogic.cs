@@ -50,14 +50,24 @@ namespace SharpestBeak.Logic.Default
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
                 foreach (var otherUnit in unitState.View.Chickens.Where(item => item.Team != this.Team))
                 {
+                    // TODO: [VM] Predict where to shoot to hit enemy according to its potential direction
+                    // TODO: [VM] Also, sometimes we need to shoot directly to unit (it's close or to disallow enemy
+                    //            to cheat us with false directions)
+
+                    var predictedOtherPosition = otherUnit.Position;
+                    //GameHelper.GetNewPosition(
+                    //otherUnit.Position,
+                    //otherUnit.BeakAngle,
+                    //GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+
                     var moveDirection = GameHelper.GetBestMoveDirection(
                         unitState.Position,
                         unitState.BeakAngle,
-                        otherUnit.Position);
+                        predictedOtherPosition);
                     var turn = GameHelper.GetBestBeakTurn(
                         unitState.Position,
                         unitState.BeakAngle,
-                        otherUnit.Position);
+                        predictedOtherPosition);
 
                     list.Add(
                         Tuple.Create(
