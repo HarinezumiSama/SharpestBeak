@@ -200,6 +200,11 @@ namespace SharpestBeak.Common
             return GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(degreeAngle));
         }
 
+        public float GetAngleCosine(Vector2D target)
+        {
+            return DotProduct(this, target) / (this.GetLength() * target.GetLength());
+        }
+
         #endregion
 
         #region Operators

@@ -47,34 +47,69 @@ namespace SharpestBeak.Logic.Default
                 }
                 m_blockedDirectionMap.Remove(unitState.UniqueId);
 
+                var aimingShotMaxDistance = 5f * GameConstants.NominalCellSize;
+                var tooCloseDistance = 2f * GameConstants.NominalCellSize;
+
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
-                foreach (var otherUnit in unitState.View.Chickens.Where(item => item.Team != this.Team))
+                var enemyUnits = unitState.View.Chickens.Where(item => item.Team != this.Team);
+                foreach (var enemyUnit in enemyUnits)
                 {
                     // TODO: [VM] Predict where to shoot to hit enemy according to its potential direction
                     // TODO: [VM] Also, sometimes we need to shoot directly to unit (it's close or to disallow enemy
                     //            to cheat us with false directions)
 
-                    var predictedOtherPosition = otherUnit.Position;
-                    //GameHelper.GetNewPosition(
-                    //otherUnit.Position,
-                    //otherUnit.BeakAngle,
-                    //GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                    Point2D? predictedEnemyUnitPosition = null;
+
+                    var enemyUnitBeakTip = GameHelper.GetBeakTipPosition(enemyUnit.Position, enemyUnit.BeakAngle);
+                    var enemyUnitVector = enemyUnitBeakTip - enemyUnit.Position;
+                    var enemyToMeVector = unitState.Position - enemyUnit.Position;
+                    var cosAlpha = enemyUnitVector.GetAngleCosine(enemyToMeVector);
+                    var distanceToEnemySqr = enemyToMeVector.GetLengthSquared();
+                    var distanceToEnemy = distanceToEnemySqr.Sqrt();
+                    if ((cosAlpha.Abs() - 1f).IsNotZero() && distanceToEnemy <= aimingShotMaxDistance)
+                    {
+                        var equation = new QuadraticEquation(
+                            GameConstants.ShotToChickenRectilinearSpeedRatio.Sqr() - 1f,
+                            2f * distanceToEnemy * cosAlpha,
+                            -distanceToEnemySqr);
+
+                        float d1, d2;
+                        if (equation.GetRoots(out d1, out d2) > 0)
+                        {
+                            var d = new[] { d1, d2 }.Where(item => item > 0f).OrderBy(item => item).FirstOrDefault();
+                            if (d.IsPositive())
+                            {
+                                predictedEnemyUnitPosition = GameHelper.GetNewPosition(
+                                    enemyUnit.Position,
+                                    enemyUnit.BeakAngle,
+                                    d);
+                            }
+                        }
+                    }
+
+                    if (!predictedEnemyUnitPosition.HasValue)
+                    {
+                        predictedEnemyUnitPosition = GameHelper.GetNewPosition(
+                            enemyUnit.Position,
+                            enemyUnit.BeakAngle,
+                            GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                    }
 
                     var moveDirection = GameHelper.GetBestMoveDirection(
                         unitState.Position,
                         unitState.BeakAngle,
-                        predictedOtherPosition);
+                        predictedEnemyUnitPosition.Value);
                     var turn = GameHelper.GetBestBeakTurn(
                         unitState.Position,
                         unitState.BeakAngle,
-                        predictedOtherPosition);
+                        predictedEnemyUnitPosition.Value);
 
                     list.Add(
                         Tuple.Create(
-                            otherUnit,
+                            enemyUnit,
                             moveDirection,
                             turn,
-                            unitState.Position.GetDistanceSquared(otherUnit.Position)));
+                            unitState.Position.GetDistanceSquared(enemyUnit.Position)));
                 }
 
                 var best = list
@@ -94,10 +129,11 @@ namespace SharpestBeak.Logic.Default
                 }
                 else
                 {
-                    move = new MoveInfo(
-                        best.Item2,
-                        GameHelper.NormalizeBeakTurn(best.Item3),
-                        FireMode.Regular);
+                    var beakTurn = GameHelper.NormalizeBeakTurn(best.Item3);
+                    var doFire = best.Item3.IsInRange(BeakTurn.ValueRange)
+                        || unitState.Position.GetDistance(best.Item1.Position) <= tooCloseDistance;
+
+                    move = new MoveInfo(best.Item2, beakTurn, doFire ? FireMode.Regular : FireMode.None);
                 }
 
                 moves.Set(unitState, move);

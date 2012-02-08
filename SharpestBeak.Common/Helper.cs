@@ -31,6 +31,13 @@ namespace SharpestBeak.Common
             return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
         }
 
+        public static void Exchange<T>(ref T value1, ref T value2)
+        {
+            T temp = value1;
+            value1 = value2;
+            value2 = temp;
+        }
+
         #endregion
     }
 }

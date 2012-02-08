@@ -117,6 +117,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="QuadraticEquation.cs" />
     <Compile Include="SettingsCache.cs" />
     <Compile Include="ThreadSafeRandom.cs" />
     <Compile Include="ValueRange.cs" />
