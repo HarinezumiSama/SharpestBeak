@@ -24,6 +24,11 @@ namespace SharpestBeak.Logic.Default
 
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
+            var aimingShotMaxDistance = 10f * GameConstants.NominalCellSize;
+            var tooCloseDistance = 2f * GameConstants.NominalCellSize;
+            var tooCloseBorderDistance = 0.5f * GameConstants.NominalCellSize;
+            var rotateOnlyBorderDistance = GameConstants.NominalCellSize;
+
             foreach (var unitState in gameState.UnitStates.Where(item => !item.IsDead))
             {
                 if (unitState.PreviousMoveState.IsRejected())
@@ -46,9 +51,6 @@ namespace SharpestBeak.Logic.Default
                     continue;
                 }
                 m_blockedDirectionMap.Remove(unitState.UniqueId);
-
-                var aimingShotMaxDistance = 10f * GameConstants.NominalCellSize;
-                var tooCloseDistance = 2f * GameConstants.NominalCellSize;
 
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
                 var enemyUnits = unitState.View.Chickens.Where(item => item.Team != this.Team);
@@ -117,25 +119,38 @@ namespace SharpestBeak.Logic.Default
                     .ThenBy(item => item.Item3)
                     .FirstOrDefault();
 
-                MoveInfo move;
                 if (best == null)
                 {
-                    move = new MoveInfo(
-                        unitState.PreviousMoveState.IsRejected()
+                    var minBorderDistance = gameState.Data.BoardBorder.Edges.Min(
+                        item => GameHelper.GetDistanceToLine(unitState.Position, item.Start, item.End));
+                    if (minBorderDistance <= tooCloseBorderDistance)
+                    {
+                        var boardCenter = new Point2D(gameState.Data.RealSize) / 2f;
+                        var direction = GameHelper.GetBestMoveDirection(
+                            unitState.Position,
+                            unitState.BeakAngle,
+                            boardCenter);
+
+                        moves.Set(unitState, new MoveInfo(direction, BeakTurn.None, FireMode.None));
+                        continue;
+                    }
+
+                    var seekingMove = new MoveInfo(
+                        unitState.PreviousMoveState.IsRejected() || minBorderDistance <= rotateOnlyBorderDistance
                             ? MoveDirection.None
                             : MoveDirection.MoveForward,
                         BeakTurn.FullyClockwise,
                         FireMode.None);
-                }
-                else
-                {
-                    var beakTurn = GameHelper.NormalizeBeakTurn(best.Item3);
-                    var doFire = best.Item3.IsInRange(BeakTurn.ValueRange)
-                        || unitState.Position.GetDistance(best.Item1.Position) <= tooCloseDistance;
 
-                    move = new MoveInfo(best.Item2, beakTurn, doFire ? FireMode.Regular : FireMode.None);
+                    moves.Set(unitState, seekingMove);
+                    continue;
                 }
 
+                var beakTurn = GameHelper.NormalizeBeakTurn(best.Item3);
+                var doFire = best.Item3.IsInRange(BeakTurn.ValueRange)
+                    || unitState.Position.GetDistance(best.Item1.Position) <= tooCloseDistance;
+
+                var move = new MoveInfo(best.Item2, beakTurn, doFire ? FireMode.Regular : FireMode.None);
                 moves.Set(unitState, move);
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using SharpestBeak.Common.Presentation.Primitives;
 
 namespace SharpestBeak.Common
 {
@@ -34,6 +35,11 @@ namespace SharpestBeak.Common
             this.RealSize = new SizeF(
                 GameConstants.NominalCellSize * nominalSize.Width,
                 GameConstants.NominalCellSize * nominalSize.Height);
+            this.BoardBorder = new ConvexPolygonPrimitive(
+                Point2D.Zero,
+                new Point2D(this.RealSize.Width, 0f),
+                new Point2D(this.RealSize),
+                new Point2D(0f, this.RealSize.Height));
         }
 
         #endregion
@@ -47,6 +53,12 @@ namespace SharpestBeak.Common
         }
 
         public SizeF RealSize
+        {
+            get;
+            private set;
+        }
+
+        public ConvexPolygonPrimitive BoardBorder
         {
             get;
             private set;

@@ -44,7 +44,6 @@ namespace SharpestBeak.Common
         private readonly Action<GamePaintEventArgs> m_paintCallback;
         private readonly ThreadSafeValue<long> m_moveCount;
         private readonly ThreadSafeValue<GameTeam?> m_winningTeam;
-        private readonly ConvexPolygonPrimitive m_boardPolygon;
         private Thread m_engineThread;
         private bool m_finalizingStage;
 
@@ -126,11 +125,6 @@ namespace SharpestBeak.Common
             m_newShotUnits = new List<ShotUnit>(m_allChickens.Count);
 
             var realSize = this.Data.RealSize;
-            m_boardPolygon = new ConvexPolygonPrimitive(
-                Point2D.Zero,
-                new Point2D(realSize.Width, 0f),
-                new Point2D(realSize),
-                new Point2D(0f, realSize.Height));
 
             #region Argument Check
 
@@ -247,7 +241,7 @@ namespace SharpestBeak.Common
             for (int index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
-                if (!CollisionDetector.IsPointInPolygon(primitive.BasePoint, m_boardPolygon))
+                if (!CollisionDetector.IsPointInPolygon(primitive.BasePoint, this.Data.BoardBorder))
                 {
                     return true;
                 }
@@ -257,9 +251,9 @@ namespace SharpestBeak.Common
             for (int index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
-                for (int edgeIndex = 0; edgeIndex < m_boardPolygon.Edges.Count; edgeIndex++)
+                for (int edgeIndex = 0; edgeIndex < this.Data.BoardBorder.Edges.Count; edgeIndex++)
                 {
-                    var edge = m_boardPolygon.Edges[edgeIndex];
+                    var edge = this.Data.BoardBorder.Edges[edgeIndex];
                     if (edge.HasCollision(primitive))
                     {
                         return true;

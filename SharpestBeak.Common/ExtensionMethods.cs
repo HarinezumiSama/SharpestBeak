@@ -11,6 +11,47 @@ namespace SharpestBeak.Common
 {
     public static class ExtensionMethods
     {
+        #region Private Methods
+
+        [DebuggerNonUserCode]
+        private static bool IsSetInternal<TEnum>(this TEnum enumerationValue, TEnum flags, bool all)
+            where TEnum : struct
+        {
+            #region Argument Check
+
+            Type enumType = typeof(TEnum);
+            if (!enumType.IsEnum)
+            {
+                throw new ArgumentException(
+                    string.Format("The type must be an enumeration ({0}).", enumType.FullName),
+                    "TEnum");
+            }
+            if (!enumType.IsDefined(typeof(FlagsAttribute), true))
+            {
+                throw new ArgumentException(
+                    string.Format("The type must be a flag enumeration ({0}).", enumType.FullName),
+                    "TEnum");
+            }
+
+            #endregion
+
+            Type underlyingType = Enum.GetUnderlyingType(enumType);
+            if (underlyingType == typeof(ulong))
+            {
+                ulong castFlags = Convert.ToUInt64(flags);
+                ulong andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
+                return all ? andedValue == castFlags : andedValue != 0;
+            }
+            else
+            {
+                long castFlags = Convert.ToInt64(flags);
+                long andedValue = Convert.ToInt64(enumerationValue) & castFlags;
+                return all ? andedValue == castFlags : andedValue != 0;
+            }
+        }
+
+        #endregion
+
         #region Public Methods
 
         public static T EnsureNotNull<T>(this T value)
@@ -317,6 +358,76 @@ namespace SharpestBeak.Common
         public static bool IsRejected(this MoveInfoStates value)
         {
             return (value & MoveInfoStates.RejectedMask) != 0;
+        }
+
+        /// <summary>
+        ///     Determines whether the specified enumeration value contains all the specified flags set.
+        /// </summary>
+        /// <typeparam name="TEnum">
+        ///     The system type of the enumeration.
+        /// </typeparam>
+        /// <param name="enumerationValue">
+        ///     The enumeration value to check the flags in.
+        /// </param>
+        /// <param name="flags">
+        ///     The combination of the bit flags to check.
+        /// </param>
+        /// <returns>
+        ///     <b>true</b> if all bits specified in <paramref name="flags"/> are set
+        ///     in <paramref name="enumerationValue"/>; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        ///     <para>
+        ///         <typeparamref name="TEnum"/> is not an enumeration type.
+        ///     </para>
+        ///     <para>
+        ///         -or-
+        ///     </para>
+        ///     <para>
+        ///         The enumeration <typeparamref name="TEnum"/> is not a flag enumeration, that is,
+        ///         <typeparamref name="TEnum"/> type is not marked by <see cref="System.FlagsAttribute"/>.
+        ///     </para>
+        /// </exception>
+        [DebuggerNonUserCode]
+        public static bool IsAllSet<TEnum>(this TEnum enumerationValue, TEnum flags)
+            where TEnum : struct
+        {
+            return IsSetInternal<TEnum>(enumerationValue, flags, true);
+        }
+
+        /// <summary>
+        ///     Determines whether the specified enumeration value contains any of the specified flags set.
+        /// </summary>
+        /// <typeparam name="TEnum">
+        ///     The system type of the enumeration.
+        /// </typeparam>
+        /// <param name="enumerationValue">
+        ///     The enumeration value to check the flags in.
+        /// </param>
+        /// <param name="flags">
+        ///     The combination of the bit flags to check.
+        /// </param>
+        /// <returns>
+        ///     <b>true</b> if any of flags specified by the <paramref name="flags"/> parameter is set
+        ///     in <paramref name="enumerationValue"/>; otherwise, <b>false</b>.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        ///     <para>
+        ///         <typeparamref name="TEnum"/> is not an enumeration type.
+        ///     </para>
+        ///     <para>
+        ///         -or-
+        ///     </para>
+        ///     <para>
+        ///         The enumeration <typeparamref name="TEnum"/> is not a flag enumeration, that is,
+        ///         <typeparamref name="TEnum"/> type is not marked by <see cref="System.FlagsAttribute"/>.
+        ///     </para>
+        /// </exception>
+        [DebuggerNonUserCode]
+        public static bool IsAnySet<TEnum>(this TEnum enumerationValue, TEnum flags)
+            where TEnum : struct
+        {
+            return IsSetInternal<TEnum>(enumerationValue, flags, false);
         }
 
         #endregion
