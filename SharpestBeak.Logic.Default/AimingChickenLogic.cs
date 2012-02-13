@@ -47,7 +47,7 @@ namespace SharpestBeak.Logic.Default
                 }
                 m_blockedDirectionMap.Remove(unitState.UniqueId);
 
-                var aimingShotMaxDistance = 5f * GameConstants.NominalCellSize;
+                var aimingShotMaxDistance = 10f * GameConstants.NominalCellSize;
                 var tooCloseDistance = 2f * GameConstants.NominalCellSize;
 
                 var list = new List<Tuple<ChickenViewData, MoveDirection, float, float>>();
