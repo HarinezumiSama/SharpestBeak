@@ -202,7 +202,7 @@ namespace SharpestBeak.Common
 
         public float GetAngleCosine(Vector2D target)
         {
-            return DotProduct(this, target) / (this.GetLength() * target.GetLength());
+            return (this * target) / (this.GetLength() * target.GetLength());
         }
 
         #endregion

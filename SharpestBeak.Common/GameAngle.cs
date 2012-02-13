@@ -105,6 +105,14 @@ namespace SharpestBeak.Common
             sin = rad.Sin();
         }
 
+        public Vector2D ToUnitVector()
+        {
+            float cos, sin;
+            CosSin(out cos, out sin);
+
+            return new Vector2D(cos, sin);
+        }
+
         #endregion
 
         #region Operators

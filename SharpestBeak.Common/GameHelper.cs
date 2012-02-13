@@ -41,6 +41,13 @@ namespace SharpestBeak.Common
             return resultProxy.ToList().AsReadOnly();
         }
 
+        private static float GetDistanceToLineInternal(Vector2D pointDirection, Vector2D lineDirection)
+        {
+            var projection = pointDirection.ProjectScalar(lineDirection);
+            var result = (pointDirection.GetLengthSquared() - projection.Sqr()).Sqrt();
+            return result;
+        }
+
         #endregion
 
         #region Public Properties
@@ -140,11 +147,6 @@ namespace SharpestBeak.Common
             return beakTipPosition - position;
         }
 
-        public static PointF Scale(this PointF value, float coefficient)
-        {
-            return new PointF(value.X * coefficient, value.Y * coefficient);
-        }
-
         public static Point2D[] Rotate(this IEnumerable<Point2D> values, Point2D center, GameAngle angle)
         {
             return Point2D.Rotate(values, center, angle);
@@ -167,6 +169,16 @@ namespace SharpestBeak.Common
         public static SizeF ToSizeF(this PointF value)
         {
             return new SizeF(value);
+        }
+
+        public static float GetDistanceToLine(Point2D point, Point2D linePoint, GameAngle lineAngle)
+        {
+            return GetDistanceToLineInternal(lineAngle.ToUnitVector(), point - linePoint);
+        }
+
+        public static float GetDistanceToLine(Point2D point, Point2D linePoint1, Point2D linePoint2)
+        {
+            return GetDistanceToLineInternal(point - linePoint1, linePoint2 - linePoint1);
         }
 
         public static T MapValueSign<T>(this float value, T zero, T negative, T positive)
