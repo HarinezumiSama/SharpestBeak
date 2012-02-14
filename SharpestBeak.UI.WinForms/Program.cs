@@ -29,10 +29,7 @@ namespace SharpestBeak.UI.WinForms
 
             form.ShowErrorMessage(message.ToString(), "Unhandled error", MessageBoxIcon.Stop);
 
-            if (!e.IsTerminating)
-            {
-                Process.GetCurrentProcess().Kill();
-            }
+            Process.GetCurrentProcess().Kill();
         }
 
         #endregion

@@ -681,7 +681,11 @@ namespace SharpestBeak.UI.WinForms
             m_gameEngine.Stop();
             m_gameEngine.CallPaint();
 
-            this.ShowInfoMessage(string.Format("Winning team: {0}.", e.WinningTeam), "Game Ended");
+            var winningLogicName = e.WinningLogic == null ? "None" : e.WinningLogic.GetType().Name;
+
+            this.ShowInfoMessage(
+                string.Format("Winning team: {0} ({1}).", e.WinningTeam, winningLogicName),
+                "Game Ended");
         }
 
         #endregion

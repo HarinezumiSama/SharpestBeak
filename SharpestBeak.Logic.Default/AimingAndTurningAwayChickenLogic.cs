@@ -7,9 +7,7 @@ using SharpestBeak.Common.View;
 
 namespace SharpestBeak.Logic.Default
 {
-    // TODO: [VM] Create base class of `smart` chicken (inheritor will just turn on needed features)
-
-    public sealed class AimingChickenLogic : ChickenUnitLogic
+    public sealed class AimingAndTurningAwayChickenLogic : ChickenUnitLogic
     {
         #region Fields
 
@@ -31,12 +29,85 @@ namespace SharpestBeak.Logic.Default
             var tooCloseDistance = 2f * GameConstants.NominalCellSize;
             var tooCloseBorderDistance = 0.5f * GameConstants.NominalCellSize;
             var rotateOnlyBorderDistance = GameConstants.NominalCellSize;
+            var boardDiagonalSize = new Vector2D(gameState.Data.RealSize).GetLength();
+
+            var tooCloseShot = 2f * GameConstants.ShotToChickenRectilinearSpeedRatio * GameConstants.NominalCellSize;
+            var dangerousRadius = 1.5f * GameConstants.ChickenUnit.BeakOffset;
+
+            var allShots = gameState.UnitStates.SelectMany(item => item.View.Shots).ToList();
 
             foreach (var unitState in gameState.UnitStates)
             {
                 if (unitState.IsDead)
                 {
                     continue;
+                }
+
+                var safetyCircle = new CirclePrimitive(unitState.Position, dangerousRadius);
+                var dangerousShots = new List<ShotViewData>(unitState.View.Shots.Count);
+                foreach (var shot in allShots)
+                {
+                    if (unitState.Position.GetDistance(shot.Position) > tooCloseShot)
+                    {
+                        continue;
+                    }
+
+                    var shotDirection = shot.Angle.ToUnitVector();
+                    var shotToUnitVector = unitState.Position - shot.Position;
+                    var angle = shotDirection.GetAngle(shotToUnitVector);
+                    if (angle.DegreeValue.Abs() >= MathHelper.QuarterRevolutionDegrees)
+                    {
+                        continue;
+                    }
+
+                    var shotLine = new LinePrimitive(
+                        shot.Position,
+                        shot.Position + shot.Angle.ToUnitVector() * boardDiagonalSize);
+                    if (CollisionDetector.CheckCollision(shotLine, safetyCircle))
+                    {
+                        dangerousShots.Add(shot);
+                    }
+                }
+
+                MoveDirection? safestMove = null;
+                if (dangerousShots.Count > 0)
+                {
+                    var safeMoves = GameHelper.MoveDirections.ToDictionary(item => item, item => 0);
+                    foreach (var dangerousShot in dangerousShots)
+                    {
+                        var shotVector = dangerousShot.Angle.ToUnitVector();
+
+                        var maxDistanceMove = MoveDirection.None;
+                        var maxDistanceSqr = float.MinValue;
+                        foreach (var moveDirection in GameHelper.MoveDirections)
+                        {
+                            var potentialPosition = GameHelper.GetNewPosition(
+                               unitState.Position,
+                               unitState.BeakAngle,
+                               moveDirection,
+                               GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                            var shotToUnitVector = potentialPosition - dangerousShot.Position;
+                            var shotToUnitVectorLengthSquared = shotToUnitVector.GetLengthSquared();
+                            var angleCosine = shotVector.GetAngleCosine(shotToUnitVector);
+                            var distanceSqr = shotToUnitVectorLengthSquared
+                                - shotToUnitVectorLengthSquared * angleCosine.Sqr();
+                            if (distanceSqr > maxDistanceSqr)
+                            {
+                                maxDistanceSqr = distanceSqr;
+                                maxDistanceMove = moveDirection;
+                            }
+                        }
+                        safeMoves[maxDistanceMove]++;
+                    }
+
+                    var actuallySafeMovePair = safeMoves
+                        .Where(pair => pair.Value > 0)
+                        .OrderByDescending(pair => pair.Value)
+                        .FirstOrDefault();
+                    if (actuallySafeMovePair.Value > 0)
+                    {
+                        safestMove = actuallySafeMovePair.Key;
+                    }
                 }
 
                 if (unitState.PreviousMoveState.IsRejected())
@@ -101,10 +172,11 @@ namespace SharpestBeak.Logic.Default
                             GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
                     }
 
-                    var moveDirection = GameHelper.GetBestMoveDirection(
-                        unitState.Position,
-                        unitState.BeakAngle,
-                        predictedEnemyUnitPosition.Value);
+                    var moveDirection = safestMove
+                        ?? GameHelper.GetBestMoveDirection(
+                            unitState.Position,
+                            unitState.BeakAngle,
+                            predictedEnemyUnitPosition.Value);
                     var turn = GameHelper.GetBestBeakTurn(
                         unitState.Position,
                         unitState.BeakAngle,
@@ -161,7 +233,7 @@ namespace SharpestBeak.Logic.Default
 
         protected override string GetCaption()
         {
-            return "Aiming";
+            return "Aiming and Turning Away";
         }
 
         #endregion

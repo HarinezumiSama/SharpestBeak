@@ -389,7 +389,7 @@ namespace SharpestBeak.Common
                 {
                     if (!m_winningTeam.Value.HasValue)
                     {
-                        RaiseGameEnded(GameTeam.None);
+                        RaiseGameEnded(GameTeam.None, null);
                     }
                     return;
                 }
@@ -519,7 +519,18 @@ namespace SharpestBeak.Common
                 if (!m_shotUnitsDirect.Any())
                 {
                     var winningTeam = aliveTeams.SingleOrDefault();
-                    RaiseGameEnded(winningTeam);
+                    ChickenUnitLogic winningLogic = null;
+                    switch (winningTeam)
+                    {
+                        case GameTeam.Light:
+                            winningLogic = m_lightTeamLogic;
+                            break;
+                        case GameTeam.Dark:
+                            winningLogic = m_darkTeamLogic;
+                            break;
+                    }
+
+                    RaiseGameEnded(winningTeam, winningLogic);
                     return;
                 }
             }
@@ -761,12 +772,12 @@ namespace SharpestBeak.Common
             }
         }
 
-        private void RaiseGameEnded(GameTeam winningTeam)
+        private void RaiseGameEnded(GameTeam winningTeam, ChickenUnitLogic winningLogic)
         {
             UpdateLastGamePresentation();
 
             m_winningTeam.Value = winningTeam;
-            var e = new GameEndedEventArgs(winningTeam);
+            var e = new GameEndedEventArgs(winningTeam, winningLogic);
             OnGameEnded(e);
         }
 

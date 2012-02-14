@@ -88,7 +88,7 @@ namespace SharpestBeak.Logic.Default
 
         protected override string GetCaption()
         {
-            return "Random Chicken Logic";
+            return "Random";
         }
 
         #endregion
