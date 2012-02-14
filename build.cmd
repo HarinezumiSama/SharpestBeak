@@ -22,22 +22,28 @@ date /t >>"%SB_LOG%"
 time /t >>"%SB_LOG%"
 echo. >>"%SB_LOG%"
 
-echo Cleaning...
+echo * Cleaning...
+echo * Cleaning... >>"%SB_LOG%"
 call :DO_BUILD Clean
 if errorlevel 1 goto ERROR
-echo Cleaning done.
+echo * Cleaning done.
+echo * Cleaning done. >>"%SB_LOG%"
 echo.
 
 echo. >>"%SB_LOG%"
+echo ******************** >>"%SB_LOG%"
+echo. >>"%SB_LOG%"
 
-echo Rebuilding...
+echo * Rebuilding...
+echo * Rebuilding... >>"%SB_LOG%"
 call :DO_BUILD Rebuild
 if errorlevel 1 goto ERROR
-echo Rebuilding done.
+echo * Rebuilding done.
+echo * Rebuilding done. >>"%SB_LOG%"
 echo.
 
 echo. >>"%SB_LOG%"
-echo Build complete >>"%SB_LOG%"
+echo * Build complete >>"%SB_LOG%"
 date /t >>"%SB_LOG%"
 time /t >>"%SB_LOG%"
 echo. >>"%SB_LOG%"
