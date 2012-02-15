@@ -51,7 +51,7 @@ namespace SharpestBeak.Common
             ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
             ///     (the whole view angle is double this value).
             /// </summary>
-            public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 8f;
+            public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 6f;
 
             public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
 
