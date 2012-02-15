@@ -27,7 +27,6 @@ namespace SharpestBeak.Logic.Default
 
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
-            var aimingShotMaxDistance = 10f * GameConstants.NominalCellSize;
             var tooCloseDistance = 2f * GameConstants.NominalCellSize;
             var tooCloseBorderDistance = 0.5f * GameConstants.NominalCellSize;
             var rotateOnlyBorderDistance = GameConstants.NominalCellSize;
@@ -72,7 +71,7 @@ namespace SharpestBeak.Logic.Default
                     var cosAlpha = enemyUnitVector.GetAngleCosine(enemyToMeVector);
                     var distanceToEnemySqr = enemyToMeVector.GetLengthSquared();
                     var distanceToEnemy = distanceToEnemySqr.Sqrt();
-                    if ((cosAlpha.Abs() - 1f).IsNotZero() && distanceToEnemy <= aimingShotMaxDistance)
+                    if ((cosAlpha.Abs() - 1f).IsNotZero())
                     {
                         var equation = new QuadraticEquation(
                             GameConstants.ShotToChickenRectilinearSpeedRatio.Sqr() - 1f,
