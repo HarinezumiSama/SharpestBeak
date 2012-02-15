@@ -54,7 +54,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public int UniqueId
+        public GameObjectId UniqueId
         {
             get;
             private set;

@@ -26,13 +26,31 @@ namespace SharpestBeak.Common.View
             this.UniqueId = unit.UniqueId;
             this.Position = unit.Position;
             this.Angle = unit.Angle;
+            this.OwnerUniqueId = unit.Owner.UniqueId;
+            this.Team = unit.Owner.Team;
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal GameObjectId OwnerUniqueId
+        {
+            get;
+            private set;
+        }
+
+        internal GameTeam Team
+        {
+            get;
+            private set;
         }
 
         #endregion
 
         #region Public Properties
 
-        public int UniqueId
+        public GameObjectId UniqueId
         {
             get;
             private set;

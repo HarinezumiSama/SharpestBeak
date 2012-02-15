@@ -21,7 +21,7 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotUnit"/> class.
         /// </summary>
-        internal ShotUnit(ChickenUnit owner, int uniqueId)
+        internal ShotUnit(ChickenUnit owner, GameObjectId uniqueId)
         {
             #region Argument Check
 
@@ -29,12 +29,9 @@ namespace SharpestBeak.Common
             {
                 throw new ArgumentNullException("owner");
             }
-            if (uniqueId <= 0)
+            if (!uniqueId.IsValid)
             {
-                throw new ArgumentOutOfRangeException(
-                    "uniqueId",
-                    uniqueId,
-                    "The unique ID must be positive.");
+                throw new ArgumentException("Invalid shot ID.", "uniqueId");
             }
 
             #endregion
@@ -71,7 +68,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public int UniqueId
+        public GameObjectId UniqueId
         {
             get;
             private set;

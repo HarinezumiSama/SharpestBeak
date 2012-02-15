@@ -13,7 +13,7 @@ namespace SharpestBeak.Common.Presentation
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotPresentation"/> class.
         /// </summary>
-        internal ShotPresentation(ShotUnit shotUnit, Dictionary<int, ChickenPresentation> chickenMap)
+        internal ShotPresentation(ShotUnit shotUnit, Dictionary<GameObjectId, ChickenPresentation> chickenMap)
         {
             #region Argument Check
 

@@ -81,7 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AimingChickenLogic.cs" />
-    <Compile Include="AimingAndTurningAwayChickenLogic.cs" />
+    <Compile Include="PredictiveAimingAndTurningAwayChickenLogic.cs" />
+    <Compile Include="PredictiveAimingChickenLogic.cs" />
+    <Compile Include="SmartChickenLogicBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomChickenLogic.cs" />
   </ItemGroup>

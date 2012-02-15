@@ -19,7 +19,8 @@
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
   &lt;string&gt;SharpestBeak.Logic.Default.RandomChickenLogic, SharpestBeak.Logic.Default&lt;/string&gt;
   &lt;string&gt;SharpestBeak.Logic.Default.AimingChickenLogic, SharpestBeak.Logic.Default&lt;/string&gt;
-  &lt;string&gt;SharpestBeak.Logic.Default.AimingAndTurningAwayChickenLogic, SharpestBeak.Logic.Default&lt;/string&gt;
+  &lt;string&gt;SharpestBeak.Logic.Default.PredictiveAimingChickenLogic, SharpestBeak.Logic.Default&lt;/string&gt;
+  &lt;string&gt;SharpestBeak.Logic.Default.PredictiveAimingAndTurningAwayChickenLogic, SharpestBeak.Logic.Default&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
   </Settings>

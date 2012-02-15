@@ -39,7 +39,7 @@ namespace SharpestBeak.Common.Presentation
             private set;
         }
 
-        public int UniqueId
+        public GameObjectId UniqueId
         {
             get;
             private set;

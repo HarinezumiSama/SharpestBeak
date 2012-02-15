@@ -65,7 +65,8 @@ namespace SharpestBeak.UI.WinForms.Properties {
 <ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <string>SharpestBeak.Logic.Default.RandomChickenLogic, SharpestBeak.Logic.Default</string>
   <string>SharpestBeak.Logic.Default.AimingChickenLogic, SharpestBeak.Logic.Default</string>
-  <string>SharpestBeak.Logic.Default.AimingAndTurningAwayChickenLogic, SharpestBeak.Logic.Default</string>
+  <string>SharpestBeak.Logic.Default.PredictiveAimingChickenLogic, SharpestBeak.Logic.Default</string>
+  <string>SharpestBeak.Logic.Default.PredictiveAimingAndTurningAwayChickenLogic, SharpestBeak.Logic.Default</string>
 </ArrayOfString>")]
         public global::System.Collections.Specialized.StringCollection Logics {
             get {

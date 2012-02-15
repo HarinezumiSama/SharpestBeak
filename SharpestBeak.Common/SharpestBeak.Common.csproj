@@ -99,6 +99,7 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
+    <Compile Include="GameObjectId.cs" />
     <Compile Include="LogicMoveResult.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Presentation\ChickenPresentation.cs" />

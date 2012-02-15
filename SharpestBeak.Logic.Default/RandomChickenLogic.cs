@@ -17,7 +17,8 @@ namespace SharpestBeak.Logic.Default
 
         private static readonly ThreadSafeRandom s_random = new ThreadSafeRandom();
 
-        private readonly Dictionary<int, Point2D> m_unitIdToTargetPointMap = new Dictionary<int, Point2D>();
+        private readonly Dictionary<GameObjectId, Point2D> m_unitIdToTargetPointMap =
+            new Dictionary<GameObjectId, Point2D>();
         private readonly object m_targetPointsLock = new object();
 
         #endregion

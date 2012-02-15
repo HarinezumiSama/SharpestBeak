@@ -111,7 +111,7 @@ namespace SharpestBeak.Common
                 .SelectMany(item => item.Units)
                 .ToList()
                 .AsReadOnly();
-            m_allChickens.DoForEach((item, index) => item.UniqueId = index + 1);
+            m_allChickens.DoForEach((item, index) => item.UniqueId = new GameObjectId(index + 1));
 
             m_aliveChickensDirect = new List<ChickenUnit>();
             this.AliveChickens = m_aliveChickensDirect.AsReadOnly();
@@ -325,12 +325,12 @@ namespace SharpestBeak.Common
             UpdateLastGamePresentation();
         }
 
-        private int GetShotUniqueIndex()
+        private GameObjectId GetShotUniqueId()
         {
             lock (m_shotIndexCounterLock)
             {
                 m_shotIndexCounter++;
-                return m_shotIndexCounter;
+                return new GameObjectId(m_shotIndexCounter);
             }
         }
 
@@ -561,7 +561,7 @@ namespace SharpestBeak.Common
                     }
                 }
 
-                var shot = new ShotUnit(unit, GetShotUniqueIndex());
+                var shot = new ShotUnit(unit, GetShotUniqueId());
                 m_newShotUnits.Add(shot);
                 unit.ShotEngineStepIndex = m_moveCount.Value;
 
