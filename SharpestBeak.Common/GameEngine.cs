@@ -18,6 +18,10 @@ namespace SharpestBeak.Common
 
     // TODO: [VM] Implement custom chicken unit positioning (or even allow game frame snapshot as a start of a game)
 
+    // TODO: [VM] Implement single-thread feature: logics are running with engine in single thread
+
+    // TODO: [VM] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
+
     public sealed class GameEngine : IDisposable
     {
         #region Constants
