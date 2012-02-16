@@ -93,6 +93,7 @@ namespace SharpestBeak.Common
         internal bool CanShoot()
         {
             return !this.Engine.ShotUnits.Any(item => item.Owner == this)
+                || this.ShotEngineStepIndex < 0 
                 || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
         }
 
