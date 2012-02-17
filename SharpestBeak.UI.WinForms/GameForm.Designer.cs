@@ -54,8 +54,9 @@ namespace SharpestBeak.UI.WinForms
             // 
             this.pbGame.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbGame.Location = new System.Drawing.Point(0, 0);
+            this.pbGame.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.pbGame.Name = "pbGame";
-            this.pbGame.Size = new System.Drawing.Size(284, 262);
+            this.pbGame.Size = new System.Drawing.Size(295, 214);
             this.pbGame.TabIndex = 0;
             this.pbGame.TabStop = false;
             this.pbGame.Paint += new System.Windows.Forms.PaintEventHandler(this.pbGame_Paint);
@@ -71,14 +72,15 @@ namespace SharpestBeak.UI.WinForms
             // statusBar
             // 
             this.statusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-                this.turnInfoLabel,
-                this.lightTeamLabel,
-                this.darkTeamLabel,
-                this.fpsLabel});
-            this.statusBar.Location = new System.Drawing.Point(0, 240);
+            this.turnInfoLabel,
+            this.lightTeamLabel,
+            this.darkTeamLabel,
+            this.fpsLabel});
+            this.statusBar.Location = new System.Drawing.Point(0, 190);
             this.statusBar.Name = "statusBar";
+            this.statusBar.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
             this.statusBar.ShowItemToolTips = true;
-            this.statusBar.Size = new System.Drawing.Size(284, 22);
+            this.statusBar.Size = new System.Drawing.Size(295, 24);
             this.statusBar.SizingGrip = false;
             this.statusBar.TabIndex = 2;
             // 
@@ -114,15 +116,17 @@ namespace SharpestBeak.UI.WinForms
             // 
             // GameForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
+            this.ClientSize = new System.Drawing.Size(295, 214);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.pbGame);
             this.DoubleBuffered = true;
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;
+            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "GameForm";
@@ -135,6 +139,7 @@ namespace SharpestBeak.UI.WinForms
             this.statusBar.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion

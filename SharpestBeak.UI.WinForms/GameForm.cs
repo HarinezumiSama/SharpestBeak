@@ -563,44 +563,53 @@ namespace SharpestBeak.UI.WinForms
                 shotUnit.Element.Draw(graphics, drawData);
             }
 
-            // TODO: [VM] Fix Y axis inversion
-            //if (m_winningTeam.HasValue)
-            //{
-            //    var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
+            // TODO: [VM] Fix sizes and offsets
+            if (m_winningTeam.HasValue)
+            {
+                var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
 
-            //    var backRectColor = Color.FromArgb(127, Color.Gray);
-            //    var messageColor = Color.FromArgb(160, Color.Maroon);
+                var backRectColor = Color.FromArgb(127, Color.Gray);
+                var messageColor = Color.Maroon;
 
-            //    var backRectSize = new SizeF(
-            //        uiRealSize.Width / 2f,
-            //        uiRealSize.Height / 2f);
-            //    var backRectBounds = new RectangleF(
-            //        new PointF(
-            //            (uiRealSize.Width - backRectSize.Width) / 2f,
-            //            (uiRealSize.Height - backRectSize.Height) / 2f),
-            //        backRectSize);
+                var message = string.Format("Winning team: {0}", m_winningTeam.Value);
+                var messageSize = graphics.MeasureString(message, this.Font);
+                var messagePoint = new PointF(
+                    (uiRealSize.Width - messageSize.Width) / 2f,
+                    (uiRealSize.Height - messageSize.Height) / 2f);
 
-            //    using (var brush = new SolidBrush(backRectColor))
-            //    {
-            //        graphics.FillRectangle(brush, backRectBounds);
-            //    }
+                var backRectSize = messageSize;
+                backRectSize.Scale(2f);
+                var backRectBounds = new RectangleF(
+                    new PointF(
+                        (uiRealSize.Width - backRectSize.Width) / 2f,
+                        (uiRealSize.Height - backRectSize.Height) / 2f),
+                    backRectSize);
 
-            //    var message = string.Format("Winning team: {0}", m_winningTeam.Value);
+                using (var brush = new SolidBrush(backRectColor))
+                {
+                    graphics.FillRectangle(brush, backRectBounds);
+                }
 
-            //    var messageSize = graphics.MeasureString(
-            //        message,
-            //        this.Font,
-            //        backRectBounds.Size);
+                using (var brush = new SolidBrush(messageColor))
+                {
+                    var gs = graphics.Save();
+                    try
+                    {
+                        using (Matrix mx1 = graphics.Transform.Clone(),
+                            mx2 = new Matrix(1f, 0f, 0f, -1f, messagePoint.X, messagePoint.Y + messageSize.Height))
+                        {
+                            mx1.Multiply(mx2);
 
-            //    var messagePoint = new PointF(
-            //        (uiRealSize.Width - messageSize.Width) / 2f,
-            //        (uiRealSize.Height - messageSize.Height) / 2f);
-
-            //    using (var brush = new SolidBrush(messageColor))
-            //    {
-            //        graphics.DrawString(message, this.Font, brush, messagePoint);
-            //    }
-            //}
+                            graphics.Transform = mx1;
+                            graphics.DrawString(message, this.Font, brush, PointF.Empty);
+                        }
+                    }
+                    finally
+                    {
+                        graphics.Restore(gs);
+                    }
+                }
+            }
         }
 
         #endregion
@@ -680,10 +689,12 @@ namespace SharpestBeak.UI.WinForms
             var graphics = e.Graphics;
 
             // Flipping Y axis and translating coordinates accordingly
-            graphics.ScaleTransform(1f, -1f);
-            graphics.TranslateTransform(0f, -(float)e.ClipRectangle.Height);
+            using (var mx = new Matrix(1f, 0f, 0f, -1f, 0f, e.ClipRectangle.Height))
+            {
+                graphics.Transform = mx;
 
-            DoPaintGame(graphics, lastPresentation);
+                DoPaintGame(graphics, lastPresentation);
+            }
 
             m_totalPaintCount++;
             m_fpsPaintCount++;
