@@ -430,6 +430,16 @@ namespace SharpestBeak.Common
             return IsSetInternal<TEnum>(enumerationValue, flags, false);
         }
 
+        public static SizeF Scale(this SizeF value, float coefficient)
+        {
+            return new SizeF(value.Width * coefficient, value.Height * coefficient);
+        }
+
+        public static PointF Scale(this PointF value, float coefficient)
+        {
+            return new PointF(value.X * coefficient, value.Y * coefficient);
+        }
+
         #endregion
     }
 }

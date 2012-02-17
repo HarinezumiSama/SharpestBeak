@@ -39,6 +39,7 @@ namespace SharpestBeak.UI.WinForms
         private GamePresentation m_lastPresentation;
         private ulong m_totalPaintCount;
         private Bitmap m_gameBoardBackground;
+        private GameTeam? m_winningTeam;
 
         private float m_fps;
         private int m_fpsPaintCount;
@@ -454,7 +455,7 @@ namespace SharpestBeak.UI.WinForms
                     var dr = this.ShowQuestion(
                         string.Format(
                             "The game has ended. Winning team: {0}.{1}{1}"
-                                + "Do you wish to restart the game?",
+                                + "Do you wish to reset the game?",
                             winningTeam.Value,
                             Environment.NewLine));
                     if (dr != DialogResult.Yes)
@@ -463,8 +464,11 @@ namespace SharpestBeak.UI.WinForms
                     }
 
                     ResetGame();
+                    m_winningTeam = null;
+                    return;
                 }
 
+                m_winningTeam = null;
                 m_totalPaintCount = 0;
                 ResetFpsCounter(true);
                 m_gameEngine.Start();
@@ -515,6 +519,88 @@ namespace SharpestBeak.UI.WinForms
             StopGame();
             m_gameEngine.Reset();
             m_gameEngine.CallPaint();
+        }
+
+        private void DoPaintGame(Graphics graphics, GamePresentation lastPresentation)
+        {
+            graphics.DrawImageUnscaled(m_gameBoardBackground.EnsureNotNull(), Point.Empty);
+
+            foreach (var chickenUnit in lastPresentation.Chickens)
+            {
+                var drawData = chickenUnit.Team == GameTeam.Light
+                    ? m_lightTeamUnitDrawData
+                    : m_darkTeamUnitDrawData;
+
+                chickenUnit.Element.Draw(graphics, drawData);
+            }
+
+            // TODO: [VM] Allow logic to provide some extra data for drawing (think up how to do it secure)
+            foreach (var teamLogic in m_gameEngine.Teams)
+            {
+                var rcl = teamLogic as RandomChickenLogic;
+                if (rcl != null)
+                {
+                    var targetPointBrush = teamLogic.Team == GameTeam.Light ? Brushes.LightBlue : Brushes.DarkBlue;
+                    foreach (var targetPoint in rcl.TargetPoints)
+                    {
+                        var tp = targetPoint * m_uiCoefficient;
+                        graphics.FillRectangle(
+                            targetPointBrush,
+                            tp.X - m_uiTargetPointRadius,
+                            tp.Y - m_uiTargetPointRadius,
+                            2f * m_uiTargetPointRadius,
+                            2f * m_uiTargetPointRadius);
+                    }
+                }
+            }
+
+            var uiShotRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient;
+            foreach (var shotUnit in lastPresentation.Shots)
+            {
+                var drawData = shotUnit.Owner.Team == GameTeam.Light
+                    ? m_lightTeamShotDrawData
+                    : m_darkTeamShotDrawData;
+                shotUnit.Element.Draw(graphics, drawData);
+            }
+
+            // TODO: [VM] Fix Y axis inversion
+            //if (m_winningTeam.HasValue)
+            //{
+            //    var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
+
+            //    var backRectColor = Color.FromArgb(127, Color.Gray);
+            //    var messageColor = Color.FromArgb(160, Color.Maroon);
+
+            //    var backRectSize = new SizeF(
+            //        uiRealSize.Width / 2f,
+            //        uiRealSize.Height / 2f);
+            //    var backRectBounds = new RectangleF(
+            //        new PointF(
+            //            (uiRealSize.Width - backRectSize.Width) / 2f,
+            //            (uiRealSize.Height - backRectSize.Height) / 2f),
+            //        backRectSize);
+
+            //    using (var brush = new SolidBrush(backRectColor))
+            //    {
+            //        graphics.FillRectangle(brush, backRectBounds);
+            //    }
+
+            //    var message = string.Format("Winning team: {0}", m_winningTeam.Value);
+
+            //    var messageSize = graphics.MeasureString(
+            //        message,
+            //        this.Font,
+            //        backRectBounds.Size);
+
+            //    var messagePoint = new PointF(
+            //        (uiRealSize.Width - messageSize.Width) / 2f,
+            //        (uiRealSize.Height - messageSize.Height) / 2f);
+
+            //    using (var brush = new SolidBrush(messageColor))
+            //    {
+            //        graphics.DrawString(message, this.Font, brush, messagePoint);
+            //    }
+            //}
         }
 
         #endregion
@@ -592,52 +678,12 @@ namespace SharpestBeak.UI.WinForms
             }
 
             var graphics = e.Graphics;
-            
+
             // Flipping Y axis and translating coordinates accordingly
             graphics.ScaleTransform(1f, -1f);
             graphics.TranslateTransform(0f, -(float)e.ClipRectangle.Height);
 
-            var size = lastPresentation.CommonData.NominalSize;
-
-            graphics.DrawImageUnscaled(m_gameBoardBackground.EnsureNotNull(), Point.Empty);
-
-            foreach (var chickenUnit in lastPresentation.Chickens)
-            {
-                var drawData = chickenUnit.Team == GameTeam.Light
-                    ? m_lightTeamUnitDrawData
-                    : m_darkTeamUnitDrawData;
-
-                chickenUnit.Element.Draw(graphics, drawData);
-            }
-
-            // TODO: [VM] Allow logic to provide some extra data for drawing (think up how to do it secure)
-            foreach (var teamLogic in m_gameEngine.Teams)
-            {
-                var rcl = teamLogic as RandomChickenLogic;
-                if (rcl != null)
-                {
-                    var targetPointBrush = teamLogic.Team == GameTeam.Light ? Brushes.LightBlue : Brushes.DarkBlue;
-                    foreach (var targetPoint in rcl.TargetPoints)
-                    {
-                        var tp = targetPoint * m_uiCoefficient;
-                        graphics.FillRectangle(
-                            targetPointBrush,
-                            tp.X - m_uiTargetPointRadius,
-                            tp.Y - m_uiTargetPointRadius,
-                            2f * m_uiTargetPointRadius,
-                            2f * m_uiTargetPointRadius);
-                    }
-                }
-            }
-
-            var uiShotRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient;
-            foreach (var shotUnit in lastPresentation.Shots)
-            {
-                var drawData = shotUnit.Owner.Team == GameTeam.Light
-                    ? m_lightTeamShotDrawData
-                    : m_darkTeamShotDrawData;
-                shotUnit.Element.Draw(graphics, drawData);
-            }
+            DoPaintGame(graphics, lastPresentation);
 
             m_totalPaintCount++;
             m_fpsPaintCount++;
@@ -682,6 +728,8 @@ namespace SharpestBeak.UI.WinForms
                 this.BeginInvoke((Action<object, GameEndedEventArgs>)this.GameEngine_GameEnded, sender, e);
                 return;
             }
+
+            m_winningTeam = e.WinningTeam;
 
             m_gameEngine.Stop();
             m_gameEngine.CallPaint();
