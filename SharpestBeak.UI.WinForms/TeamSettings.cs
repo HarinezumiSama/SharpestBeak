@@ -123,6 +123,7 @@ namespace SharpestBeak.UI.WinForms
 
         [DisplayName("Logic")]
         [Editor(typeof(LogicTypeEditor), typeof(UITypeEditor))]
+        [RefreshProperties(RefreshProperties.All)]
         public LogicInfo Logic
         {
             get;
@@ -130,6 +131,7 @@ namespace SharpestBeak.UI.WinForms
         }
 
         [DisplayName("Player count")]
+        [RefreshProperties(RefreshProperties.All)]
         public int PlayerCount
         {
             get;

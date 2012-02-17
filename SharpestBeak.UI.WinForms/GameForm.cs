@@ -591,8 +591,13 @@ namespace SharpestBeak.UI.WinForms
                 return;
             }
 
-            var size = lastPresentation.CommonData.NominalSize;
             var graphics = e.Graphics;
+            
+            // Flipping Y axis and translating coordinates accordingly
+            graphics.ScaleTransform(1f, -1f);
+            graphics.TranslateTransform(0f, -(float)e.ClipRectangle.Height);
+
+            var size = lastPresentation.CommonData.NominalSize;
 
             graphics.DrawImageUnscaled(m_gameBoardBackground.EnsureNotNull(), Point.Empty);
 
