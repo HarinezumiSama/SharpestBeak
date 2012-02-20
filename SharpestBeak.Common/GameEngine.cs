@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -549,6 +550,10 @@ namespace SharpestBeak.Common
         {
             if (SettingsCache.Instance.DebugModeDisableShooting)
             {
+                DebugHelper.WriteLine(
+                    "[{0}] Skipping any new shots since {1} is on.",
+                    MethodBase.GetCurrentMethod().GetQualifiedName(),
+                    Helper.GetPropertyName((SettingsCache obj) => obj.DebugModeDisableShooting));
                 return;
             }
 
@@ -771,9 +776,6 @@ namespace SharpestBeak.Common
 
                     return;
                 }
-                //logic.MoveCount++;
-
-                Thread.Yield();
             }
         }
 
