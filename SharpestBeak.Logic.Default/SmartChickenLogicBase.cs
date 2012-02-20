@@ -233,7 +233,7 @@ namespace SharpestBeak.Logic.Default
             m_rotateOnlyBorderDistance = GameConstants.NominalCellSize;
             m_boardDiagonalSize = new Vector2D(gameState.Data.RealSize).GetLength();
             m_tooCloseShot = 2f * GameConstants.ShotToChickenRectilinearSpeedRatio * GameConstants.NominalCellSize;
-            m_dangerousRadius = 2f * GameConstants.ChickenUnit.BeakOffset;
+            m_dangerousRadius = 3f * GameConstants.ChickenUnit.BeakOffset;
         }
 
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
@@ -318,14 +318,21 @@ namespace SharpestBeak.Logic.Default
                         continue;
                     }
 
-                    var seekingMove = new MoveInfo(
-                        unitState.PreviousMoveState.IsRejected() || minBorderDistance <= m_rotateOnlyBorderDistance
-                            ? MoveDirection.None
-                            : MoveDirection.MoveForward,
-                        BeakTurn.FullyClockwise,
-                        FireMode.None);
+                    if (safestMoveDirection.HasValue)
+                    {
+                        moves.Set(unitState, new MoveInfo(safestMoveDirection.Value, BeakTurn.None, FireMode.None));
+                    }
+                    else
+                    {
+                        var seekingMove = new MoveInfo(
+                            unitState.PreviousMoveState.IsRejected() || minBorderDistance <= m_rotateOnlyBorderDistance
+                                ? MoveDirection.None
+                                : MoveDirection.MoveForward,
+                            BeakTurn.FullyClockwise,
+                            FireMode.None);
+                        moves.Set(unitState, seekingMove);
+                    }
 
-                    moves.Set(unitState, seekingMove);
                     continue;
                 }
 

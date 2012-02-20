@@ -411,7 +411,11 @@ namespace SharpestBeak.UI.WinForms
                 UpdateMoveCountStatus();
             }
 
-            var countMap = e.Presentation.Chickens.GroupBy(item => item.Team).ToDictionary(item => item.Key, item => item.Count());
+            var countMap = e
+                .Presentation
+                .Chickens
+                .GroupBy(item => item.Team)
+                .ToDictionary(item => item.Key, item => item.Count());
             lightTeamLabel.Text = string.Format("Light: {0}", countMap.GetValueOrDefault(GameTeam.Light));
             darkTeamLabel.Text = string.Format("Dark: {0}", countMap.GetValueOrDefault(GameTeam.Dark));
 
@@ -464,7 +468,6 @@ namespace SharpestBeak.UI.WinForms
                     }
 
                     ResetGame();
-                    m_winningTeam = null;
                     return;
                 }
 
@@ -517,6 +520,8 @@ namespace SharpestBeak.UI.WinForms
         private void ResetGame()
         {
             StopGame();
+            m_winningTeam = null;
+
             m_gameEngine.Reset();
             m_gameEngine.CallPaint();
         }

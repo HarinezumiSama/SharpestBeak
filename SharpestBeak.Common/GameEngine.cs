@@ -331,6 +331,11 @@ namespace SharpestBeak.Common
 
         private GameObjectId GetShotUniqueId()
         {
+            if (SettingsCache.Instance.DebugModeDisableShooting)
+            {
+                throw new InvalidOperationException("Shooting is disabled.");
+            }
+
             lock (m_shotIndexCounterLock)
             {
                 m_shotIndexCounter++;
@@ -542,6 +547,11 @@ namespace SharpestBeak.Common
 
         private void ProcessNewShots(IEnumerable<KeyValuePair<ChickenUnit, MoveInfo>> shootingMoves)
         {
+            if (SettingsCache.Instance.DebugModeDisableShooting)
+            {
+                return;
+            }
+
             m_newShotUnits.Clear();
             foreach (var shootingMovePair in shootingMoves)
             {

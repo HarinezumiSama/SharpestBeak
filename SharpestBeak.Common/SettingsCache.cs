@@ -19,9 +19,19 @@ namespace SharpestBeak.Common
 
         private SettingsCache()
         {
+            ReadSettings();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ReadSettings()
+        {
             this.UsePerformanceCounters = Settings.Default.UsePerformanceCounters;
             this.EnableDebugOutput = Settings.Default.EnableDebugOutput;
             this.InstrumentationMode = Settings.Default.InstrumentationMode;
+            this.DebugModeDisableShooting = Settings.Default.DebugModeDisableShooting;
         }
 
         #endregion
@@ -53,6 +63,23 @@ namespace SharpestBeak.Common
         {
             get;
             private set;
+        }
+
+        // TODO: [VM] Allow to disable shooting in UI via editable setting
+
+        public bool DebugModeDisableShooting
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Reload()
+        {
+            ReadSettings();
         }
 
         #endregion
