@@ -7,11 +7,12 @@ using SharpestBeak.Common.Presentation.Elements;
 
 namespace SharpestBeak.Common
 {
-    internal sealed class ShotUnit
+    internal sealed class ShotUnit : IDirectionalPosition
     {
         #region Fields
 
         private Point2D m_position;
+        private readonly GameAngle m_angle;
         private ShotElement m_cachedElement;
 
         #endregion
@@ -41,7 +42,7 @@ namespace SharpestBeak.Common
             this.UniqueId = uniqueId;
             this.Owner = owner;
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
-            this.Angle = owner.BeakAngle;
+            m_angle = owner.BeakAngle;
             this.CreationTime = DateTime.Now;
         }
 
@@ -93,8 +94,11 @@ namespace SharpestBeak.Common
 
         public GameAngle Angle
         {
-            get;
-            private set;
+            [DebuggerStepThrough]
+            get
+            {
+                return m_angle;
+            }
         }
 
         public ChickenUnit Owner
@@ -132,6 +136,28 @@ namespace SharpestBeak.Common
                 m_cachedElement = new ShotElement(this.Position);
             }
             return m_cachedElement;
+        }
+
+        #endregion
+
+        #region IDirectionalPosition Members
+
+        Point2D IDirectionalPosition.Position
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_position;
+            }
+        }
+
+        GameAngle IDirectionalPosition.Angle
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_angle;
+            }
         }
 
         #endregion

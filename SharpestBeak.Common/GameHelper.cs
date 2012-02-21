@@ -11,7 +11,7 @@ namespace SharpestBeak.Common
     {
         #region Fields
 
-        private static readonly Dictionary<MoveDirection, GameAngle?> s_directionMap =
+        private static readonly Dictionary<MoveDirection, GameAngle?> s_directionToAngleMap =
             new Dictionary<MoveDirection, GameAngle?>
             {
                 { MoveDirection.None, null },
@@ -116,13 +116,27 @@ namespace SharpestBeak.Common
             return result;
         }
 
+        public static Point2D GetNewPosition(IDirectionalPosition directionalPosition, float distance)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetNewPosition(directionalPosition.Position, directionalPosition.Angle, distance);
+        }
+
         public static Point2D GetNewPosition(
             Point2D oldPosition,
             GameAngle currentAngle,
             MoveDirection direction,
             float distance)
         {
-            var relativeAngle = s_directionMap[direction];
+            var relativeAngle = s_directionToAngleMap[direction];
             if (relativeAngle == null)
             {
                 return oldPosition;
@@ -134,6 +148,23 @@ namespace SharpestBeak.Common
             return result;
         }
 
+        public static Point2D GetNewPosition(
+            IDirectionalPosition directionalPosition,
+            MoveDirection direction,
+            float distance)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetNewPosition(directionalPosition.Position, directionalPosition.Angle, direction, distance);
+        }
+
         public static Point2D GetBeakTipPosition(Point2D position, GameAngle beakAngle)
         {
             return position
@@ -141,10 +172,38 @@ namespace SharpestBeak.Common
                 .Rotate(position, beakAngle);
         }
 
+        public static Point2D GetBeakTipPosition(IDirectionalPosition directionalPosition)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetBeakTipPosition(directionalPosition.Position, directionalPosition.Angle);
+        }
+
         public static Vector2D GetChickenViewDirection(Point2D position, GameAngle beakAngle)
         {
             var beakTipPosition = GetBeakTipPosition(position, beakAngle);
             return beakTipPosition - position;
+        }
+
+        public static Vector2D GetChickenViewDirection(IDirectionalPosition directionalPosition)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetChickenViewDirection(directionalPosition.Position, directionalPosition.Angle);
         }
 
         public static Point2D[] Rotate(this IEnumerable<Point2D> values, Point2D center, GameAngle angle)
@@ -229,6 +288,22 @@ namespace SharpestBeak.Common
             return resultProxy.Item1;
         }
 
+        public static MoveDirection GetBestMoveDirection(
+            IDirectionalPosition directionalPosition,
+            Point2D targetPoint)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetBestMoveDirection(directionalPosition.Position, directionalPosition.Angle, targetPoint);
+        }
+
         public static float GetBestBeakTurn(Point2D position, GameAngle beakAngle, Point2D targetPoint)
         {
             var targetOffset = targetPoint - position;
@@ -237,11 +312,41 @@ namespace SharpestBeak.Common
             return result;
         }
 
+        public static float GetBestBeakTurn(IDirectionalPosition directionalPosition, Point2D targetPoint)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetBestBeakTurn(directionalPosition.Position, directionalPosition.Angle, targetPoint);
+        }
+
         public static BeakTurn GetBestBeakTurnNormalized(Point2D position, GameAngle beakAngle, Point2D targetPoint)
         {
             var absoluteBeakTurn = GetBestBeakTurn(position, beakAngle, targetPoint);
             var result = NormalizeBeakTurn(absoluteBeakTurn);
             return result;
+        }
+
+        public static BeakTurn GetBestBeakTurnNormalized(
+            IDirectionalPosition directionalPosition,
+            Point2D targetPoint)
+        {
+            #region Argument Check
+
+            if (directionalPosition == null)
+            {
+                throw new ArgumentNullException("directionalPosition");
+            }
+
+            #endregion
+
+            return GetBestBeakTurnNormalized(directionalPosition.Position, directionalPosition.Angle, targetPoint);
         }
 
         #endregion

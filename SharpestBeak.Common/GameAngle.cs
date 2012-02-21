@@ -13,7 +13,7 @@ namespace SharpestBeak.Common
         internal static float NormalizeDegreeAngle(float value)
         {
             var result = value;
-            // TODO: [VM] Use tolerance when comparing values
+            // TODO: [VM] Use tolerance when comparing values - (?)
             while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
             {
                 result -= MathHelper.RevolutionDegrees;

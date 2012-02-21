@@ -295,11 +295,12 @@ namespace SharpestBeak.UI.WinForms
 
             #endregion
 
-            m_gameEngine = new GameEngine(this.PaintGame, nominalSize, lightTeam, darkTeam);
+            var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame);
+            m_gameEngine = new GameEngine(settings);
             m_gameEngine.GameEnded += this.GameEngine_GameEnded;
 
             this.Text = string.Format(
-                "{0} [{1}x{2}] [L:{3}x{4} vs D:{5}x{6}]",
+                "{0} [{1}x{2}] [L: {3}x {4}  -vs-  D: {5}x {6}]",
                 this.Text,
                 nominalSize.Width,
                 nominalSize.Height,
@@ -568,53 +569,53 @@ namespace SharpestBeak.UI.WinForms
                 shotUnit.Element.Draw(graphics, drawData);
             }
 
-            // TODO: [VM] Fix sizes and offsets
-            if (m_winningTeam.HasValue)
-            {
-                var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
+            //// TODO: [VM] Fix sizes and offsets
+            //if (m_winningTeam.HasValue)
+            //{
+            //    var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
 
-                var backRectColor = Color.FromArgb(127, Color.Gray);
-                var messageColor = Color.Maroon;
+            //    var backRectColor = Color.FromArgb(127, Color.Gray);
+            //    var messageColor = Color.Maroon;
 
-                var message = string.Format("Winning team: {0}", m_winningTeam.Value);
-                var messageSize = graphics.MeasureString(message, this.Font);
-                var messagePoint = new PointF(
-                    (uiRealSize.Width - messageSize.Width) / 2f,
-                    (uiRealSize.Height - messageSize.Height) / 2f);
+            //    var message = string.Format("Winning team: {0}", m_winningTeam.Value);
+            //    var messageSize = graphics.MeasureString(message, this.Font);
+            //    var messagePoint = new PointF(
+            //        (uiRealSize.Width - messageSize.Width) / 2f,
+            //        (uiRealSize.Height - messageSize.Height) / 2f);
 
-                var backRectSize = messageSize;
-                backRectSize.Scale(2f);
-                var backRectBounds = new RectangleF(
-                    new PointF(
-                        (uiRealSize.Width - backRectSize.Width) / 2f,
-                        (uiRealSize.Height - backRectSize.Height) / 2f),
-                    backRectSize);
+            //    var backRectSize = messageSize;
+            //    backRectSize.Scale(2f);
+            //    var backRectBounds = new RectangleF(
+            //        new PointF(
+            //            (uiRealSize.Width - backRectSize.Width) / 2f,
+            //            (uiRealSize.Height - backRectSize.Height) / 2f),
+            //        backRectSize);
 
-                using (var brush = new SolidBrush(backRectColor))
-                {
-                    graphics.FillRectangle(brush, backRectBounds);
-                }
+            //    using (var brush = new SolidBrush(backRectColor))
+            //    {
+            //        graphics.FillRectangle(brush, backRectBounds);
+            //    }
 
-                using (var brush = new SolidBrush(messageColor))
-                {
-                    var gs = graphics.Save();
-                    try
-                    {
-                        using (Matrix mx1 = graphics.Transform.Clone(),
-                            mx2 = new Matrix(1f, 0f, 0f, -1f, messagePoint.X, messagePoint.Y + messageSize.Height))
-                        {
-                            mx1.Multiply(mx2);
+            //    using (var brush = new SolidBrush(messageColor))
+            //    {
+            //        var gs = graphics.Save();
+            //        try
+            //        {
+            //            using (Matrix mx1 = graphics.Transform.Clone(),
+            //                mx2 = new Matrix(1f, 0f, 0f, -1f, messagePoint.X, messagePoint.Y + messageSize.Height))
+            //            {
+            //                mx1.Multiply(mx2);
 
-                            graphics.Transform = mx1;
-                            graphics.DrawString(message, this.Font, brush, PointF.Empty);
-                        }
-                    }
-                    finally
-                    {
-                        graphics.Restore(gs);
-                    }
-                }
-            }
+            //                graphics.Transform = mx1;
+            //                graphics.DrawString(message, this.Font, brush, PointF.Empty);
+            //            }
+            //        }
+            //        finally
+            //        {
+            //            graphics.Restore(gs);
+            //        }
+            //    }
+            //}
         }
 
         #endregion

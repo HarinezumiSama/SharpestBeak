@@ -99,7 +99,12 @@
     <Compile Include="CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
+    <Compile Include="DirectionalPosition.cs" />
+    <Compile Include="GameEngineSettings.cs" />
+    <Compile Include="GameException.cs" />
     <Compile Include="GameObjectId.cs" />
+    <Compile Include="GamePositionEventArgs.cs" />
+    <Compile Include="IDirectionalPosition.cs" />
     <Compile Include="LogicMoveResult.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Presentation\ChickenPresentation.cs" />

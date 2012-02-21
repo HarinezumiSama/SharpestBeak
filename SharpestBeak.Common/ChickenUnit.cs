@@ -9,7 +9,7 @@ using SharpestBeak.Common.Presentation.Elements;
 
 namespace SharpestBeak.Common
 {
-    internal sealed class ChickenUnit
+    internal sealed class ChickenUnit : IDirectionalPosition
     {
         #region Fields
 
@@ -92,7 +92,7 @@ namespace SharpestBeak.Common
 
         internal bool CanShoot()
         {
-            return this.ShotEngineStepIndex < 0 
+            return this.ShotEngineStepIndex < 0
                 || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
         }
 
@@ -187,6 +187,28 @@ namespace SharpestBeak.Common
                 m_cachedElement = new ChickenElement(this.Position, this.BeakAngle);
             }
             return m_cachedElement;
+        }
+
+        #endregion
+
+        #region IDirectionalPosition Members
+
+        Point2D IDirectionalPosition.Position
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_position;
+            }
+        }
+
+        GameAngle IDirectionalPosition.Angle
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_beakAngle;
+            }
         }
 
         #endregion

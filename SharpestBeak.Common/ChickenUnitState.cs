@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Common.View;
 
 namespace SharpestBeak.Common
 {
-    public sealed class ChickenUnitState
+    public sealed class ChickenUnitState : IDirectionalPosition
     {
         #region Constructors
 
@@ -122,6 +122,28 @@ namespace SharpestBeak.Common
                 this.BeakAngle,
                 this.Team,
                 this.IsDead);
+        }
+
+        #endregion
+
+        #region IDirectionalPosition Members
+
+        Point2D IDirectionalPosition.Position
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return this.Position;
+            }
+        }
+
+        GameAngle IDirectionalPosition.Angle
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return this.BeakAngle;
+            }
         }
 
         #endregion

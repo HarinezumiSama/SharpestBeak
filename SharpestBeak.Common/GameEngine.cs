@@ -17,7 +17,7 @@ namespace SharpestBeak.Common
 {
     // TODO: [VM] Capture the game to allow playback
 
-    // TODO: [VM] Implement custom chicken unit positioning (or even allow game frame snapshot as a start of a game)
+    // TODO: [VM] Allow game frame snapshot as a start of a game
 
     // TODO: [VM] Implement single-thread feature: logics are running with engine in single thread
 
@@ -47,6 +47,7 @@ namespace SharpestBeak.Common
         private readonly ChickenUnitLogic m_darkTeamLogic;
         private bool m_disposed;
         private readonly Action<GamePaintEventArgs> m_paintCallback;
+        private readonly Action<GamePositionEventArgs> m_positionCallback;
         private readonly ThreadSafeValue<long> m_moveCount;
         private readonly ThreadSafeValue<GameTeam?> m_winningTeam;
         private Thread m_engineThread;
@@ -69,45 +70,33 @@ namespace SharpestBeak.Common
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameEngine"/> class.
         /// </summary>
-        public GameEngine(
-            Action<GamePaintEventArgs> paintCallback,
-            Size nominalSize,
-            ChickenTeamRecord lightTeam,
-            ChickenTeamRecord darkTeam)
+        public GameEngine(GameEngineSettings settings)
         {
             #region Argument Check
 
-            if (paintCallback == null)
+            if (settings == null)
             {
-                throw new ArgumentNullException("paintCallback");
-            }
-            if (lightTeam == null)
-            {
-                throw new ArgumentNullException("lightTeam");
-            }
-            if (darkTeam == null)
-            {
-                throw new ArgumentNullException("darkTeam");
+                throw new ArgumentNullException("settings");
             }
 
             #endregion
-
-            m_paintCallback = paintCallback;
 
             if (SettingsCache.Instance.UsePerformanceCounters)
             {
                 PerformanceCounterHelper.Initialize();
             }
 
-            // Pre-initialized properties
-            this.Data = new StaticData(nominalSize);
+            // Pre-initialized fields and properties
+            m_paintCallback = settings.PaintCallback;
+            m_positionCallback = settings.PositionCallback;
+            this.Data = new StaticData(settings.NominalSize);
             m_moveCount = new ThreadSafeValue<long>();
             m_winningTeam = new ThreadSafeValue<GameTeam?>();
             m_lastGamePresentation = new ThreadSafeValue<GamePresentation>();
 
-            // Post-initialized properties
-            m_lightTeamLogic = CreateLogic(this, lightTeam, GameTeam.Light);
-            m_darkTeamLogic = CreateLogic(this, darkTeam, GameTeam.Dark);
+            // Post-initialized fields and properties
+            m_lightTeamLogic = CreateLogic(this, settings.LightTeam, GameTeam.Light);
+            m_darkTeamLogic = CreateLogic(this, settings.DarkTeam, GameTeam.Dark);
             m_logics = new[] { m_lightTeamLogic, m_darkTeamLogic }
                 .ToList()
                 .AsReadOnly();
@@ -183,29 +172,110 @@ namespace SharpestBeak.Common
             }
         }
 
+        private void ValidatePositioning(GamePositionEventArgs e)
+        {
+            #region Argument Check
+
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+
+            #endregion
+
+            for (int index = 0; index < e.UnitStates.Count; index++)
+            {
+                var unitState = e.UnitStates[index];
+
+                DirectionalPosition position;
+                if (!e.TryGetPosition(unitState, out position))
+                {
+                    throw new GameException(
+                        string.Format(
+                            "Chicken unit {{{0}}} has undefined position.",
+                            unitState.ToString()));
+                }
+
+                var tooCloseUnit = e.UnitStates.Take(index).FirstOrDefault(
+                    item => e.GetPosition(item).Position.GetDistance(position.Position)
+                        < GameConstants.NominalCellSize);
+                if (tooCloseUnit != null)
+                {
+                    throw new GameException(
+                        string.Format(
+                            "Chicken unit {{{0}}} is too close to chicken unit {{{1}}}.",
+                            unitState.ToString(),
+                            tooCloseUnit.ToString()));
+                }
+            }
+        }
+
+        private void ApplyPositioning(GamePositionEventArgs e)
+        {
+            foreach (var unit in m_allChickens)
+            {
+                var position = e.GetPosition(unit);
+                unit.Position = position.Position;
+                unit.BeakAngle = position.Angle;
+            }
+        }
+
         private void PositionChickens()
         {
-            for (int index = 0; index < m_allChickens.Count; index++)
-            {
-                var chicken = m_allChickens[index];
+            UpdateUnitStates(true);  // Unit states are used in positioning
+            var e = new GamePositionEventArgs(this);
 
-                Point2D newPosition;
+            if (m_positionCallback != null)
+            {
+                m_positionCallback(e);
+                if (e.Handled)
+                {
+                    ValidatePositioning(e);
+                    ApplyPositioning(e);
+                    return;
+                }
+            }
+
+            e.Reset();
+            PositionChickensDefault(e);
+            ValidatePositioning(e);
+            ApplyPositioning(e);
+        }
+
+        private static void PositionChickensDefault(GamePositionEventArgs e)
+        {
+            #region Argument Check
+
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+
+            #endregion
+
+            for (int index = 0; index < e.UnitStates.Count; index++)
+            {
+                var unitState = e.UnitStates[index];
+
+                Point2D position;
                 do
                 {
                     var nominalPosition = new Point(
-                        s_random.Next(this.Data.NominalSize.Width),
-                        s_random.Next(this.Data.NominalSize.Height));
-                    newPosition = GameHelper.NominalToReal(nominalPosition);
+                        s_random.Next(e.Data.NominalSize.Width),
+                        s_random.Next(e.Data.NominalSize.Height));
+                    position = GameHelper.NominalToReal(nominalPosition);
                 }
-                while (m_allChickens.Take(index).Any(
-                    item => item.Position.GetDistance(newPosition) < GameConstants.NominalCellSize));
+                while (e.UnitStates.Take(index).Any(
+                    item => e.GetPosition(item).Position.GetDistance(position) < GameConstants.NominalCellSize));
 
-                var newAngle = (float)Math.Floor(
+                var plainAngle = (float)Math.Floor(
                     MathHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
+                var angle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(plainAngle));
 
-                chicken.Position = newPosition;
-                chicken.BeakAngle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(newAngle));
+                e.SetPosition(unitState, new DirectionalPosition(position, angle));
             }
+
+            e.Handled = true;
         }
 
         private void CallPaintCallback()
@@ -275,12 +345,11 @@ namespace SharpestBeak.Common
 
             if (m_engineThread != null)
             {
-                throw new InvalidOperationException("Engine is already running.");
+                throw new GameException("Engine is already running.");
             }
-
             if (m_winningTeam.Value.HasValue)
             {
-                throw new InvalidOperationException("The game has ended. Reset the game before starting it again.");
+                throw new GameException("The game has ended. Reset the game before starting it again.");
             }
 
             Application.Idle += this.Application_Idle;
@@ -323,7 +392,7 @@ namespace SharpestBeak.Common
             m_previousMoves.Clear();
 
             PositionChickens();
-            UpdateUnitStates();
+            UpdateUnitStates(true);
 
             m_logics.DoForEach(item => item.Reset());
 
@@ -334,7 +403,7 @@ namespace SharpestBeak.Common
         {
             if (SettingsCache.Instance.DebugModeDisableShooting)
             {
-                throw new InvalidOperationException("Shooting is disabled.");
+                throw new GameException("Shooting is disabled.");
             }
 
             lock (m_shotIndexCounterLock)
@@ -355,7 +424,7 @@ namespace SharpestBeak.Common
                     return;
                 }
 
-                if (!UpdateUnitStates())
+                if (!UpdateUnitStates(false))
                 {
                     return;
                 }
@@ -670,7 +739,7 @@ namespace SharpestBeak.Common
             return true;
         }
 
-        private bool UpdateUnitStates()
+        private bool UpdateUnitStates(bool force)
         {
             for (int logicIndex = 0; logicIndex < m_logics.Count; logicIndex++)
             {
@@ -682,7 +751,7 @@ namespace SharpestBeak.Common
 
                     for (int unitIndex = 0; unitIndex < logic.Units.Count; unitIndex++)
                     {
-                        if (IsStopping())
+                        if (!force && IsStopping())
                         {
                             return false;
                         }
@@ -711,7 +780,7 @@ namespace SharpestBeak.Common
             var logic = logicInstance as ChickenUnitLogic;
             if (logic == null)
             {
-                throw new InvalidOperationException("Invalid logic passed to thread method.");
+                throw new GameException("Invalid logic passed to thread method.");
             }
 
             while (!IsStopping())
@@ -801,6 +870,15 @@ namespace SharpestBeak.Common
 
         #region Internal Properties
 
+        internal IList<ChickenUnit> AllChickens
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_allChickens;
+            }
+        }
+
         internal IList<ChickenUnit> AliveChickens
         {
             get;
@@ -811,6 +889,15 @@ namespace SharpestBeak.Common
         {
             get;
             private set;
+        }
+
+        internal IList<ChickenUnitLogic> Logics
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return m_logics;
+            }
         }
 
         #endregion
@@ -919,7 +1006,7 @@ namespace SharpestBeak.Common
         {
             if (this.IsRunning)
             {
-                throw new InvalidOperationException("Cannot reset game engine while it is running.");
+                throw new GameException("Cannot reset game engine while it is running.");
             }
 
             m_syncLock.ExecuteInWriteLock(this.ResetInternal);

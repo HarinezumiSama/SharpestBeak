@@ -239,6 +239,10 @@ namespace SharpestBeak.Logic.Default
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
             var allShots = gameState.UnitStates.SelectMany(item => item.View.Shots).ToList();
+            var enemyUnits = gameState
+                .UnitStates
+                .SelectMany(item => item.View.Chickens.Where(visibleUnit => visibleUnit.Team != this.Team))
+                .ToList();
 
             foreach (var unitState in gameState.UnitStates)
             {
@@ -273,7 +277,6 @@ namespace SharpestBeak.Logic.Default
                 m_blockedDirectionMap.Remove(unitState.UniqueId);
 
                 var possibleActions = new List<PossibleActionInfo>(unitState.View.Chickens.Count);
-                var enemyUnits = unitState.View.Chickens.Where(item => item.Team != this.Team);
                 foreach (var enemyUnit in enemyUnits)
                 {
                     var shotTargetPosition = GetShotTargetPosition(unitState, enemyUnit);
