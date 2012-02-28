@@ -523,6 +523,8 @@ namespace SharpestBeak.UI.WinForms
             StopGame();
             m_winningTeam = null;
 
+            ResetFpsCounter(true);
+
             m_gameEngine.Reset();
             m_gameEngine.CallPaint();
         }
@@ -591,16 +593,18 @@ namespace SharpestBeak.UI.WinForms
             //            (uiRealSize.Height - backRectSize.Height) / 2f),
             //        backRectSize);
 
-            //    using (var brush = new SolidBrush(backRectColor))
-            //    {
-            //        graphics.FillRectangle(brush, backRectBounds);
-            //    }
-
             //    using (var brush = new SolidBrush(messageColor))
             //    {
             //        var gs = graphics.Save();
             //        try
             //        {
+            //            //graphics.RotateTransform(30f, MatrixOrder.Prepend);
+
+            //            using (var backBrush = new SolidBrush(backRectColor))
+            //            {
+            //                graphics.FillRectangle(backBrush, backRectBounds);
+            //            }
+
             //            using (Matrix mx1 = graphics.Transform.Clone(),
             //                mx2 = new Matrix(1f, 0f, 0f, -1f, messagePoint.X, messagePoint.Y + messageSize.Height))
             //            {
@@ -732,10 +736,7 @@ namespace SharpestBeak.UI.WinForms
 
         private void fpsTimer_Tick(object sender, EventArgs e)
         {
-            if (m_fps >= 0f)
-            {
-                fpsLabel.Text = string.Format("{0:N1} FPS", m_fps);
-            }
+            fpsLabel.Text = m_fps >= 0f ? string.Format("{0:N1} FPS", m_fps) : string.Empty;
         }
 
         private void GameEngine_GameEnded(object sender, GameEndedEventArgs e)
