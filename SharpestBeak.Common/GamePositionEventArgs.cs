@@ -70,7 +70,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public StaticData Data
+        public GameEngineData Data
         {
             get;
             private set;

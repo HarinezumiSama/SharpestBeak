@@ -7,14 +7,14 @@ using SharpestBeak.Common.Presentation.Primitives;
 
 namespace SharpestBeak.Common
 {
-    public sealed class StaticData
+    public sealed class GameEngineData
     {
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="StaticData"/> class.
+        ///     Initializes a new instance of the <see cref="GameEngineData"/> class.
         /// </summary>
-        internal StaticData(Size nominalSize)
+        internal GameEngineData(Size nominalSize)
         {
             #region Argument Check
 

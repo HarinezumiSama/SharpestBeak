@@ -12,6 +12,7 @@ using SharpestBeak.Common.Presentation;
 using SharpestBeak.Common.Presentation.Elements;
 using SharpestBeak.Common.Presentation.Primitives;
 using SharpestBeak.Common.Properties;
+using SharpestBeak.Common.Settings;
 
 namespace SharpestBeak.Common
 {
@@ -89,7 +90,7 @@ namespace SharpestBeak.Common
             // Pre-initialized fields and properties
             m_paintCallback = settings.PaintCallback;
             m_positionCallback = settings.PositionCallback;
-            this.Data = new StaticData(settings.NominalSize);
+            this.Data = new GameEngineData(settings.NominalSize);
             m_moveCount = new ThreadSafeValue<long>();
             m_winningTeam = new ThreadSafeValue<GameTeam?>();
             m_lastGamePresentation = new ThreadSafeValue<GamePresentation>();
@@ -269,7 +270,7 @@ namespace SharpestBeak.Common
                     item => e.GetPosition(item).Position.GetDistance(position) < GameConstants.NominalCellSize));
 
                 var plainAngle = (float)Math.Floor(
-                    MathHelper.HalfRevolutionDegrees - s_random.NextDouble() * GameConstants.FullRevolutionAngle);
+                    MathHelper.HalfRevolutionDegrees - s_random.NextDouble() * MathHelper.RevolutionDegrees);
                 var angle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(plainAngle));
 
                 e.SetPosition(unitState, new DirectionalPosition(position, angle));
@@ -913,7 +914,7 @@ namespace SharpestBeak.Common
 
         #region Public Properties
 
-        public StaticData Data
+        public GameEngineData Data
         {
             get;
             private set;

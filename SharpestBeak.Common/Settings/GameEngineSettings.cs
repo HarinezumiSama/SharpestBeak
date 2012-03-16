@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using SharpestBeak.Common.Presentation;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak.Common.Settings
 {
     public sealed class GameEngineSettings
     {

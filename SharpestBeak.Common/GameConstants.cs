@@ -125,7 +125,9 @@ namespace SharpestBeak.Common
         [DebuggerNonUserCode]
         private static float GetSlowDownRatio()
         {
-            var result = Math.Min(MaxSlowDownRatio, Math.Max(MinSlowDownRatio, Settings.Default.SlowDownRatio));
+            var result = Math.Min(
+                MaxSlowDownRatio,
+                Math.Max(MinSlowDownRatio, Properties.Settings.Default.SlowDownRatio));
             return result;
         }
 

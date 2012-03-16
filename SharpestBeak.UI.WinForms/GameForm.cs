@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using SharpestBeak.Common;
 using SharpestBeak.Common.Diagnostics;
 using SharpestBeak.Common.Presentation;
+using SharpestBeak.Common.Settings;
 using SharpestBeak.Logic.Default;
 using SharpestBeak.UI.WinForms.Properties;
 
@@ -574,7 +575,7 @@ namespace SharpestBeak.UI.WinForms
             //// TODO: [VM] Fix sizes and offsets
             //if (m_winningTeam.HasValue)
             //{
-            //    var uiRealSize = lastPresentation.CommonData.RealSize.Scale(m_uiCoefficient);
+            //    var uiRealSize = lastPresentation.Data.RealSize.Scale(m_uiCoefficient);
 
             //    var backRectColor = Color.FromArgb(127, Color.Gray);
             //    var messageColor = Color.Maroon;

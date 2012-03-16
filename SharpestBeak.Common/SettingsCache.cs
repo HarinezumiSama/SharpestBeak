@@ -28,10 +28,12 @@ namespace SharpestBeak.Common
 
         private void ReadSettings()
         {
-            this.UsePerformanceCounters = Settings.Default.UsePerformanceCounters;
-            this.EnableDebugOutput = Settings.Default.EnableDebugOutput;
-            this.InstrumentationMode = Settings.Default.InstrumentationMode;
-            this.DebugModeDisableShooting = Settings.Default.DebugModeDisableShooting;
+            var settings = Properties.Settings.Default.EnsureNotNull();
+
+            this.UsePerformanceCounters = settings.UsePerformanceCounters;
+            this.EnableDebugOutput = settings.EnableDebugOutput;
+            this.InstrumentationMode = settings.InstrumentationMode;
+            this.DebugModeDisableShooting = settings.DebugModeDisableShooting;
         }
 
         #endregion

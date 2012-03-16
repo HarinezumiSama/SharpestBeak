@@ -6,8 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using SharpestBeak.Common;
 
-namespace SharpestBeak.Common
+// The namespace is intentionally the root to ease access from other projects
+namespace SharpestBeak
 {
     public static class ExtensionMethods
     {

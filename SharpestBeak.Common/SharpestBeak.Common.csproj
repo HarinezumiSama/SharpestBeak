@@ -100,7 +100,8 @@
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
     <Compile Include="DirectionalPosition.cs" />
-    <Compile Include="GameEngineSettings.cs" />
+    <Compile Include="Mapper\ObjectMapper.cs" />
+    <Compile Include="Settings\GameEngineSettings.cs" />
     <Compile Include="GameException.cs" />
     <Compile Include="GameObjectId.cs" />
     <Compile Include="GamePositionEventArgs.cs" />
@@ -137,7 +138,7 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FireMode.cs" />
     <Compile Include="GameAngle.cs" />
-    <Compile Include="StaticData.cs" />
+    <Compile Include="GameEngineData.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="GameHelper.cs" />
