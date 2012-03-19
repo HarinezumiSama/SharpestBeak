@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SharpestBeak.Model;
 using SharpestBeak.Presentation.Elements;
 
 namespace SharpestBeak.Presentation

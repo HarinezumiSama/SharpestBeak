@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 namespace SharpestBeak
 {
     public static class Helper

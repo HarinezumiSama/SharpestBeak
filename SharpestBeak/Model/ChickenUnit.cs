@@ -5,9 +5,10 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Elements;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     internal sealed class ChickenUnit : IDirectionalPosition
     {

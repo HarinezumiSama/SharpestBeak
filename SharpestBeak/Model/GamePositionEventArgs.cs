@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SharpestBeak.Physics;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     public sealed class GamePositionEventArgs : EventArgs
     {

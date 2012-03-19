@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     // TODO: [VM] Implement a partial move in a particular direction: (0; 1] (similar to that in BeakTurn) - (?)
 

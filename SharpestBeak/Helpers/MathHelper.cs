@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 namespace SharpestBeak
 {
     public static class MathHelper

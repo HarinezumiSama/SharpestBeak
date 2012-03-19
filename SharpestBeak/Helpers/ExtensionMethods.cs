@@ -7,8 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using SharpestBeak;
+using SharpestBeak.Model;
 
-// The namespace is intentionally the root to ease access from other projects
+// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 namespace SharpestBeak
 {
     public static class ExtensionMethods

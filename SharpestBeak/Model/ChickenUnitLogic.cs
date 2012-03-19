@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     public abstract class ChickenUnitLogic : IDisposable
     {

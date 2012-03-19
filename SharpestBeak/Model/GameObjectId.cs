@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     public struct GameObjectId : IEquatable<GameObjectId>
     {

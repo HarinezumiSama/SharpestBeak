@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak
+namespace SharpestBeak.Physics
 {
     public struct GameAngle : IEquatable<GameAngle>, IFormattable
     {

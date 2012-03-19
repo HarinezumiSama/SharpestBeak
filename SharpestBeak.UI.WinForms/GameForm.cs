@@ -9,9 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SharpestBeak;
+using SharpestBeak.Configuration;
 using SharpestBeak.Diagnostics;
 using SharpestBeak.Logic.Default;
-using SharpestBeak.Parameters;
+using SharpestBeak.Model;
 using SharpestBeak.Presentation;
 using SharpestBeak.UI.WinForms.Properties;
 

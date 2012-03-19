@@ -9,7 +9,7 @@ using SharpestBeak.Presentation;
 using SharpestBeak.Presentation.Primitives;
 using SharpestBeak.Properties;
 
-namespace SharpestBeak
+namespace SharpestBeak.Physics
 {
     public static class CollisionDetector
     {

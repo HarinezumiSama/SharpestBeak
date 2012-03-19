@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     [Serializable]
     public struct BeakTurn : IEquatable<BeakTurn>, IComparable<BeakTurn>

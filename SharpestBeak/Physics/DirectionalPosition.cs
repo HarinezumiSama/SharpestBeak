@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace SharpestBeak
+namespace SharpestBeak.Physics
 {
     public struct DirectionalPosition : IDirectionalPosition
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using SharpestBeak.Model;
 
 namespace SharpestBeak.View
 {

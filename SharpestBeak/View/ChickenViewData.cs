@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using SharpestBeak.Model;
+using SharpestBeak.Physics;
 
 namespace SharpestBeak.View
 {

@@ -28,7 +28,7 @@ namespace SharpestBeak
 
         private void ReadSettings()
         {
-            var settings = Properties.Settings.Default.EnsureNotNull();
+            var settings = Settings.Default.EnsureNotNull();
 
             this.UsePerformanceCounters = settings.UsePerformanceCounters;
             this.EnableDebugOutput = settings.EnableDebugOutput;

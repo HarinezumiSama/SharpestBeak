@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharpestBeak
+namespace SharpestBeak.Model
 {
     // So far only one real fire mode
     public enum FireMode

@@ -91,23 +91,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BeakTurn.cs" />
-    <Compile Include="ChickenTeamRecord.cs" />
-    <Compile Include="ChickenUnit.cs" />
-    <Compile Include="ChickenUnitLogic.cs" />
-    <Compile Include="ChickenUnitState.cs" />
-    <Compile Include="CollisionDetector.cs" />
+    <Compile Include="Model\BeakTurn.cs" />
+    <Compile Include="Configuration\ChickenTeamRecord.cs" />
+    <Compile Include="Model\ChickenUnit.cs" />
+    <Compile Include="Model\ChickenUnitLogic.cs" />
+    <Compile Include="Model\ChickenUnitState.cs" />
+    <Compile Include="Physics\CollisionDetector.cs" />
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
-    <Compile Include="DirectionalPosition.cs" />
+    <Compile Include="Physics\DirectionalPosition.cs" />
     <Compile Include="Mapper\ObjectMapper.cs" />
-    <Compile Include="Parameters\GameEngineSettings.cs" />
+    <Compile Include="Configuration\GameEngineSettings.cs" />
     <Compile Include="GameException.cs" />
-    <Compile Include="GameObjectId.cs" />
-    <Compile Include="GamePositionEventArgs.cs" />
-    <Compile Include="IDirectionalPosition.cs" />
-    <Compile Include="LogicMoveResult.cs" />
-    <Compile Include="MathHelper.cs" />
+    <Compile Include="Model\GameObjectId.cs" />
+    <Compile Include="Model\GamePositionEventArgs.cs" />
+    <Compile Include="Physics\IDirectionalPosition.cs" />
+    <Compile Include="Model\LogicMoveResult.cs" />
+    <Compile Include="Helpers\MathHelper.cs" />
     <Compile Include="Presentation\ChickenPresentation.cs" />
     <Compile Include="Presentation\Elements\BaseElement.cs" />
     <Compile Include="Presentation\Primitives\BasePrimitive.cs" />
@@ -115,45 +115,45 @@
     <Compile Include="Presentation\Primitives\ConvexPolygonPrimitive.cs" />
     <Compile Include="Presentation\DrawData.cs" />
     <Compile Include="GameEndedEventArgs.cs" />
-    <Compile Include="GameTeam.cs" />
-    <Compile Include="LineSide.cs" />
-    <Compile Include="MoveInfoStates.cs" />
+    <Compile Include="Model\GameTeam.cs" />
+    <Compile Include="Physics\LineSide.cs" />
+    <Compile Include="Model\MoveInfoStates.cs" />
     <Compile Include="Presentation\ShotPresentation.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="QuadraticEquation.cs" />
+    <Compile Include="Physics\QuadraticEquation.cs" />
     <Compile Include="SettingsCache.cs" />
     <Compile Include="ThreadSafeRandom.cs" />
     <Compile Include="ValueRange.cs" />
-    <Compile Include="Vector2D.cs" />
+    <Compile Include="Physics\Vector2D.cs" />
     <Compile Include="Diagnostics\DebugHelper.cs" />
     <Compile Include="Presentation\Elements\ChickenElement.cs" />
     <Compile Include="Presentation\Primitives\CirclePrimitive.cs" />
     <Compile Include="Presentation\Elements\ShotElement.cs" />
     <Compile Include="Presentation\Primitives\PolygonPrimitive.cs" />
     <Compile Include="Presentation\Primitives\LinePrimitive.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="FireMode.cs" />
-    <Compile Include="GameAngle.cs" />
+    <Compile Include="Helpers\ExtensionMethods.cs" />
+    <Compile Include="Model\FireMode.cs" />
+    <Compile Include="Physics\GameAngle.cs" />
     <Compile Include="GameEngineData.cs" />
     <Compile Include="GameConstants.cs" />
     <Compile Include="GameEngine.cs" />
-    <Compile Include="GameHelper.cs" />
+    <Compile Include="Helpers\GameHelper.cs" />
     <Compile Include="Presentation\GamePaintEventArgs.cs" />
     <Compile Include="Presentation\GamePresentation.cs" />
-    <Compile Include="GameState.cs" />
-    <Compile Include="Helper.cs" />
+    <Compile Include="Model\GameState.cs" />
+    <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Presentation\ICollidable.cs" />
     <Compile Include="Presentation\ICollidableElement.cs" />
     <Compile Include="Presentation\ICollidablePrimitive.cs" />
-    <Compile Include="Point2D.cs" />
-    <Compile Include="MoveInfo.cs" />
-    <Compile Include="MoveDirection.cs" />
+    <Compile Include="Physics\Point2D.cs" />
+    <Compile Include="Model\MoveInfo.cs" />
+    <Compile Include="Model\MoveDirection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShotUnit.cs" />
+    <Compile Include="Model\ShotUnit.cs" />
     <Compile Include="ThreadSafeValue.cs" />
     <Compile Include="View\ChickenViewData.cs" />
     <Compile Include="View\ShotViewData.cs" />
@@ -167,6 +167,9 @@
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Helpers\_ReadMe.Helpers.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
