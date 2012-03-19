@@ -107,7 +107,10 @@ namespace SharpestBeak.Common.Mapper
         {
             #region Constructors
 
-            internal MappingInfo(Type baseType, LambdaExpression validateExpression)
+            internal MappingInfo(
+                Type baseType,
+                ConstructorInfo destinationConstructor,
+                LambdaExpression validateExpression)
             {
                 #region Argument Check
 
@@ -115,10 +118,15 @@ namespace SharpestBeak.Common.Mapper
                 {
                     throw new ArgumentNullException("baseType");
                 }
+                if (destinationConstructor == null)
+                {
+                    throw new ArgumentNullException("destinationConstructor");
+                }
 
                 #endregion
 
                 this.BaseType = baseType;
+                this.DestinationConstructor = destinationConstructor;
                 this.ValidateExpression = validateExpression;
             }
 
@@ -127,6 +135,12 @@ namespace SharpestBeak.Common.Mapper
             #region Public Properties
 
             public Type BaseType
+            {
+                get;
+                private set;
+            }
+
+            public ConstructorInfo DestinationConstructor
             {
                 get;
                 private set;
@@ -244,12 +258,79 @@ namespace SharpestBeak.Common.Mapper
             return result;
         }
 
+        private void MapInternal<TSource, TDestination>(
+            TSource source,
+            ref TDestination destination,
+            bool createDestination)
+        {
+            #region Argument Check
+
+            if (!createDestination)
+            {
+                if (source == null)
+                {
+                    throw new ArgumentNullException("source");
+                }
+                if (destination == null)
+                {
+                    throw new ArgumentNullException("destination");
+                }
+            }
+
+            #endregion
+
+            if (source == null)
+            {
+                destination = default(TDestination);
+                return;
+            }
+
+            var key = MappingKey.Create<TSource, TDestination>();
+
+            MappingInfo mapping;
+            lock (m_syncLock)
+            {
+                mapping = m_typeMappings.GetValueOrDefault(key);
+            }
+
+            if (mapping == null)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "There is no registered mapping from '{0}' to '{1}'.",
+                        key.Source.FullName,
+                        key.Destination.FullName));
+            }
+
+            if (createDestination)
+            {
+                // TODO: [VM] Check if constructor can be omitted for structures
+                destination = (TDestination)mapping.DestinationConstructor.Invoke((object[])null);
+            }
+
+            var validate = (Expression<Func<TSource, string>>)mapping.ValidateExpression;
+            if (validate != null)
+            {
+                var validationResult = validate.Compile().Invoke(source);
+                if (!string.IsNullOrWhiteSpace(validationResult))
+                {
+                    throw new ArgumentException(validationResult, "source");
+                }
+            }
+
+            var propertyInfoPairs = GetMappedProperties(key.Source, key.Destination, mapping.BaseType);
+            foreach (var propertyInfoPair in propertyInfoPairs)
+            {
+                var propertyValue = propertyInfoPair.Key.GetValue(source, null);
+                propertyInfoPair.Value.SetValue(destination, propertyValue, null);
+            }
+        }
+
         #endregion
 
         #region Public Methods
 
         public ObjectMapper Register<TSource, TDestination, TBase>(Expression<Func<TSource, string>> validate = null)
-            where TDestination : new()
         {
             var sourceType = typeof(TSource);
             var destinationType = typeof(TDestination);
@@ -298,7 +379,24 @@ namespace SharpestBeak.Common.Mapper
                             destinationType.FullName));
                 }
 
-                var mapping = new MappingInfo(baseType, validate);
+                const BindingFlags constructorBindingFlags = BindingFlags.Instance
+                    | BindingFlags.Public
+                    | BindingFlags.NonPublic;
+
+                var destinationConstructor = key.Destination.GetConstructor(
+                    constructorBindingFlags,
+                    Type.DefaultBinder,
+                    Type.EmptyTypes,
+                    null);
+                if (destinationConstructor == null)
+                {
+                    throw new ArgumentException(
+                        string.Format(
+                            "The destination type '{0}' has no parameterless constructor.",
+                            destinationType.FullName));
+                }
+
+                var mapping = new MappingInfo(baseType, destinationConstructor, validate);
                 m_typeMappings.Add(key, mapping);
             }
 
@@ -306,13 +404,11 @@ namespace SharpestBeak.Common.Mapper
         }
 
         public ObjectMapper Register<TSource, TDestination>(Expression<Func<TSource, string>> validate = null)
-            where TDestination : new()
         {
             return Register<TSource, TDestination, TDestination>(validate);
         }
 
         public ObjectMapper Unregister<TSource, TDestination>()
-            where TDestination : new()
         {
             var key = MappingKey.Create<TSource, TDestination>();
             lock (m_syncLock)
@@ -324,50 +420,16 @@ namespace SharpestBeak.Common.Mapper
         }
 
         public TDestination Map<TSource, TDestination>(TSource source)
-            where TDestination : new()
         {
-            if (source == null)
-            {
-                return default(TDestination);
-            }
-
-            var key = MappingKey.Create<TSource, TDestination>();
-
-            MappingInfo mapping;
-            lock (m_syncLock)
-            {
-                mapping = m_typeMappings.GetValueOrDefault(key);
-            }
-
-            if (mapping == null)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "There is not registered mapping from '{0}' to '{1}'.",
-                        key.Source.FullName,
-                        key.Destination.FullName));
-            }
-
-            var result = new TDestination();
-
-            var validate = (Expression<Func<TSource, string>>)mapping.ValidateExpression;
-            if (validate != null)
-            {
-                var validationResult = validate.Compile().Invoke(source);
-                if (!string.IsNullOrWhiteSpace(validationResult))
-                {
-                    throw new ArgumentException(validationResult, "source");
-                }
-            }
-
-            var propertyInfoPairs = GetMappedProperties(key.Source, key.Destination, mapping.BaseType);
-            foreach (var propertyInfoPair in propertyInfoPairs)
-            {
-                var propertyValue = propertyInfoPair.Key.GetValue(source, null);
-                propertyInfoPair.Value.SetValue(result, propertyValue, null);
-            }
-
+            TDestination result = default(TDestination);
+            MapInternal<TSource, TDestination>(source, ref result, true);
             return result;
+        }
+
+        public TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        {
+            MapInternal<TSource, TDestination>(source, ref destination, false);
+            return destination;
         }
 
         #endregion
