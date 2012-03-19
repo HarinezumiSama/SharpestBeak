@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common.Presentation;
+using SharpestBeak.Presentation;
 
-namespace SharpestBeak.Common.Settings
+namespace SharpestBeak.Parameters
 {
     public sealed class GameEngineSettings
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common.Presentation.Elements;
+using SharpestBeak.Presentation.Elements;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     internal sealed class ShotUnit : IDirectionalPosition
     {

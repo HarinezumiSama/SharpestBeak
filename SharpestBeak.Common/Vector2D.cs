@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     [Serializable]
     public struct Vector2D : IEquatable<Vector2D>

@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public struct ValueRange<T>
         where T : struct, IComparable<T>

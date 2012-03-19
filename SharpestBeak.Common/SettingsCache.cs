@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Properties;
+using SharpestBeak.Properties;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     internal sealed class SettingsCache
     {

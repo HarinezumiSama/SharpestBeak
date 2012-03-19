@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Properties;
+using SharpestBeak.Properties;
 
-namespace SharpestBeak.Common.Diagnostics
+namespace SharpestBeak.Diagnostics
 {
     public static class DebugHelper
     {

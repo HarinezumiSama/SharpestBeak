@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace SharpestBeak.Common.Diagnostics
+namespace SharpestBeak.Diagnostics
 {
     internal sealed class PerformanceCounterHelper
     {

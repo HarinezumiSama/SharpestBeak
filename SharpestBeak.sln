@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.Common", "SharpestBeak.Common\SharpestBeak.Common.csproj", "{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak", "SharpestBeak.Common\SharpestBeak.csproj", "{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.UI.WinForms", "SharpestBeak.UI.WinForms\SharpestBeak.UI.WinForms.csproj", "{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}"
 EndProject

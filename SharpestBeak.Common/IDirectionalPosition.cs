@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public interface IDirectionalPosition
     {

@@ -8,11 +8,11 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using SharpestBeak.Common;
-using SharpestBeak.Common.Diagnostics;
-using SharpestBeak.Common.Presentation;
-using SharpestBeak.Common.Settings;
+using SharpestBeak;
+using SharpestBeak.Diagnostics;
 using SharpestBeak.Logic.Default;
+using SharpestBeak.Parameters;
+using SharpestBeak.Presentation;
 using SharpestBeak.UI.WinForms.Properties;
 
 namespace SharpestBeak.UI.WinForms

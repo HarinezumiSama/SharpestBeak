@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common.Presentation.Primitives;
+using SharpestBeak.Presentation.Primitives;
 
-namespace SharpestBeak.Common.Presentation.Elements
+namespace SharpestBeak.Presentation.Elements
 {
     public sealed class ChickenElement : BaseElement, ICollidableElement
     {

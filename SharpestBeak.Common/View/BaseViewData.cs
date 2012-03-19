@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.View
+namespace SharpestBeak.View
 {
     public abstract class BaseViewData
     {

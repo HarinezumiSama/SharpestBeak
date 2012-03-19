@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-using SharpestBeak.Common.Diagnostics;
-using SharpestBeak.Common.Presentation;
-using SharpestBeak.Common.Presentation.Primitives;
-using SharpestBeak.Common.Properties;
+using SharpestBeak.Diagnostics;
+using SharpestBeak.Presentation;
+using SharpestBeak.Presentation.Primitives;
+using SharpestBeak.Properties;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public static class CollisionDetector
     {

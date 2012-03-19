@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SharpestBeak.Common.View
+namespace SharpestBeak.View
 {
     public sealed class ShotViewData : BaseViewData, IDirectionalPosition
     {

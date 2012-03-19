@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Presentation
+namespace SharpestBeak.Presentation
 {
     public sealed class DrawData : IDisposable
     {

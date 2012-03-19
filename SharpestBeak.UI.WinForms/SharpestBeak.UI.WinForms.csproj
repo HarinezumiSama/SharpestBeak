@@ -161,9 +161,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SharpestBeak.Common\SharpestBeak.Common.csproj">
+    <ProjectReference Include="..\SharpestBeak.Common\SharpestBeak.csproj">
       <Project>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</Project>
-      <Name>SharpestBeak.Common</Name>
+      <Name>SharpestBeak</Name>
     </ProjectReference>
     <ProjectReference Include="..\SharpestBeak.Logic.Default\SharpestBeak.Logic.Default.csproj">
       <Project>{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}</Project>

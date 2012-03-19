@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     [Flags]
     public enum MoveInfoStates : int

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Diagnostics
+namespace SharpestBeak.Diagnostics
 {
     public sealed class AutoStopwatch : IDisposable
     {

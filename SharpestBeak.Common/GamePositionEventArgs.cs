@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public sealed class GamePositionEventArgs : EventArgs
     {

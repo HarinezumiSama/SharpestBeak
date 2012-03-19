@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using SharpestBeak.Common;
+using SharpestBeak;
 
 namespace SharpestBeak.Logic.Default
 {

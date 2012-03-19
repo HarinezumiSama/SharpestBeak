@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common;
-using SharpestBeak.Common.Presentation.Primitives;
-using SharpestBeak.Common.View;
+using SharpestBeak;
+using SharpestBeak.Presentation.Primitives;
+using SharpestBeak.View;
 
 namespace SharpestBeak.Logic.Default
 {

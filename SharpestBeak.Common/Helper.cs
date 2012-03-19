@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public static class Helper
     {

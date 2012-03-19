@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     [Serializable]
     public sealed class GameException : Exception

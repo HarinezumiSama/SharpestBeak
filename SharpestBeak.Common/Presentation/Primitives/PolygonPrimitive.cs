@@ -6,7 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Presentation.Primitives
+namespace SharpestBeak.Presentation.Primitives
 {
     public class PolygonPrimitive : BasePrimitive
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public struct QuadraticEquation
     {

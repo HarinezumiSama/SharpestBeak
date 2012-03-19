@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using SharpestBeak.Common.View;
+using SharpestBeak.View;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public sealed class ChickenUnitState : IDirectionalPosition
     {

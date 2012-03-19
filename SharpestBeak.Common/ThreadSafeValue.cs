@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public sealed class ThreadSafeValue<T>
     {

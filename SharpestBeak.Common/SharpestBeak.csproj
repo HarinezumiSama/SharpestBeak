@@ -8,8 +8,8 @@
     <ProjectGuid>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpestBeak.Common</RootNamespace>
-    <AssemblyName>SharpestBeak.Common</AssemblyName>
+    <RootNamespace>SharpestBeak</RootNamespace>
+    <AssemblyName>SharpestBeak</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -23,7 +23,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\_Output_\AnyCpu\Debug\SharpestBeak.Common.xml</DocumentationFile>
+    <DocumentationFile>..\_Output_\AnyCpu\Debug\SharpestBeak.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,14 +35,14 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\_Output_\AnyCpu\Release\SharpestBeak.Common.xml</DocumentationFile>
+    <DocumentationFile>..\_Output_\AnyCpu\Release\SharpestBeak.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>..\_Output_\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>..\_Output_\x86\Debug\SharpestBeak.Common.xml</DocumentationFile>
+    <DocumentationFile>..\_Output_\x86\Debug\SharpestBeak.xml</DocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1591</NoWarn>
     <DebugType>full</DebugType>
@@ -61,7 +61,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>..\_Output_\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>..\_Output_\x86\Release\SharpestBeak.Common.xml</DocumentationFile>
+    <DocumentationFile>..\_Output_\x86\Release\SharpestBeak.xml</DocumentationFile>
     <Optimize>true</Optimize>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1591</NoWarn>
@@ -101,7 +101,7 @@
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
     <Compile Include="DirectionalPosition.cs" />
     <Compile Include="Mapper\ObjectMapper.cs" />
-    <Compile Include="Settings\GameEngineSettings.cs" />
+    <Compile Include="Parameters\GameEngineSettings.cs" />
     <Compile Include="GameException.cs" />
     <Compile Include="GameObjectId.cs" />
     <Compile Include="GamePositionEventArgs.cs" />

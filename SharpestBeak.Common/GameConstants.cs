@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SharpestBeak.Common.Properties;
+using SharpestBeak.Properties;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public static class GameConstants
     {

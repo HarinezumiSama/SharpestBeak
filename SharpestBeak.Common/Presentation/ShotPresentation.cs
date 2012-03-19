@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Presentation.Elements;
+using SharpestBeak.Presentation.Elements;
 
-namespace SharpestBeak.Common.Presentation
+namespace SharpestBeak.Presentation
 {
     public sealed class ShotPresentation
     {

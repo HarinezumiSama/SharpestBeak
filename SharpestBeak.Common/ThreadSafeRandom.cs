@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using SharpestBeak.Common.Diagnostics;
+using SharpestBeak.Diagnostics;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     public sealed class ThreadSafeRandom : Random
     {

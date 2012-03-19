@@ -1,4 +1,4 @@
-﻿using SharpestBeak.Common;
+﻿using SharpestBeak;
 namespace SharpestBeak.UI.WinForms
 {
     partial class GameForm

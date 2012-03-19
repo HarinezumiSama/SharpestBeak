@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace SharpestBeak.Common.Presentation.Primitives
+namespace SharpestBeak.Presentation.Primitives
 {
     public abstract class BasePrimitive
     {

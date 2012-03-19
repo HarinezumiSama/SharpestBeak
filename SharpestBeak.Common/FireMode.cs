@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     // So far only one real fire mode
     public enum FireMode
     {
         None = 0,
-        Regular
+        Regular = 1
     }
 }

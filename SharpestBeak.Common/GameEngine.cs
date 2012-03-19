@@ -7,14 +7,14 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using SharpestBeak.Common.Diagnostics;
-using SharpestBeak.Common.Presentation;
-using SharpestBeak.Common.Presentation.Elements;
-using SharpestBeak.Common.Presentation.Primitives;
-using SharpestBeak.Common.Properties;
-using SharpestBeak.Common.Settings;
+using SharpestBeak.Diagnostics;
+using SharpestBeak.Parameters;
+using SharpestBeak.Presentation;
+using SharpestBeak.Presentation.Elements;
+using SharpestBeak.Presentation.Primitives;
+using SharpestBeak.Properties;
 
-namespace SharpestBeak.Common
+namespace SharpestBeak
 {
     // TODO: [VM] Capture the game to allow playback
 
