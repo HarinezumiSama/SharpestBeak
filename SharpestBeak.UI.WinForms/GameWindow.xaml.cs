@@ -176,6 +176,10 @@ namespace SharpestBeak.UI.WinForms
         private readonly Dictionary<GameObjectId, ShotData> m_shotDatas =
             new Dictionary<GameObjectId, ShotData>();
 
+        private Point3D m_defaultCameraPosition;
+        private Vector3D m_defaultCameraLookDirection;
+        private Vector3D m_defaultCameraUpDirection;
+
         private GameTeam? m_winningTeam;
 
         #endregion
@@ -195,11 +199,7 @@ namespace SharpestBeak.UI.WinForms
             m_chickenGeometry = CreateChickenGeometry(m_nominalSizeCoefficient);
             m_shotGeometry = CreateShotGeometry(m_nominalSizeCoefficient);
 
-            //this.TestChickenModel.Geometry = m_chickenGeometry;
-            //this.TestChickenModel.Material = LightTeamUnitMaterial;
-
-            //this.TestShotModel.Geometry = m_shotGeometry;
-            //this.TestShotModel.Material = LightTeamShotMaterial;
+            SaveCameraDefaults();
         }
 
         /// <summary>
@@ -288,6 +288,13 @@ namespace SharpestBeak.UI.WinForms
             return meshBuilder.ToMesh(true);
         }
 
+        private void SaveCameraDefaults()
+        {
+            m_defaultCameraPosition = this.Camera.Position;
+            m_defaultCameraLookDirection = this.Camera.LookDirection;
+            m_defaultCameraUpDirection = this.Camera.UpDirection;
+        }
+
         private bool InitializeGameUI()
         {
             const double BoardThickness = 1d / 4d;
@@ -327,6 +334,8 @@ namespace SharpestBeak.UI.WinForms
                 this.Camera.Position += boardCenter;
                 this.Camera.LookDirection = boardCenter.ToPoint3D() - this.Camera.Position;
 
+                SaveCameraDefaults();
+
                 //ClearStatusLabels();
                 //UpdateMoveCountStatus();
 
@@ -346,7 +355,7 @@ namespace SharpestBeak.UI.WinForms
             return true;
         }
 
-        private void InitializeVisuals(GamePresentation gamePresentation)
+        private void InitializeVisualData(GamePresentation gamePresentation)
         {
             ClearData();
 
@@ -428,7 +437,7 @@ namespace SharpestBeak.UI.WinForms
 
             if (!m_chickenDatas.Any())
             {
-                InitializeVisuals(presentation);
+                InitializeVisualData(presentation);
             }
 
             var deadChickenIds = new HashSet<GameObjectId>(m_chickenDatas.Keys);
@@ -558,6 +567,13 @@ namespace SharpestBeak.UI.WinForms
             m_gameEngine.Reset();
         }
 
+        private void RestoreCameraDefaults()
+        {
+            this.Camera.Position = m_defaultCameraPosition;
+            this.Camera.LookDirection = m_defaultCameraLookDirection;
+            this.Camera.UpDirection = m_defaultCameraUpDirection;
+        }
+
         #endregion
 
         #region Protected Methods
@@ -605,10 +621,10 @@ namespace SharpestBeak.UI.WinForms
                     ResetGame();
                     break;
 
-                //case Key.C:
-                //    e.Handled = true;
-                //    this.MainViewport.ResetCamera();
-                //    break;
+                case Key.C:
+                    e.Handled = true;
+                    RestoreCameraDefaults();
+                    break;
             }
 
             base.OnKeyDown(e);
