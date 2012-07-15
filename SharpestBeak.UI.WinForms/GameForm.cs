@@ -71,8 +71,8 @@ namespace SharpestBeak.UI.WinForms
             InitializeComponent();
 
             m_uiCellSize = uiCellSize;
-            m_uiFullCellSize = m_uiCellSize + 1;
-            m_uiCoefficient = (float)m_uiCellSize / GameConstants.NominalCellSize;
+            m_uiFullCellSize = uiCellSize + 1;
+            m_uiCoefficient = (float)uiCellSize / GameConstants.NominalCellSize;
             m_uiTargetPointRadius = GameConstants.ShotUnit.Radius * m_uiCoefficient / 2f;
 
             m_lightTeamUnitDrawData = new DrawData(Color.LightGreen, m_uiCoefficient);

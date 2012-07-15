@@ -183,7 +183,9 @@ namespace SharpestBeak
 
         public static bool IsThreadAbort(this Exception exception)
         {
-            return exception is ThreadAbortException || exception is ThreadInterruptedException;
+            return exception is ThreadAbortException
+                || exception is ThreadInterruptedException
+                || exception is OperationCanceledException;
         }
 
         public static void ExecuteInReadLock(this ReaderWriterLockSlim @lock, Action action)

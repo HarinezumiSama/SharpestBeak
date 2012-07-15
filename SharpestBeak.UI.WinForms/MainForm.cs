@@ -48,13 +48,33 @@ namespace SharpestBeak.UI.WinForms
                 var lightTeamRecord = new ChickenTeamRecord(lightTeam.Logic.Type, lightTeam.PlayerCount);
                 var darkTeamRecord = new ChickenTeamRecord(darkTeam.Logic.Type, darkTeam.PlayerCount);
 
-                using (var gameForm = new GameForm(
-                    m_gameSettings.UICellSize,
-                    m_gameSettings.NominalSize,
-                    lightTeamRecord,
-                    darkTeamRecord))
+                switch (m_gameSettings.ViewMode)
                 {
-                    gameForm.ShowDialog(this);
+                    case UIViewMode.WinForms2D:
+                        {
+                            using (var gameForm = new GameForm(
+                               m_gameSettings.UICellSize,
+                               m_gameSettings.NominalSize,
+                               lightTeamRecord,
+                               darkTeamRecord))
+                            {
+                                gameForm.ShowDialog(this);
+                            }
+                        }
+                        break;
+
+                    case UIViewMode.Wpf3D:
+                        {
+                            var gameWindow = new GameWindow(
+                                m_gameSettings.NominalSize,
+                                lightTeamRecord,
+                                darkTeamRecord);
+                            gameWindow.ShowDialog();
+                        }
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
                 }
             }
             catch (Exception ex)

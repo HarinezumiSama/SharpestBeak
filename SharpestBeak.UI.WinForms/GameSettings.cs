@@ -20,8 +20,14 @@ namespace SharpestBeak.UI.WinForms
         {
             this.UICellSize = Settings.Default.UICellSize;
             this.NominalSize = Settings.Default.NominalSize;
-            this.LightTeam = new TeamSettings() { PlayerCount = Settings.Default.TeamUnitCount };
-            this.DarkTeam = new TeamSettings() { PlayerCount = Settings.Default.TeamUnitCount };
+            this.LightTeam = new TeamSettings()
+            {
+                PlayerCount = Settings.Default.TeamUnitCount
+            };
+            this.DarkTeam = new TeamSettings()
+            {
+                PlayerCount = Settings.Default.TeamUnitCount
+            };
         }
 
         #endregion
@@ -55,6 +61,13 @@ namespace SharpestBeak.UI.WinForms
         #endregion
 
         #region Public Properties
+
+        [DisplayName("View mode")]
+        public UIViewMode ViewMode
+        {
+            get;
+            set;
+        }
 
         [DisplayName("UI cell size")]
         public int UICellSize
