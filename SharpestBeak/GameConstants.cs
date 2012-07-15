@@ -68,7 +68,7 @@ namespace SharpestBeak
         {
             #region Fields
 
-            public static readonly double s_maximumFrequencyMsec = 500d * SlowDownRatio;
+            public static readonly double MaximumFrequencyMsec = 500d * SlowDownRatio;
 
             public static readonly float Radius = GameConstants.NominalCellSize / 10f;
 
@@ -80,7 +80,7 @@ namespace SharpestBeak
 
             public static readonly int MaximumFrequency = Math.Max(
                 1,
-                (int)(s_maximumFrequencyMsec / s_logicPollFrequencyMsec));
+                (int)(MaximumFrequencyMsec / s_logicPollFrequencyMsec));
 
             public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
 

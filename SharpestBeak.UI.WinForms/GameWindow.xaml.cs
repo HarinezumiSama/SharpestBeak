@@ -26,12 +26,22 @@ namespace SharpestBeak.UI.WinForms
     {
         #region Fields
 
+        private static readonly Color LightTeamUnitColor = Colors.LightGreen;
+        private static readonly Color LightTeamShotColor = Colors.Pink;
+
+        private static readonly Color DarkTeamUnitColor = Colors.DarkGreen;
+        private static readonly Color DarkTeamShotColor = Colors.DarkRed;
+
         private readonly double m_uiCellSize;
+        private readonly double m_nominalSizeCoefficient;
+        private readonly MeshGeometry3D m_chickenGeometry;
+        private readonly MeshGeometry3D m_shotGeometry;
 
         private readonly GameEngine m_gameEngine;
-        private readonly object m_lastPresentationLock = new object();
 
+        //private readonly object m_lastPresentationLock = new object();
         //private GamePresentation m_lastPresentation;
+
         private GameTeam? m_winningTeam;
 
         #endregion
@@ -46,6 +56,16 @@ namespace SharpestBeak.UI.WinForms
             InitializeComponent();
 
             m_uiCellSize = 1d;
+            m_nominalSizeCoefficient = GameConstants.NominalCellSize;
+
+            m_chickenGeometry = CreateChickenGeometry(m_nominalSizeCoefficient);
+            m_shotGeometry = CreateShotGeometry(m_nominalSizeCoefficient);
+
+            this.TestChickenModel.Geometry = m_chickenGeometry;
+            this.TestChickenBrush.Color = LightTeamUnitColor;
+
+            this.TestShotModel.Geometry = m_shotGeometry;
+            this.TestShotBrush.Color = LightTeamShotColor;
         }
 
         /// <summary>
@@ -79,8 +99,65 @@ namespace SharpestBeak.UI.WinForms
 
         #region Private Methods
 
+        private static MeshGeometry3D CreateChickenGeometry(double nominalSizeCoefficient)
+        {
+            #region Argument Check
+
+            if (nominalSizeCoefficient <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "nominalSizeCoefficient",
+                    nominalSizeCoefficient,
+                    "The value must be positive.");
+            }
+
+            #endregion
+
+            var bodyCircleRadius = GameConstants.ChickenUnit.BodyCircleRadius / nominalSizeCoefficient;
+            var beakOffset = GameConstants.ChickenUnit.BeakOffset / nominalSizeCoefficient;
+            var beakRayOffset = GameConstants.ChickenUnit.BeakRayOffset / nominalSizeCoefficient;
+
+            var meshBuilder = new MeshBuilder();
+            meshBuilder.AddSphere(
+                new Point3D(0d, 0d, bodyCircleRadius),
+                bodyCircleRadius);
+            meshBuilder.AddCone(
+                new Point3D(0d, 0d, bodyCircleRadius),
+                new Point3D(beakOffset, 0d, bodyCircleRadius),
+                beakRayOffset,
+                true,
+                20);
+            return meshBuilder.ToMesh(true);
+        }
+
+        private static MeshGeometry3D CreateShotGeometry(double nominalSizeCoefficient)
+        {
+            #region Argument Check
+
+            if (nominalSizeCoefficient <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "nominalSizeCoefficient",
+                    nominalSizeCoefficient,
+                    "The value must be positive.");
+            }
+
+            #endregion
+
+            var bodyCircleRadius = GameConstants.ChickenUnit.BodyCircleRadius / nominalSizeCoefficient;
+            var shotRadius = GameConstants.ShotUnit.Radius / nominalSizeCoefficient;
+
+            var meshBuilder = new MeshBuilder();
+            meshBuilder.AddSphere(
+                new Point3D(0d, 0d, bodyCircleRadius),
+                shotRadius);
+            return meshBuilder.ToMesh(true);
+        }
+
         private bool InitializeGameUI()
         {
+            const double BoardThickness = 1d / 4d;
+
             try
             {
                 var boardSize = m_gameEngine.Data.NominalSize;
@@ -94,7 +171,13 @@ namespace SharpestBeak.UI.WinForms
                         var builder = (x + y) % 2 == 0 ? evenCellsMeshBuilder : oddCellsMeshBuilder;
 
                         builder.AddBox(
-                            new Rect3D(x * m_uiCellSize, y * m_uiCellSize, -0.25d, m_uiCellSize, m_uiCellSize, 0.25d));
+                            new Rect3D(
+                                x * m_uiCellSize,
+                                y * m_uiCellSize,
+                                -BoardThickness,
+                                m_uiCellSize,
+                                m_uiCellSize,
+                                BoardThickness));
                     }
                 }
 
@@ -107,6 +190,9 @@ namespace SharpestBeak.UI.WinForms
                     0d);
                 this.Camera.Position += boardCenter;
                 this.Camera.LookDirection = boardCenter.ToPoint3D() - this.Camera.Position;
+
+                this.TestChickenModel.Transform = new TranslateTransform3D(boardCenter);
+                this.TestShotModel.Transform = new TranslateTransform3D(boardCenter + new Vector3D(1d, 0d, 0d));
 
                 //ClearStatusLabels();
                 //UpdateMoveCountStatus();
@@ -131,7 +217,14 @@ namespace SharpestBeak.UI.WinForms
 
         private void PaintGame(GamePaintEventArgs e)
         {
-            // TODO: PaintGame (WPF)
+            // TODO: PaintGame!
+
+            ////lock (m_lastPresentationLock)
+            ////{
+            ////    m_lastPresentation = e.Presentation;
+            ////}
+
+            ////this.MainViewport.InvalidateVisual();
         }
 
         private void StartGame()
