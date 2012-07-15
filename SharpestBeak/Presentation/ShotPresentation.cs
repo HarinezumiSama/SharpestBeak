@@ -30,6 +30,7 @@ namespace SharpestBeak.Presentation
             #endregion
 
             this.Element = shotUnit.GetElement();
+            this.UniqueId = shotUnit.UniqueId;
             var createdChickenPresentation = chickenMap.GetValueOrDefault(shotUnit.Owner.UniqueId);
             this.Owner = createdChickenPresentation ?? new ChickenPresentation(shotUnit.Owner);
         }
@@ -39,6 +40,12 @@ namespace SharpestBeak.Presentation
         #region Public Properties
 
         public ShotElement Element
+        {
+            get;
+            private set;
+        }
+
+        public GameObjectId UniqueId
         {
             get;
             private set;

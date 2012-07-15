@@ -528,7 +528,6 @@ namespace SharpestBeak.UI.WinForms
             ResetFpsCounter(true);
 
             m_gameEngine.Reset();
-            m_gameEngine.CallPaint();
         }
 
         private void DoPaintGame(Graphics graphics, GamePresentation lastPresentation)
@@ -632,6 +631,8 @@ namespace SharpestBeak.UI.WinForms
         {
             base.OnLoad(e);
 
+            Application.Idle += this.Application_Idle;
+
             ClearStatusLabels();
             if (!InitializeGameUI())
             {
@@ -643,6 +644,8 @@ namespace SharpestBeak.UI.WinForms
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             StopGame();
+            Application.Idle -= this.Application_Idle;
+
             base.OnFormClosing(e);
         }
 
@@ -685,6 +688,11 @@ namespace SharpestBeak.UI.WinForms
         #endregion
 
         #region Event Handlers
+
+        private void Application_Idle(object sender, EventArgs e)
+        {
+            m_gameEngine.CallPaint();
+        }
 
         private void pbGame_Paint(object sender, PaintEventArgs e)
         {

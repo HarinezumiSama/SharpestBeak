@@ -41,6 +41,7 @@ namespace SharpestBeak
 
         private readonly ReaderWriterLockSlim m_syncLock =
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
         private readonly ManualResetEvent m_stopEvent = new ManualResetEvent(false);
         private readonly IList<ChickenUnit> m_allChickens;
         private readonly List<ChickenUnit> m_aliveChickensDirect;
@@ -292,10 +293,10 @@ namespace SharpestBeak
             m_paintCallback(new GamePaintEventArgs(presentation));
         }
 
-        private void Application_Idle(object sender, EventArgs e)
-        {
-            CallPaintCallback();
-        }
+        //private void Application_Idle(object sender, EventArgs e)
+        //{
+        //    CallPaintCallback();
+        //}
 
         private bool IsStopping()
         {
@@ -355,7 +356,7 @@ namespace SharpestBeak
                 throw new GameException("The game has ended. Reset the game before starting it again.");
             }
 
-            Application.Idle += this.Application_Idle;
+            //Application.Idle += this.Application_Idle;
 
             m_engineThread = new Thread(this.DoExecuteEngine)
             {
@@ -607,6 +608,7 @@ namespace SharpestBeak
                         case GameTeam.Light:
                             winningLogic = m_lightTeamLogic;
                             break;
+
                         case GameTeam.Dark:
                             winningLogic = m_darkTeamLogic;
                             break;
@@ -974,7 +976,7 @@ namespace SharpestBeak
 
             var engineThread = m_syncLock.ExecuteInReadLock(() => m_engineThread);
 
-            Application.Idle -= this.Application_Idle;
+            //Application.Idle -= this.Application_Idle;
 
             m_syncLock.ExecuteInWriteLock(
                 () => m_logics.DoForEach(
@@ -1019,6 +1021,25 @@ namespace SharpestBeak
         public void CallPaint()
         {
             CallPaintCallback();
+        }
+
+        public GamePresentation GetPresentation()
+        {
+            m_syncLock.EnterReadLock();
+            try
+            {
+                //if (this.IsRunning)
+                //{
+                //    throw new InvalidOperationException(
+                //        "Presentation cannot be obtained directly while the engine is running.");
+                //}
+
+                return m_lastGamePresentation.Value;
+            }
+            finally
+            {
+                m_syncLock.ExitReadLock();
+            }
         }
 
         #endregion
