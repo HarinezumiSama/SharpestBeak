@@ -9,7 +9,8 @@
     <Grid>
         <helix:HelixViewport3D Name="MainViewport" ShowCameraInfo="True" ShowCameraTarget="True"
                 ShowCoordinateSystem="True" ShowFrameRate="True" ShowFieldOfView="True" ShowTriangleCountInfo="True"
-                ShowViewCube="True" RotateAroundMouseDownPoint="True">
+                ShowViewCube="True" RotateAroundMouseDownPoint="True"
+                MouseLeftButtonDown="MainViewport_MouseLeftButtonDown">
             <helix:HelixViewport3D.Background>
                 <SolidColorBrush Color="Black" />
             </helix:HelixViewport3D.Background>
@@ -44,7 +45,7 @@
                     </Model3DGroup>
                 </ModelVisual3D.Content>
             </ModelVisual3D>
-            
+
             <ModelVisual3D x:Name="ShotsVisual">
                 <ModelVisual3D.Content>
                     <Model3DGroup x:Name="ShotsModelGroup" />
