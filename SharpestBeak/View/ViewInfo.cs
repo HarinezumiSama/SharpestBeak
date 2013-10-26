@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Model;
 
 namespace SharpestBeak.View
@@ -12,8 +11,8 @@ namespace SharpestBeak.View
     {
         #region Fields
 
-        private static readonly IList<ChickenViewData> s_emptyChickens = new ChickenViewData[0];
-        private static readonly IList<ShotViewData> s_emptyShots = new ShotViewData[0];
+        private static readonly IList<ChickenViewData> EmptyChickens = new ChickenViewData[0];
+        private static readonly IList<ShotViewData> EmptyShots = new ShotViewData[0];
 
         #endregion
 
@@ -41,8 +40,8 @@ namespace SharpestBeak.View
 
             if (unit.IsDead)
             {
-                this.Chickens = s_emptyChickens;
-                this.Shots = s_emptyShots;
+                this.Chickens = EmptyChickens;
+                this.Shots = EmptyShots;
             }
             else
             {

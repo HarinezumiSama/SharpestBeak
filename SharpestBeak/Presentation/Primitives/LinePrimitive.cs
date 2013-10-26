@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives
@@ -12,7 +11,7 @@ namespace SharpestBeak.Presentation.Primitives
     {
         #region Fields
 
-        private Vector2D? m_direction;
+        private Vector2D? _direction;
 
         #endregion
 
@@ -72,11 +71,11 @@ namespace SharpestBeak.Presentation.Primitives
             [DebuggerNonUserCode]
             get
             {
-                if (!m_direction.HasValue)
+                if (!_direction.HasValue)
                 {
-                    m_direction = this.End - this.Start;
+                    _direction = this.End - this.Start;
                 }
-                return m_direction.Value;
+                return _direction.Value;
             }
         }
 

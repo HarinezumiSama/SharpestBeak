@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+// ReSharper disable once CheckNamespace
 namespace SharpestBeak
 {
     public static class MathHelper
@@ -134,7 +134,7 @@ namespace SharpestBeak
 
         public static bool IsValidDegreeAngle(this float angle)
         {
-            return angle > -MathHelper.HalfRevolutionDegrees && angle <= MathHelper.HalfRevolutionDegrees;
+            return angle > -HalfRevolutionDegrees && angle <= HalfRevolutionDegrees;
         }
 
         public static float EnsureValidDegreeAngle(this float angle)

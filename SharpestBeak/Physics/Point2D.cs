@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 
 namespace SharpestBeak.Physics
 {
@@ -14,8 +13,8 @@ namespace SharpestBeak.Physics
 
         public static readonly Point2D Zero = new Point2D();
 
-        private readonly float m_x;
-        private readonly float m_y;
+        private readonly float _x;
+        private readonly float _y;
 
         #endregion
 
@@ -26,15 +25,15 @@ namespace SharpestBeak.Physics
         /// </summary>
         public Point2D(float x, float y)
         {
-            m_x = x;
-            m_y = y;
+            _x = x;
+            _y = y;
         }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Point2D"/> class.
         /// </summary>
         public Point2D(Point point)
-            : this((float)point.X, (float)point.Y)
+            : this(point.X, point.Y)
         {
             // Nothing to do
         }
@@ -86,7 +85,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_x;
+                return _x;
             }
         }
 
@@ -95,7 +94,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_y;
+                return _y;
             }
         }
 
@@ -122,7 +121,7 @@ namespace SharpestBeak.Physics
 
         public override int GetHashCode()
         {
-            return m_x.GetHashCode() ^ m_y.GetHashCode();
+            return _x.GetHashCode() ^ _y.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -132,17 +131,17 @@ namespace SharpestBeak.Physics
 
         public override string ToString()
         {
-            return string.Format("{{{0}: X = {1}, Y = {2}}}", GetType().Name, m_x, m_y);
+            return string.Format("{{{0}: X = {1}, Y = {2}}}", GetType().Name, _x, _y);
         }
 
         public PointF ToPointF()
         {
-            return new PointF(m_x, m_y);
+            return new PointF(_x, _y);
         }
 
         public SizeF ToSizeF()
         {
-            return new SizeF(m_x, m_y);
+            return new SizeF(_x, _y);
         }
 
         public Vector2D ToVector2D()
@@ -152,17 +151,17 @@ namespace SharpestBeak.Physics
 
         public Point2D OffsetX(float offset)
         {
-            return new Point2D(m_x + offset, m_y);
+            return new Point2D(_x + offset, _y);
         }
 
         public Point2D OffsetY(float offset)
         {
-            return new Point2D(m_x, m_y + offset);
+            return new Point2D(_x, _y + offset);
         }
 
         public Point2D Negate()
         {
-            return new Point2D(-m_x, -m_y);
+            return new Point2D(-_x, -_y);
         }
 
         public float GetDistanceSquared(Point2D otherValue)
@@ -294,7 +293,7 @@ namespace SharpestBeak.Physics
 
         public bool Equals(Point2D other)
         {
-            return m_x == other.X && m_y == other.Y;
+            return _x == other.X && _y == other.Y;
         }
 
         #endregion

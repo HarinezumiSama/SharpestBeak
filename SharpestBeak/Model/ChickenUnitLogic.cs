@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace SharpestBeak.Model
@@ -11,9 +10,9 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private readonly List<ChickenUnit> m_unitsDirect = new List<ChickenUnit>();
-        private readonly ThreadSafeValue<Exception> m_error;
-        private readonly Lazy<string> m_caption;
+        private readonly List<ChickenUnit> _unitsDirect = new List<ChickenUnit>();
+        private readonly ThreadSafeValue<Exception> _error;
+        private readonly Lazy<string> _caption;
 
         #endregion
 
@@ -24,16 +23,16 @@ namespace SharpestBeak.Model
         /// </summary>
         protected ChickenUnitLogic()
         {
-            m_error = new ThreadSafeValue<Exception>();
+            _error = new ThreadSafeValue<Exception>();
             this.MakeMoveEvent = new AutoResetEvent(false);
 
-            this.Units = m_unitsDirect.AsReadOnly();
-            m_caption = new Lazy<string>(this.GetCaption);
+            this.Units = _unitsDirect.AsReadOnly();
+            _caption = new Lazy<string>(this.GetCaption);
 
-            this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(m_unitsDirect.Count);
+            this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(_unitsDirect.Count);
             this.UnitsStatesLock = new object();
 
-            this.UnitsMoves = new Dictionary<ChickenUnit, MoveInfo>(m_unitsDirect.Count);
+            this.UnitsMoves = new Dictionary<ChickenUnit, MoveInfo>(_unitsDirect.Count);
             this.UnitsMovesLock = new object();
         }
 
@@ -91,12 +90,13 @@ namespace SharpestBeak.Model
             [DebuggerNonUserCode]
             get
             {
-                return m_error.Value;
+                return _error.Value;
             }
+
             [DebuggerNonUserCode]
             set
             {
-                m_error.Value = value;
+                _error.Value = value;
             }
         }
 
@@ -159,7 +159,7 @@ namespace SharpestBeak.Model
             this.Engine = engine;
             this.Team = team;
 
-            m_unitsDirect.ChangeContents(
+            _unitsDirect.ChangeContents(
                 Enumerable.Range(1, unitCount).Select(i => new ChickenUnit(this)));
         }
 
@@ -194,7 +194,7 @@ namespace SharpestBeak.Model
             [DebuggerNonUserCode]
             get
             {
-                return m_caption.Value;
+                return _caption.Value;
             }
         }
 

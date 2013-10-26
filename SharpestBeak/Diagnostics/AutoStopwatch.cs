@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,15 +16,15 @@ namespace SharpestBeak.Diagnostics
         public static readonly string MillisecondsOnlyOutputFormat = "{1} ms";
         public static readonly string DefaultOutputFormat = TimeSpanOnlyOutputFormat;
 
-        private readonly object m_syncLock = new object();
-        private Stopwatch m_stopwatch;
-        private TimeSpan? m_elapsed;
-        private TextWriter m_textWriter;
-        private bool m_ownsTextWriter;
-        private Action<string> m_write;
-        private Action<TimeSpan> m_callback;
+        private readonly object _syncLock = new object();
+        private Stopwatch _stopwatch;
+        private TimeSpan? _elapsed;
+        private TextWriter _textWriter;
+        private readonly bool _ownsTextWriter;
+        private Action<string> _write;
+        private Action<TimeSpan> _callback;
 
-        private string m_outputFormat;
+        private string _outputFormat;
 
         #endregion
 
@@ -46,14 +45,14 @@ namespace SharpestBeak.Diagnostics
 
             #endregion
 
-            m_textWriter = textWriter;
-            m_ownsTextWriter = ownsTextWriter;
-            m_write = write ?? (textWriter == null ? (Action<string>)null : textWriter.Write);
-            m_callback = callback;
-            m_outputFormat = DefaultOutputFormat;
+            _textWriter = textWriter;
+            _ownsTextWriter = ownsTextWriter;
+            _write = write ?? (textWriter == null ? (Action<string>)null : textWriter.Write);
+            _callback = callback;
+            _outputFormat = DefaultOutputFormat;
 
-            m_stopwatch = new Stopwatch();
-            m_stopwatch.Start();
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
         }
 
         public AutoStopwatch(Action<TimeSpan> callback = null)
@@ -95,14 +94,14 @@ namespace SharpestBeak.Diagnostics
             [DebuggerNonUserCode]
             get
             {
-                lock (m_syncLock)
+                lock (_syncLock)
                 {
-                    if (!m_elapsed.HasValue)
+                    if (!_elapsed.HasValue)
                     {
                         throw new InvalidOperationException(string.Format("{0} is not stopped yet.", GetType().Name));
                     }
 
-                    return m_elapsed.Value;
+                    return _elapsed.Value;
                 }
             }
         }
@@ -153,11 +152,12 @@ namespace SharpestBeak.Diagnostics
             [DebuggerNonUserCode]
             get
             {
-                lock (m_syncLock)
+                lock (_syncLock)
                 {
-                    return m_outputFormat;
+                    return _outputFormat;
                 }
             }
+
             [DebuggerNonUserCode]
             set
             {
@@ -170,9 +170,9 @@ namespace SharpestBeak.Diagnostics
 
                 #endregion
 
-                lock (m_syncLock)
+                lock (_syncLock)
                 {
-                    m_outputFormat = value;
+                    _outputFormat = value;
                 }
             }
         }
@@ -183,25 +183,25 @@ namespace SharpestBeak.Diagnostics
 
         public void Stop()
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
-                if (m_stopwatch == null)
+                if (_stopwatch == null)
                 {
                     return;
                 }
 
-                m_stopwatch.Stop();
-                var elapsed = m_stopwatch.Elapsed;
-                m_elapsed = elapsed;
-                m_stopwatch = null;
+                _stopwatch.Stop();
+                var elapsed = _stopwatch.Elapsed;
+                _elapsed = elapsed;
+                _stopwatch = null;
 
-                if (m_callback != null)
+                if (_callback != null)
                 {
-                    m_callback(elapsed);
-                    m_callback = null;
+                    _callback(elapsed);
+                    _callback = null;
                 }
 
-                if (m_write != null)
+                if (_write != null)
                 {
                     var outputFormat = this.OutputFormat;
                     string output;
@@ -213,18 +213,18 @@ namespace SharpestBeak.Diagnostics
                     {
                         output = string.Format(" * [Invalid output format \"{0}\": {1}] *", outputFormat, ex.Message);
                     }
-                    m_write(output);
+                    _write(output);
 
-                    m_write = null;
+                    _write = null;
                 }
 
-                if (m_textWriter != null)
+                if (_textWriter != null)
                 {
-                    if (m_ownsTextWriter)
+                    if (_ownsTextWriter)
                     {
-                        m_textWriter.Dispose();
+                        _textWriter.Dispose();
                     }
-                    m_textWriter = null;
+                    _textWriter = null;
                 }
             }
         }

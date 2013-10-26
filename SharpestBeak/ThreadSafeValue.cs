@@ -9,7 +9,7 @@ namespace SharpestBeak
     {
         #region Fields
 
-        private T m_value;
+        private T _value;
 
         #endregion
 
@@ -30,7 +30,7 @@ namespace SharpestBeak
             #endregion
 
             this.Lock = @lock;
-            m_value = value;
+            _value = value;
         }
 
         /// <summary>
@@ -59,15 +59,16 @@ namespace SharpestBeak
             {
                 lock (this.Lock)
                 {
-                    return m_value;
+                    return _value;
                 }
             }
+
             [DebuggerNonUserCode]
             set
             {
                 lock (this.Lock)
                 {
-                    m_value = value;
+                    _value = value;
                 }
             }
         }
@@ -79,7 +80,7 @@ namespace SharpestBeak
         public override string ToString()
         {
             var value = this.Value;
-            return value == null ? string.Empty : value.ToString();
+            return ReferenceEquals(value, null) ? string.Empty : value.ToString();
         }
 
         #endregion

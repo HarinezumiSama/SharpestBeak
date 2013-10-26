@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Properties;
 
 namespace SharpestBeak
@@ -11,7 +10,7 @@ namespace SharpestBeak
     {
         #region Fields
 
-        private static readonly SettingsCache s_instance = new SettingsCache();
+        private static readonly SettingsCache InstanceField = new SettingsCache();
 
         #endregion
 
@@ -45,7 +44,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return s_instance;
+                return InstanceField;
             }
         }
 

@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+// ReSharper disable once CheckNamespace
 namespace SharpestBeak
 {
     public static class Helper
@@ -15,6 +14,7 @@ namespace SharpestBeak
 
         private const string InvalidExpressionMessageFmt =
             "Invalid expression (must be a getter of a property of the type '{0}'): {{ {1} }}.";
+
         private const string InvalidExpressionMessageAutoFmt =
             "Invalid expression (must be a getter of a property of some type): {{ {0} }}.";
 
@@ -45,7 +45,7 @@ namespace SharpestBeak
 
         public static void Exchange<T>(ref T value1, ref T value2)
         {
-            T temp = value1;
+            var temp = value1;
             value1 = value2;
             value2 = temp;
         }
@@ -265,7 +265,9 @@ namespace SharpestBeak
             Expression<Func<TProperty>> propertyGetterExpression)
         {
             var propertyInfo = GetPropertyInfo(propertyGetterExpression);
-            return propertyInfo.DeclaringType.Name + Type.Delimiter + propertyInfo.Name;
+            return (propertyInfo.DeclaringType ?? propertyInfo.ReflectedType).Name
+                + Type.Delimiter
+                + propertyInfo.Name;
         }
 
         #endregion

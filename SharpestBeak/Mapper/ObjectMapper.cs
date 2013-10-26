@@ -17,8 +17,8 @@ namespace SharpestBeak.Mapper
         {
             #region Fields
 
-            private readonly Type m_source;
-            private readonly Type m_destination;
+            private readonly Type _source;
+            private readonly Type _destination;
 
             #endregion
 
@@ -39,8 +39,8 @@ namespace SharpestBeak.Mapper
 
                 #endregion
 
-                m_source = source;
-                m_destination = destination;
+                _source = source;
+                _destination = destination;
             }
 
             #endregion
@@ -50,13 +50,13 @@ namespace SharpestBeak.Mapper
             public Type Source
             {
                 [DebuggerStepThrough]
-                get { return m_source; }
+                get { return _source; }
             }
 
             public Type Destination
             {
                 [DebuggerStepThrough]
-                get { return m_destination; }
+                get { return _destination; }
             }
 
             #endregion
@@ -75,7 +75,7 @@ namespace SharpestBeak.Mapper
 
             public override int GetHashCode()
             {
-                return m_source.GetHashCode() ^ m_destination.GetHashCode();
+                return _source.GetHashCode() ^ _destination.GetHashCode();
             }
 
             public override string ToString()
@@ -83,8 +83,8 @@ namespace SharpestBeak.Mapper
                 return string.Format(
                     "{0}. {1} -> {2}",
                     GetType().Name,
-                    m_source.Name,
-                    m_destination.Name);
+                    _source.Name,
+                    _destination.Name);
             }
 
             #endregion
@@ -93,7 +93,7 @@ namespace SharpestBeak.Mapper
 
             public bool Equals(MappingKey other)
             {
-                return m_source == other.m_source && m_destination == other.m_destination;
+                return _source == other._source && _destination == other._destination;
             }
 
             #endregion
@@ -161,10 +161,10 @@ namespace SharpestBeak.Mapper
 
         #region Fields
 
-        private static readonly ObjectMapper s_instance = new ObjectMapper();
+        private static readonly ObjectMapper InstanceField = new ObjectMapper();
 
-        private readonly object m_syncLock = new object();
-        private readonly Dictionary<MappingKey, MappingInfo> m_typeMappings;
+        private readonly object _syncLock = new object();
+        private readonly Dictionary<MappingKey, MappingInfo> _typeMappings;
 
         #endregion
 
@@ -175,7 +175,7 @@ namespace SharpestBeak.Mapper
         /// </summary>
         private ObjectMapper()
         {
-            m_typeMappings = new Dictionary<MappingKey, MappingInfo>();
+            _typeMappings = new Dictionary<MappingKey, MappingInfo>();
         }
 
         #endregion
@@ -183,7 +183,7 @@ namespace SharpestBeak.Mapper
         #region Private Methods
 
         private static PropertyInfo FindInterfaceProperty(
-            PropertyInfo[] allSourceProperties,
+            IEnumerable<PropertyInfo> allSourceProperties,
             MethodInfo basePropertyGetter,
             ref InterfaceMapping sourceInterfaceMapping)
         {
@@ -199,18 +199,18 @@ namespace SharpestBeak.Mapper
             return sourceProperty;
         }
 
-        private List<KeyValuePair<PropertyInfo, PropertyInfo>> GetMappedProperties(
+        private static List<KeyValuePair<PropertyInfo, PropertyInfo>> GetMappedProperties(
             Type sourceType,
             Type destinationType,
             Type baseType)
         {
-            const BindingFlags propertyBindingFlags = BindingFlags.Instance
+            const BindingFlags PropertyBindingFlags = BindingFlags.Instance
                 | BindingFlags.Public
                 | BindingFlags.NonPublic;
 
-            var allSourceProperties = sourceType.GetProperties(propertyBindingFlags);
-            var allDestinationProperties = destinationType.GetProperties(propertyBindingFlags);
-            var allBaseProperties = baseType.GetProperties(propertyBindingFlags);
+            var allSourceProperties = sourceType.GetProperties(PropertyBindingFlags);
+            var allDestinationProperties = destinationType.GetProperties(PropertyBindingFlags);
+            var allBaseProperties = baseType.GetProperties(PropertyBindingFlags);
 
             var result = new List<KeyValuePair<PropertyInfo, PropertyInfo>>(allBaseProperties.Length);
             if (baseType.IsInterface)
@@ -267,11 +267,11 @@ namespace SharpestBeak.Mapper
 
             if (!createDestination)
             {
-                if (source == null)
+                if (ReferenceEquals(source, null))
                 {
                     throw new ArgumentNullException("source");
                 }
-                if (destination == null)
+                if (ReferenceEquals(destination, null))
                 {
                     throw new ArgumentNullException("destination");
                 }
@@ -279,7 +279,7 @@ namespace SharpestBeak.Mapper
 
             #endregion
 
-            if (source == null)
+            if (ReferenceEquals(source, null))
             {
                 destination = default(TDestination);
                 return;
@@ -288,9 +288,9 @@ namespace SharpestBeak.Mapper
             var key = MappingKey.Create<TSource, TDestination>();
 
             MappingInfo mapping;
-            lock (m_syncLock)
+            lock (_syncLock)
             {
-                mapping = m_typeMappings.GetValueOrDefault(key);
+                mapping = _typeMappings.GetValueOrDefault(key);
             }
 
             if (mapping == null)
@@ -305,7 +305,7 @@ namespace SharpestBeak.Mapper
             if (createDestination)
             {
                 // TODO: [VM] Check if constructor can be omitted for structures
-                destination = (TDestination)mapping.DestinationConstructor.Invoke((object[])null);
+                destination = (TDestination)mapping.DestinationConstructor.Invoke(null);
             }
 
             var validate = (Expression<Func<TSource, string>>)mapping.ValidateExpression;
@@ -368,9 +368,9 @@ namespace SharpestBeak.Mapper
             #endregion
 
             var key = MappingKey.Create<TSource, TDestination>();
-            lock (m_syncLock)
+            lock (_syncLock)
             {
-                if (m_typeMappings.ContainsKey(key))
+                if (_typeMappings.ContainsKey(key))
                 {
                     throw new ArgumentException(
                         string.Format(
@@ -379,12 +379,12 @@ namespace SharpestBeak.Mapper
                             destinationType.FullName));
                 }
 
-                const BindingFlags constructorBindingFlags = BindingFlags.Instance
+                const BindingFlags ConstructorBindingFlags = BindingFlags.Instance
                     | BindingFlags.Public
                     | BindingFlags.NonPublic;
 
                 var destinationConstructor = key.Destination.GetConstructor(
-                    constructorBindingFlags,
+                    ConstructorBindingFlags,
                     Type.DefaultBinder,
                     Type.EmptyTypes,
                     null);
@@ -397,7 +397,7 @@ namespace SharpestBeak.Mapper
                 }
 
                 var mapping = new MappingInfo(baseType, destinationConstructor, validate);
-                m_typeMappings.Add(key, mapping);
+                _typeMappings.Add(key, mapping);
             }
 
             return this;
@@ -411,9 +411,9 @@ namespace SharpestBeak.Mapper
         public ObjectMapper Unregister<TSource, TDestination>()
         {
             var key = MappingKey.Create<TSource, TDestination>();
-            lock (m_syncLock)
+            lock (_syncLock)
             {
-                m_typeMappings.Remove(key);
+                _typeMappings.Remove(key);
             }
 
             return this;
@@ -421,7 +421,7 @@ namespace SharpestBeak.Mapper
 
         public TDestination Map<TSource, TDestination>(TSource source)
         {
-            TDestination result = default(TDestination);
+            var result = default(TDestination);
             MapInternal<TSource, TDestination>(source, ref result, true);
             return result;
         }

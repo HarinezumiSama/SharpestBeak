@@ -9,7 +9,7 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private readonly Dictionary<ChickenUnit, DirectionalPosition> m_unitToPositionMap;
+        private readonly Dictionary<ChickenUnit, DirectionalPosition> _unitToPositionMap;
 
         #endregion
 
@@ -41,7 +41,7 @@ namespace SharpestBeak.Model
                 }
             }
 
-            m_unitToPositionMap = new Dictionary<ChickenUnit, DirectionalPosition>();
+            _unitToPositionMap = new Dictionary<ChickenUnit, DirectionalPosition>();
         }
 
         #endregion
@@ -50,7 +50,7 @@ namespace SharpestBeak.Model
 
         internal void Reset()
         {
-            m_unitToPositionMap.Clear();
+            _unitToPositionMap.Clear();
         }
 
         internal DirectionalPosition GetPosition(ChickenUnit unit)
@@ -64,7 +64,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            return m_unitToPositionMap[unit];
+            return _unitToPositionMap[unit];
         }
 
         #endregion
@@ -104,7 +104,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            return m_unitToPositionMap.TryGetValue(unitState.Unit, out position);
+            return _unitToPositionMap.TryGetValue(unitState.Unit, out position);
         }
 
         public DirectionalPosition GetPosition(ChickenUnitState unitState)
@@ -118,7 +118,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            return m_unitToPositionMap[unitState.Unit];
+            return _unitToPositionMap[unitState.Unit];
         }
 
         public void SetPosition(ChickenUnitState unitState, DirectionalPosition position)
@@ -132,7 +132,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            m_unitToPositionMap[unitState.Unit] = position;
+            _unitToPositionMap[unitState.Unit] = position;
         }
 
         #endregion

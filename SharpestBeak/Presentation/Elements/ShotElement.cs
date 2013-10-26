@@ -12,7 +12,7 @@ namespace SharpestBeak.Presentation.Elements
     {
         #region Fields
 
-        private readonly IList<ICollidablePrimitive> m_primitives;
+        private readonly IList<ICollidablePrimitive> _primitives;
 
         #endregion
 
@@ -25,7 +25,7 @@ namespace SharpestBeak.Presentation.Elements
         {
             this.Position = position;
 
-            m_primitives = new List<ICollidablePrimitive>(1)
+            _primitives = new List<ICollidablePrimitive>(1)
             {
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
@@ -83,7 +83,7 @@ namespace SharpestBeak.Presentation.Elements
 
         public IList<ICollidablePrimitive> GetPrimitives()
         {
-            return m_primitives;
+            return _primitives;
         }
 
         #endregion

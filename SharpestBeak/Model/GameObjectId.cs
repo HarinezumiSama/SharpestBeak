@@ -7,9 +7,9 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private static readonly GameObjectId s_none = new GameObjectId();
+        private static readonly GameObjectId NoneField = new GameObjectId();
 
-        private readonly int m_value;
+        private readonly int _value;
 
         #endregion
 
@@ -32,7 +32,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            m_value = value;
+            _value = value;
         }
 
         #endregion
@@ -42,7 +42,7 @@ namespace SharpestBeak.Model
         internal int Value
         {
             [DebuggerStepThrough]
-            get { return m_value; }
+            get { return _value; }
         }
 
         #endregion
@@ -52,7 +52,7 @@ namespace SharpestBeak.Model
         public static GameObjectId None
         {
             [DebuggerStepThrough]
-            get { return s_none; }
+            get { return NoneField; }
         }
 
         public bool IsValid
@@ -60,7 +60,7 @@ namespace SharpestBeak.Model
             [DebuggerNonUserCode]
             get
             {
-                return m_value > 0;
+                return _value > 0;
             }
         }
 
@@ -69,7 +69,7 @@ namespace SharpestBeak.Model
             [DebuggerNonUserCode]
             get
             {
-                return Equals(s_none);
+                return Equals(NoneField);
             }
         }
 
@@ -84,12 +84,12 @@ namespace SharpestBeak.Model
 
         public override int GetHashCode()
         {
-            return m_value.GetHashCode();
+            return _value.GetHashCode();
         }
 
         public override string ToString()
         {
-            return string.Format("{0}. Value = {1}", GetType().Name, m_value);
+            return string.Format("{0}. Value = {1}", GetType().Name, _value);
         }
 
         #endregion
@@ -98,7 +98,7 @@ namespace SharpestBeak.Model
 
         public bool Equals(GameObjectId other)
         {
-            return m_value == other.m_value;
+            return _value == other._value;
         }
 
         #endregion

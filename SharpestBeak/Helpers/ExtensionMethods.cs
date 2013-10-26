@@ -4,12 +4,11 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using SharpestBeak;
 using SharpestBeak.Model;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+// ReSharper disable once CheckNamespace
 namespace SharpestBeak
 {
     public static class ExtensionMethods
@@ -22,7 +21,7 @@ namespace SharpestBeak
         {
             #region Argument Check
 
-            Type enumType = typeof(TEnum);
+            var enumType = typeof(TEnum);
             if (!enumType.IsEnum)
             {
                 throw new ArgumentException(
@@ -38,17 +37,17 @@ namespace SharpestBeak
 
             #endregion
 
-            Type underlyingType = Enum.GetUnderlyingType(enumType);
+            var underlyingType = Enum.GetUnderlyingType(enumType);
             if (underlyingType == typeof(ulong))
             {
-                ulong castFlags = Convert.ToUInt64(flags);
-                ulong andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
+                var castFlags = Convert.ToUInt64(flags);
+                var andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
                 return all ? andedValue == castFlags : andedValue != 0;
             }
             else
             {
-                long castFlags = Convert.ToInt64(flags);
-                long andedValue = Convert.ToInt64(enumerationValue) & castFlags;
+                var castFlags = Convert.ToInt64(flags);
+                var andedValue = Convert.ToInt64(enumerationValue) & castFlags;
                 return all ? andedValue == castFlags : andedValue != 0;
             }
         }
@@ -78,7 +77,6 @@ namespace SharpestBeak
             if (disposable != null)
             {
                 disposable.Dispose();
-                disposable = null;
             }
         }
 
@@ -130,7 +128,7 @@ namespace SharpestBeak
 
             #endregion
 
-            DoForEach<T>(collection, (item, index) => action(item));
+            DoForEach(collection, (item, index) => action(item));
         }
 
         public static void ChangeContents<T>(this IList<T> list, IEnumerable<T> newContents)
@@ -397,7 +395,7 @@ namespace SharpestBeak
         public static bool IsAllSet<TEnum>(this TEnum enumerationValue, TEnum flags)
             where TEnum : struct
         {
-            return IsSetInternal<TEnum>(enumerationValue, flags, true);
+            return IsSetInternal(enumerationValue, flags, true);
         }
 
         /// <summary>
@@ -432,7 +430,7 @@ namespace SharpestBeak
         public static bool IsAnySet<TEnum>(this TEnum enumerationValue, TEnum flags)
             where TEnum : struct
         {
-            return IsSetInternal<TEnum>(enumerationValue, flags, false);
+            return IsSetInternal(enumerationValue, flags, false);
         }
 
         public static SizeF Scale(this SizeF value, float coefficient)

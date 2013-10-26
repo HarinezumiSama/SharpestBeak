@@ -12,8 +12,8 @@ namespace SharpestBeak.Presentation.Elements
     {
         #region Fields
 
-        private readonly IList<ICollidablePrimitive> m_roughPrimitives;
-        private readonly IList<ICollidablePrimitive> m_primitives;
+        private readonly IList<ICollidablePrimitive> _roughPrimitives;
+        private readonly IList<ICollidablePrimitive> _primitives;
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace SharpestBeak.Presentation.Elements
             this.Position = position;
             this.BeakAngle = beakAngle;
 
-            m_roughPrimitives = new List<ICollidablePrimitive>(1)
+            _roughPrimitives = new List<ICollidablePrimitive>(1)
             {
                 new CirclePrimitive(position, GameConstants.ChickenUnit.BeakOffset)
             }
@@ -41,7 +41,7 @@ namespace SharpestBeak.Presentation.Elements
             };
             var beakPolygonPoints = defaultBeakPolygonPoints.Rotate(Position, beakAngle);
 
-            m_primitives = new List<ICollidablePrimitive>(2)
+            _primitives = new List<ICollidablePrimitive>(2)
             {
                 new CirclePrimitive(position, GameConstants.ChickenUnit.BodyCircleRadius),
                 new ConvexPolygonPrimitive(beakPolygonPoints)
@@ -102,12 +102,12 @@ namespace SharpestBeak.Presentation.Elements
 
         public IList<ICollidablePrimitive> GetRoughPrimitives()
         {
-            return m_roughPrimitives;
+            return _roughPrimitives;
         }
 
         public IList<ICollidablePrimitive> GetPrimitives()
         {
-            return m_primitives;
+            return _primitives;
         }
 
         #endregion

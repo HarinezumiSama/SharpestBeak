@@ -7,9 +7,9 @@ namespace SharpestBeak.Physics
     {
         #region Fields
 
-        private float m_a;
-        private float m_b;
-        private float m_c;
+        private float _a;
+        private float _b;
+        private float _c;
 
         #endregion
 
@@ -20,9 +20,9 @@ namespace SharpestBeak.Physics
         /// </summary>
         public QuadraticEquation(float a, float b, float c)
         {
-            m_a = a;
-            m_b = b;
-            m_c = c;
+            _a = a;
+            _b = b;
+            _c = c;
         }
 
         #endregion
@@ -32,25 +32,25 @@ namespace SharpestBeak.Physics
         public float A
         {
             [DebuggerStepThrough]
-            get { return m_a; }
+            get { return _a; }
             [DebuggerStepThrough]
-            set { m_a = value; }
+            set { _a = value; }
         }
 
         public float B
         {
             [DebuggerStepThrough]
-            get { return m_b; }
+            get { return _b; }
             [DebuggerStepThrough]
-            set { m_b = value; }
+            set { _b = value; }
         }
 
         public float C
         {
             [DebuggerStepThrough]
-            get { return m_c; }
+            get { return _c; }
             [DebuggerStepThrough]
-            set { m_c = value; }
+            set { _c = value; }
         }
 
         #endregion
@@ -59,23 +59,23 @@ namespace SharpestBeak.Physics
 
         public float GetDiscriminant()
         {
-            return m_b.Sqr() - 4f * m_a * m_c;
+            return _b.Sqr() - 4f * _a * _c;
         }
 
         public int GetRoots(out float x1, out float x2)
         {
-            if (m_a.IsZero())
+            if (_a.IsZero())
             {
                 // Linear equation case
 
-                if (m_b.IsZero())
+                if (_b.IsZero())
                 {
                     x1 = 0f;
                     x2 = 0f;
                     return 0;
                 }
 
-                x1 = -m_c / m_b;
+                x1 = -_c / _b;
                 x2 = x1;
                 return 1;
             }
@@ -89,10 +89,10 @@ namespace SharpestBeak.Physics
             }
 
             var ds = d.Sqrt();
-            var a2 = 2f * m_a;
+            var a2 = 2f * _a;
 
-            x1 = (-m_b - ds) / a2;
-            x2 = (-m_b + ds) / a2;
+            x1 = (-_b - ds) / a2;
+            x2 = (-_b + ds) / a2;
             return 2;
         }
 

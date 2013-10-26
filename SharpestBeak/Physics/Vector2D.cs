@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 
 namespace SharpestBeak.Physics
 {
@@ -17,8 +16,8 @@ namespace SharpestBeak.Physics
         public static readonly Vector2D UnitY = new Vector2D(0f, 1f);
         public static readonly Vector2D One = new Vector2D(1f, 1f);
 
-        private readonly float m_x;
-        private readonly float m_y;
+        private readonly float _x;
+        private readonly float _y;
 
         #endregion
 
@@ -29,15 +28,15 @@ namespace SharpestBeak.Physics
         /// </summary>
         public Vector2D(float x, float y)
         {
-            m_x = x;
-            m_y = y;
+            _x = x;
+            _y = y;
         }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="Vector2D"/> class.
         /// </summary>
         public Vector2D(Point point)
-            : this((float)point.X, (float)point.Y)
+            : this(point.X, point.Y)
         {
             // Nothing to do
         }
@@ -78,7 +77,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_x;
+                return _x;
             }
         }
 
@@ -87,7 +86,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_y;
+                return _y;
             }
         }
 
@@ -108,7 +107,7 @@ namespace SharpestBeak.Physics
 
         public override int GetHashCode()
         {
-            return m_x.GetHashCode() ^ m_y.GetHashCode();
+            return _x.GetHashCode() ^ _y.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -118,17 +117,17 @@ namespace SharpestBeak.Physics
 
         public override string ToString()
         {
-            return string.Format("{{{0}: X = {1}, Y = {2}}}", GetType().Name, m_x, m_y);
+            return string.Format("{{{0}: X = {1}, Y = {2}}}", GetType().Name, _x, _y);
         }
 
         public PointF ToPointF()
         {
-            return new PointF(m_x, m_y);
+            return new PointF(_x, _y);
         }
 
         public SizeF ToSizeF()
         {
-            return new SizeF(m_x, m_y);
+            return new SizeF(_x, _y);
         }
 
         public Point2D ToPoint2D()
@@ -138,22 +137,22 @@ namespace SharpestBeak.Physics
 
         public Vector2D OffsetX(float offset)
         {
-            return new Vector2D(m_x + offset, m_y);
+            return new Vector2D(_x + offset, _y);
         }
 
         public Vector2D OffsetY(float offset)
         {
-            return new Vector2D(m_x, m_y + offset);
+            return new Vector2D(_x, _y + offset);
         }
 
         public Vector2D Negate()
         {
-            return new Vector2D(-m_x, -m_y);
+            return new Vector2D(-_x, -_y);
         }
 
         public float GetLengthSquared()
         {
-            return m_x.Sqr() + m_y.Sqr();
+            return _x.Sqr() + _y.Sqr();
         }
 
         public float GetLength()
@@ -173,7 +172,7 @@ namespace SharpestBeak.Physics
 
         public Vector2D GetNormal()
         {
-            return new Vector2D(m_y, -m_x);
+            return new Vector2D(_y, -_x);
         }
 
         public Vector2D Normalize()
@@ -195,7 +194,7 @@ namespace SharpestBeak.Physics
 
         public GameAngle GetAngle(Vector2D target)
         {
-            var radianAngle = MathHelper.Atan2(target.m_y, target.m_x) - MathHelper.Atan2(m_y, m_x);
+            var radianAngle = MathHelper.Atan2(target._y, target._x) - MathHelper.Atan2(_y, _x);
             var degreeAngle = radianAngle.ToDegrees();
             return GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(degreeAngle));
         }
@@ -322,7 +321,9 @@ namespace SharpestBeak.Physics
 
         public bool Equals(Vector2D other)
         {
-            return m_x == other.X && m_y == other.Y;
+            //// ReSharper disable CompareOfFloatsByEqualityOperator
+            return _x == other.X && _y == other.Y;
+            //// ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         #endregion

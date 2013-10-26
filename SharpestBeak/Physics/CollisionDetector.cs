@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Threading;
 using SharpestBeak.Diagnostics;
 using SharpestBeak.Presentation;
 using SharpestBeak.Presentation.Primitives;
-using SharpestBeak.Properties;
 
 namespace SharpestBeak.Physics
 {
@@ -15,7 +12,7 @@ namespace SharpestBeak.Physics
     {
         #region Fields
 
-        private static readonly ValueRange<float> s_lineCollisionRange = new ValueRange<float>(0f, 1f);
+        private static readonly ValueRange<float> LineCollisionRange = new ValueRange<float>(0f, 1f);
 
         #endregion
 
@@ -25,7 +22,7 @@ namespace SharpestBeak.Physics
             ConvexPolygonPrimitive polygon,
             ConvexPolygonPrimitive otherPolygon)
         {
-            for (int index = 0; index < polygon.Edges.Count; index++)
+            for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var direction = polygon.Edges[index].Direction.GetNormal();
 
@@ -75,7 +72,7 @@ namespace SharpestBeak.Physics
             var otherElement = other as ICollidableElement;
             if (otherElement != null)
             {
-                return CollisionDetector.CheckElementCollision(otherElement, primitive);
+                return CheckElementCollision(otherElement, primitive);
             }
 
             throw new NotSupportedException();
@@ -107,7 +104,7 @@ namespace SharpestBeak.Physics
                             "The element {{{0}}} has empty rough primitives collection.",
                             element));
                 }
-                for (int index = 0; index < roughPrimitives.Count; index++)
+                for (var index = 0; index < roughPrimitives.Count; index++)
                 {
                     var roughPrimitive = roughPrimitives[index];
                     if (roughPrimitive.HasCollision(other))
@@ -131,7 +128,7 @@ namespace SharpestBeak.Physics
                         "The element {{{0}}} has empty primitives collection.",
                         element));
             }
-            for (int index = 0; index < primitives.Count; index++)
+            for (var index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
                 if (CheckPrimitiveCollision(primitive, other))
@@ -180,7 +177,7 @@ namespace SharpestBeak.Physics
             var a = numeratorA / denominator;
             var b = numeratorB / denominator;
 
-            return a.IsInRange(s_lineCollisionRange) && b.IsInRange(s_lineCollisionRange);
+            return a.IsInRange(LineCollisionRange) && b.IsInRange(LineCollisionRange);
         }
 
         internal static bool CheckCircleToCircleCollision(CirclePrimitive circle1, CirclePrimitive circle2)
@@ -256,7 +253,7 @@ namespace SharpestBeak.Physics
                 return true;
             }
 
-            for (int index = 0; index < polygon.Edges.Count; index++)
+            for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var edge = polygon.Edges[index];
                 if (CheckLineToLineCollision(line, edge))
@@ -383,7 +380,7 @@ namespace SharpestBeak.Physics
             #endregion
 
             // If a point is on a polygon's line, it is considered to be in this polygon
-            for (int index = 0; index < polygon.Edges.Count; index++)
+            for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var edge = polygon.Edges[index];
                 if (GetLineSide(edge, point) == LineSide.Right)

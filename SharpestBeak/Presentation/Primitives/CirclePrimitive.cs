@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives
@@ -12,7 +11,7 @@ namespace SharpestBeak.Presentation.Primitives
     {
         #region Fields
 
-        private float m_radiusSqr = float.MinValue;
+        private float _radiusSqr = float.MinValue;
 
         #endregion
 
@@ -70,11 +69,11 @@ namespace SharpestBeak.Presentation.Primitives
             [DebuggerNonUserCode]
             get
             {
-                if (m_radiusSqr <= 0f)
+                if (_radiusSqr <= 0f)
                 {
-                    m_radiusSqr = this.Radius.Sqr();
+                    _radiusSqr = this.Radius.Sqr();
                 }
-                return m_radiusSqr;
+                return _radiusSqr;
             }
         }
 

@@ -8,8 +8,8 @@ namespace SharpestBeak.Physics
     {
         #region Fields
 
-        private readonly Point2D m_position;
-        private readonly GameAngle m_angle;
+        private readonly Point2D _position;
+        private readonly GameAngle _angle;
 
         #endregion
 
@@ -20,8 +20,8 @@ namespace SharpestBeak.Physics
         /// </summary>
         public DirectionalPosition(Point2D position, GameAngle angle)
         {
-            m_position = position;
-            m_angle = angle;
+            _position = position;
+            _angle = angle;
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace SharpestBeak.Physics
 
             #endregion
 
-            m_position = directionalPosition.Position;
-            m_angle = directionalPosition.Angle;
+            _position = directionalPosition.Position;
+            _angle = directionalPosition.Angle;
         }
 
         #endregion
@@ -51,7 +51,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_position;
+                return _position;
             }
         }
 
@@ -60,7 +60,7 @@ namespace SharpestBeak.Physics
             [DebuggerStepThrough]
             get
             {
-                return m_angle;
+                return _angle;
             }
         }
 

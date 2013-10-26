@@ -90,12 +90,12 @@ namespace SharpestBeak.Physics
 
         public override string ToString()
         {
-            return ToString((string)null, (IFormatProvider)null);
+            return ToString(null, null);
         }
 
         public string ToString(string format)
         {
-            return ToString(format, (IFormatProvider)null);
+            return ToString(format, null);
         }
 
         public void CosSin(out float cos, out float sin)
@@ -134,27 +134,27 @@ namespace SharpestBeak.Physics
 
         public static GameAngle operator -(GameAngle value)
         {
-            return GameAngle.FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
+            return FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
         }
 
         public static GameAngle operator +(GameAngle left, GameAngle right)
         {
-            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
         }
 
         public static GameAngle operator -(GameAngle left, GameAngle right)
         {
-            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
         }
 
         public static GameAngle operator *(GameAngle left, float right)
         {
-            return GameAngle.FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
         }
 
         public static GameAngle operator *(float left, GameAngle right)
         {
-            return GameAngle.FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
+            return FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
         }
 
         #endregion
@@ -163,6 +163,7 @@ namespace SharpestBeak.Physics
 
         public bool Equals(GameAngle other)
         {
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             return this.DegreeValue == other.DegreeValue;
         }
 

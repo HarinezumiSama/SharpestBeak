@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives
@@ -38,8 +37,8 @@ namespace SharpestBeak.Presentation.Primitives
 
         #region Fields
 
-        private readonly IList<LinePrimitive> m_edges;
-        private ConvexState? m_convexState;
+        private readonly IList<LinePrimitive> _edges;
+        private ConvexState? _convexState;
 
         #endregion
 
@@ -60,7 +59,7 @@ namespace SharpestBeak.Presentation.Primitives
             #endregion
 
             this.Vertices = vertices.ToList().AsReadOnly();
-            m_edges = GetEdges(this.Vertices);
+            _edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
             base.BasePoint = this.Vertices.First();
         }
@@ -101,7 +100,7 @@ namespace SharpestBeak.Presentation.Primitives
             var count = vertices.Count;
             var resultProxy = new List<LinePrimitive>(count);
             var currentPoint = vertices[0];
-            for (int nextIndex = 1; nextIndex <= count; nextIndex++)
+            for (var nextIndex = 1; nextIndex <= count; nextIndex++)
             {
                 var nextPoint = nextIndex < count ? vertices[nextIndex] : vertices[0];
                 resultProxy.Add(new LinePrimitive(currentPoint, nextPoint));
@@ -134,8 +133,8 @@ namespace SharpestBeak.Presentation.Primitives
 
             #endregion
 
-            ConvexSign sign = ConvexSign.None;
-            for (int index = 0; index < edges.Count; index++)
+            var sign = ConvexSign.None;
+            for (var index = 0; index < edges.Count; index++)
             {
                 var nextIndex = (index + 1) % edges.Count;
 
@@ -195,7 +194,7 @@ namespace SharpestBeak.Presentation.Primitives
             [DebuggerStepThrough]
             get
             {
-                return m_edges;
+                return _edges;
             }
         }
 
@@ -211,11 +210,11 @@ namespace SharpestBeak.Presentation.Primitives
 
         public ConvexState GetConvexState()
         {
-            if (!m_convexState.HasValue)
+            if (!_convexState.HasValue)
             {
-                m_convexState = GetConvexState(this.Edges);
+                _convexState = GetConvexState(this.Edges);
             }
-            return m_convexState.Value;
+            return _convexState.Value;
         }
 
         public bool IsConvex()

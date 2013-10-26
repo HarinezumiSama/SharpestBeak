@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+// ReSharper disable once CheckNamespace
 namespace SharpestBeak
 {
     public static class GameHelper
     {
         #region Fields
 
-        private static readonly Dictionary<MoveDirection, GameAngle?> s_directionToAngleMap =
+        private static readonly Dictionary<MoveDirection, GameAngle?> DirectionToAngleMap =
             new Dictionary<MoveDirection, GameAngle?>
             {
                 { MoveDirection.None, null },
@@ -24,14 +24,15 @@ namespace SharpestBeak
                 { MoveDirection.StrafeRight, GameAngle.FromDegrees(-MathHelper.QuarterRevolutionDegrees) }
             };
 
-        private static readonly Vector2D s_halfNominalCellOffset =
+        private static readonly Vector2D HalfNominalCellOffset =
             new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
 
-        private static readonly IList<MoveDirection> s_moveDirections =
+        private static readonly IList<MoveDirection> MoveDirectionsField =
             Helper.GetEnumValues<MoveDirection>().AsReadOnly();
-        private static readonly IList<MoveDirection> s_activeMoveDirections = GetActiveMoveDirections();
 
-        private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
+        private static readonly IList<MoveDirection> ActiveMoveDirectionsField = GetActiveMoveDirections();
+
+        private static readonly IList<FireMode> FireModesField = Helper.GetEnumValues<FireMode>().AsReadOnly();
 
         #endregion
 
@@ -60,7 +61,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return s_moveDirections;
+                return MoveDirectionsField;
             }
         }
 
@@ -69,7 +70,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return s_activeMoveDirections;
+                return ActiveMoveDirectionsField;
             }
         }
 
@@ -78,7 +79,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return s_fireModes;
+                return FireModesField;
             }
         }
 
@@ -97,7 +98,7 @@ namespace SharpestBeak
         /// </returns>
         public static Point2D NominalToReal(Point nominalPoint)
         {
-            return new Point2D(nominalPoint) * GameConstants.NominalCellSize + s_halfNominalCellOffset;
+            return new Point2D(nominalPoint) * GameConstants.NominalCellSize + HalfNominalCellOffset;
         }
 
         public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn)
@@ -139,7 +140,7 @@ namespace SharpestBeak
             MoveDirection direction,
             float distance)
         {
-            var relativeAngle = s_directionToAngleMap[direction];
+            var relativeAngle = DirectionToAngleMap[direction];
             if (relativeAngle == null)
             {
                 return oldPosition;
@@ -274,9 +275,9 @@ namespace SharpestBeak
         public static MoveDirection GetBestMoveDirection(Point2D position, GameAngle beakAngle, Point2D targetPoint)
         {
             var resultProxy = Tuple.Create(MoveDirection.None, float.MaxValue);
-            foreach (var item in s_moveDirections)
+            foreach (var item in MoveDirectionsField)
             {
-                var potentialMovePoint = GameHelper.GetNewPosition(
+                var potentialMovePoint = GetNewPosition(
                     position,
                     beakAngle,
                     item,
@@ -311,7 +312,7 @@ namespace SharpestBeak
         {
             var targetOffset = targetPoint - position;
             var targetAngle = GameAngle.FromRadians((float)Math.Atan2(targetOffset.Y, targetOffset.X));
-            var result = GameHelper.GetBeakTurn(beakAngle, targetAngle);
+            var result = GetBeakTurn(beakAngle, targetAngle);
             return result;
         }
 

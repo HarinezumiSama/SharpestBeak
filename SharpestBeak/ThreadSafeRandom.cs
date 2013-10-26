@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using SharpestBeak.Diagnostics;
 
 namespace SharpestBeak
@@ -12,10 +11,10 @@ namespace SharpestBeak
     {
         #region Fields
 
-        private static ulong s_instanceCount;
-        private static readonly object s_instanceCountLock = new object();
+        private static readonly object InstanceCountLock = new object();
+        private static ulong _instanceCount;
 
-        private readonly object m_syncLock = new object();
+        private readonly object _syncLock = new object();
 
         #endregion
 
@@ -53,10 +52,10 @@ namespace SharpestBeak
 
         private static ulong GetNextInstanceId()
         {
-            lock (s_instanceCountLock)
+            lock (InstanceCountLock)
             {
-                s_instanceCount++;
-                return s_instanceCount;
+                _instanceCount++;
+                return _instanceCount;
             }
         }
 
@@ -66,7 +65,7 @@ namespace SharpestBeak
 
         protected override double Sample()
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 return base.Sample();
             }
@@ -93,7 +92,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return m_syncLock;
+                return _syncLock;
             }
         }
 
@@ -103,7 +102,7 @@ namespace SharpestBeak
 
         public override int Next()
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 return base.Next();
             }
@@ -111,7 +110,7 @@ namespace SharpestBeak
 
         public override int Next(int minValue, int maxValue)
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 return base.Next(minValue, maxValue);
             }
@@ -119,7 +118,7 @@ namespace SharpestBeak
 
         public override int Next(int maxValue)
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 return base.Next(maxValue);
             }
@@ -127,7 +126,7 @@ namespace SharpestBeak
 
         public override void NextBytes(byte[] buffer)
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 base.NextBytes(buffer);
             }
@@ -135,7 +134,7 @@ namespace SharpestBeak
 
         public override double NextDouble()
         {
-            lock (m_syncLock)
+            lock (_syncLock)
             {
                 return base.NextDouble();
             }

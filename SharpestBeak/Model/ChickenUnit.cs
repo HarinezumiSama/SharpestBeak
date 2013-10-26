@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Elements;
 
@@ -14,9 +11,9 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private Point2D m_position;
-        private GameAngle m_beakAngle;
-        private ChickenElement m_cachedElement;
+        private Point2D _position;
+        private GameAngle _beakAngle;
+        private ChickenElement _cachedElement;
 
         #endregion
 
@@ -49,7 +46,7 @@ namespace SharpestBeak.Model
 
         private void ResetCachedElement()
         {
-            m_cachedElement = null;
+            _cachedElement = null;
         }
 
         #endregion
@@ -118,13 +115,14 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_position;
+                return _position;
             }
+
             set
             {
-                if (m_position != value)
+                if (_position != value)
                 {
-                    m_position = value;
+                    _position = value;
                     ResetCachedElement();
                 }
             }
@@ -135,13 +133,14 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_beakAngle;
+                return _beakAngle;
             }
+
             set
             {
-                if (m_beakAngle != value)
+                if (_beakAngle != value)
                 {
-                    m_beakAngle = value;
+                    _beakAngle = value;
                     ResetCachedElement();
                 }
             }
@@ -183,11 +182,12 @@ namespace SharpestBeak.Model
 
         public ChickenElement GetElement()
         {
-            if (m_cachedElement == null)
+            if (_cachedElement == null)
             {
-                m_cachedElement = new ChickenElement(this.Position, this.BeakAngle);
+                _cachedElement = new ChickenElement(this.Position, this.BeakAngle);
             }
-            return m_cachedElement;
+
+            return _cachedElement;
         }
 
         #endregion
@@ -199,7 +199,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_position;
+                return _position;
             }
         }
 
@@ -208,7 +208,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_beakAngle;
+                return _beakAngle;
             }
         }
 

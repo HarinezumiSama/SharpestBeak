@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace SharpestBeak.Model
 {
@@ -10,7 +9,7 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private static readonly MoveInfo s_empty = new MoveInfo(MoveDirection.None, BeakTurn.None, FireMode.None);
+        private static readonly MoveInfo _emptyField = new MoveInfo(MoveDirection.None, BeakTurn.None, FireMode.None);
 
         #endregion
 
@@ -46,7 +45,7 @@ namespace SharpestBeak.Model
         public static MoveInfo Empty
         {
             [DebuggerStepThrough]
-            get { return s_empty; }
+            get { return _emptyField; }
         }
 
         public MoveDirection MoveDirection

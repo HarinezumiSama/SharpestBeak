@@ -22,7 +22,7 @@ namespace SharpestBeak.Model
         public static readonly BeakTurn None = new BeakTurn();
         public static readonly BeakTurn FullyCounterClockwise = new BeakTurn(MaxValue);
 
-        private readonly float m_value;
+        private readonly float _value;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            m_value = value;
+            _value = value;
         }
 
         #endregion
@@ -58,7 +58,7 @@ namespace SharpestBeak.Model
         public float Value
         {
             [DebuggerStepThrough]
-            get { return m_value; }
+            get { return _value; }
         }
 
         #endregion
@@ -72,7 +72,7 @@ namespace SharpestBeak.Model
 
         public override int GetHashCode()
         {
-            return m_value.GetHashCode();
+            return _value.GetHashCode();
         }
 
         public override string ToString()
@@ -80,7 +80,7 @@ namespace SharpestBeak.Model
             return string.Format(
                 "{0}. Value = {1}",
                 GetType().Name,
-                m_value);
+                _value);
         }
 
         #endregion
@@ -89,7 +89,8 @@ namespace SharpestBeak.Model
 
         public bool Equals(BeakTurn other)
         {
-            return m_value == other.m_value;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            return _value == other._value;
         }
 
         #endregion
@@ -98,7 +99,7 @@ namespace SharpestBeak.Model
 
         public int CompareTo(BeakTurn other)
         {
-            return m_value.CompareTo(other.m_value);
+            return _value.CompareTo(other._value);
         }
 
         #endregion

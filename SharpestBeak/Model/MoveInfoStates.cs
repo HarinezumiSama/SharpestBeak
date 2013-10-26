@@ -3,7 +3,7 @@
 namespace SharpestBeak.Model
 {
     [Flags]
-    public enum MoveInfoStates : int
+    public enum MoveInfoStates
     {
         Handled = 0,
         RejectedBoardCollision = 0x01,

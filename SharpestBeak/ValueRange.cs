@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace SharpestBeak
 {
@@ -12,8 +11,8 @@ namespace SharpestBeak
     {
         #region Fields
 
-        private readonly T m_min;
-        private readonly T m_max;
+        private readonly T _min;
+        private readonly T _max;
 
         #endregion
 
@@ -33,8 +32,8 @@ namespace SharpestBeak
 
             #endregion
 
-            m_min = min;
-            m_max = max;
+            _min = min;
+            _max = max;
         }
 
         #endregion
@@ -46,7 +45,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return m_min;
+                return _min;
             }
         }
 
@@ -55,7 +54,7 @@ namespace SharpestBeak
             [DebuggerStepThrough]
             get
             {
-                return m_max;
+                return _max;
             }
         }
 
@@ -65,7 +64,7 @@ namespace SharpestBeak
 
         public override string ToString()
         {
-            return string.Format(CultureInfo.InvariantCulture, "[{0} .. {1}]", m_min, m_max);
+            return string.Format(CultureInfo.InvariantCulture, "[{0} .. {1}]", _min, _max);
         }
 
         /// <summary>
@@ -79,7 +78,7 @@ namespace SharpestBeak
         /// </returns>
         public bool Belongs(T value)
         {
-            return MathHelper.IsInRange(value, this);
+            return value.IsInRange(this);
         }
 
         #endregion

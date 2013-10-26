@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Elements;
@@ -12,9 +11,9 @@ namespace SharpestBeak.Model
     {
         #region Fields
 
-        private Point2D m_position;
-        private readonly GameAngle m_angle;
-        private ShotElement m_cachedElement;
+        private Point2D _position;
+        private readonly GameAngle _angle;
+        private ShotElement _cachedElement;
 
         #endregion
 
@@ -43,7 +42,7 @@ namespace SharpestBeak.Model
             this.UniqueId = uniqueId;
             this.Owner = owner;
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
-            m_angle = owner.BeakAngle;
+            _angle = owner.BeakAngle;
             this.CreationTime = DateTime.Now;
         }
 
@@ -53,7 +52,7 @@ namespace SharpestBeak.Model
 
         private void ResetCachedElement()
         {
-            m_cachedElement = null;
+            _cachedElement = null;
         }
 
         #endregion
@@ -81,13 +80,14 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_position;
+                return _position;
             }
+
             set
             {
-                if (m_position != value)
+                if (_position != value)
                 {
-                    m_position = value;
+                    _position = value;
                     ResetCachedElement();
                 }
             }
@@ -98,7 +98,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_angle;
+                return _angle;
             }
         }
 
@@ -132,11 +132,12 @@ namespace SharpestBeak.Model
 
         public ShotElement GetElement()
         {
-            if (m_cachedElement == null)
+            if (_cachedElement == null)
             {
-                m_cachedElement = new ShotElement(this.Position);
+                _cachedElement = new ShotElement(this.Position);
             }
-            return m_cachedElement;
+
+            return _cachedElement;
         }
 
         #endregion
@@ -148,7 +149,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_position;
+                return _position;
             }
         }
 
@@ -157,7 +158,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return m_angle;
+                return _angle;
             }
         }
 

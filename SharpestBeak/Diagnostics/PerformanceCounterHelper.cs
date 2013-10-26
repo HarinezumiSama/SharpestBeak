@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace SharpestBeak.Diagnostics
 {
@@ -19,7 +17,7 @@ namespace SharpestBeak.Diagnostics
 
         #region Fields
 
-        private static readonly PerformanceCounterHelper s_instance = new PerformanceCounterHelper();
+        private static readonly PerformanceCounterHelper InstanceField = new PerformanceCounterHelper();
 
         #endregion
 
@@ -87,7 +85,7 @@ namespace SharpestBeak.Diagnostics
         public static PerformanceCounterHelper Instance
         {
             [DebuggerStepThrough]
-            get { return s_instance; }
+            get { return InstanceField; }
         }
 
         public PerformanceCounter CollisionCountPerStep
