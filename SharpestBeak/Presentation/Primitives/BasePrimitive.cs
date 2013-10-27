@@ -20,12 +20,6 @@ namespace SharpestBeak.Presentation.Primitives
 
         #endregion
 
-        #region Protected Methods
-
-        protected abstract void OnDraw(Graphics graphics, DrawData data);
-
-        #endregion
-
         #region Public Properties
 
         public Point2D BasePoint
@@ -55,6 +49,12 @@ namespace SharpestBeak.Presentation.Primitives
 
             OnDraw(graphics, data);
         }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected abstract void OnDraw(Graphics graphics, DrawData data);
 
         #endregion
     }

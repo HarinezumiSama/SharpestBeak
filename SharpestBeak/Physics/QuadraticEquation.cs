@@ -5,7 +5,7 @@ namespace SharpestBeak.Physics
 {
     public struct QuadraticEquation
     {
-        #region Fields
+        #region Constants and Fields
 
         private float _a;
         private float _b;

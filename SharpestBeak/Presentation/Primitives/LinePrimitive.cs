@@ -9,7 +9,7 @@ namespace SharpestBeak.Presentation.Primitives
 {
     public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
     {
-        #region Fields
+        #region Constants and Fields
 
         private Vector2D? _direction;
 
@@ -36,18 +36,6 @@ namespace SharpestBeak.Presentation.Primitives
             this.Start = start;
             this.End = end;
             base.BasePoint = start;
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnDraw(Graphics graphics, DrawData data)
-        {
-            graphics.DrawLine(
-                data.Pen,
-                (this.Start * data.Coefficient).ToPointF(),
-                (this.End * data.Coefficient).ToPointF());
         }
 
         #endregion
@@ -140,6 +128,18 @@ namespace SharpestBeak.Presentation.Primitives
         public bool HasCollision(ICollidable other)
         {
             return CollisionDetector.CheckPrimitiveCollision(this, other);
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            graphics.DrawLine(
+                data.Pen,
+                (this.Start * data.Coefficient).ToPointF(),
+                (this.End * data.Coefficient).ToPointF());
         }
 
         #endregion

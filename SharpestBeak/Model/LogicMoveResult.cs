@@ -18,16 +18,6 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Internal Properties
-
-        internal Dictionary<ChickenUnit, MoveInfo> InnerMap
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
         #region Public Methods
 
         public void Set(ChickenUnitState unitState, MoveInfo move)
@@ -63,6 +53,16 @@ namespace SharpestBeak.Model
             #endregion
 
             return this.InnerMap.GetValueOrDefault(unitState.Unit);
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal Dictionary<ChickenUnit, MoveInfo> InnerMap
+        {
+            get;
+            private set;
         }
 
         #endregion

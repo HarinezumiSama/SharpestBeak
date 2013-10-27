@@ -9,7 +9,7 @@ namespace SharpestBeak
 {
     public sealed class ThreadSafeRandom : Random
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly object InstanceCountLock = new object();
         private static ulong _instanceCount;
@@ -44,31 +44,6 @@ namespace SharpestBeak
             : this(Environment.TickCount)
         {
             // Nothing to do
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static ulong GetNextInstanceId()
-        {
-            lock (InstanceCountLock)
-            {
-                _instanceCount++;
-                return _instanceCount;
-            }
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override double Sample()
-        {
-            lock (_syncLock)
-            {
-                return base.Sample();
-            }
         }
 
         #endregion
@@ -162,6 +137,31 @@ namespace SharpestBeak
             #endregion
 
             return list[Next(list.Count)];
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override double Sample()
+        {
+            lock (_syncLock)
+            {
+                return base.Sample();
+            }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static ulong GetNextInstanceId()
+        {
+            lock (InstanceCountLock)
+            {
+                _instanceCount++;
+                return _instanceCount;
+            }
         }
 
         #endregion

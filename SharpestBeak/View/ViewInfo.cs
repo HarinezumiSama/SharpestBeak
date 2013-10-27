@@ -9,7 +9,7 @@ namespace SharpestBeak.View
     [DebuggerDisplay("{GetType().Name,nq}. Chickens.Count = {Chickens.Count}, Shots.Count = {Shots.Count}")]
     public sealed class ViewInfo
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly IList<ChickenViewData> EmptyChickens = new ChickenViewData[0];
         private static readonly IList<ShotViewData> EmptyShots = new ShotViewData[0];

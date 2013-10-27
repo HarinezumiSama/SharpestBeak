@@ -10,7 +10,7 @@ namespace SharpestBeak
 {
     public static class Helper
     {
-        #region Constants
+        #region Constants and Fields
 
         private const string InvalidExpressionMessageFmt =
             "Invalid expression (must be a getter of a property of the type '{0}'): {{ {1} }}.";

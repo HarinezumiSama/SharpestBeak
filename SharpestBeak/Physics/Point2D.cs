@@ -9,7 +9,7 @@ namespace SharpestBeak.Physics
     [Serializable]
     public struct Point2D : IEquatable<Point2D>
     {
-        #region Fields
+        #region Constants and Fields
 
         public static readonly Point2D Zero = new Point2D();
 
@@ -63,17 +63,6 @@ namespace SharpestBeak.Physics
             : this(value.X, value.Y)
         {
             // Nothing to do
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static Point2D RotatePointInternal(Point2D value, Point2D center, float cos, float sin)
-        {
-            var newX = center.X + (value.X - center.X) * cos - (value.Y - center.Y) * sin;
-            var newY = center.Y + (value.X - center.X) * sin + (value.Y - center.Y) * cos;
-            return new Point2D(newX, newY);
         }
 
         #endregion
@@ -294,6 +283,17 @@ namespace SharpestBeak.Physics
         public bool Equals(Point2D other)
         {
             return _x == other.X && _y == other.Y;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static Point2D RotatePointInternal(Point2D value, Point2D center, float cos, float sin)
+        {
+            var newX = center.X + (value.X - center.X) * cos - (value.Y - center.Y) * sin;
+            var newY = center.Y + (value.X - center.X) * sin + (value.Y - center.Y) * cos;
+            return new Point2D(newX, newY);
         }
 
         #endregion

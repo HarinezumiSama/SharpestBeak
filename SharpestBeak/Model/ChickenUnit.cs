@@ -9,7 +9,7 @@ namespace SharpestBeak.Model
 {
     internal sealed class ChickenUnit : IDirectionalPosition
     {
-        #region Fields
+        #region Constants and Fields
 
         private Point2D _position;
         private GameAngle _beakAngle;
@@ -38,60 +38,6 @@ namespace SharpestBeak.Model
             this.Team = logic.Team;
 
             Reset();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void ResetCachedElement()
-        {
-            _cachedElement = null;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal ChickenUnitLogic Logic
-        {
-            get;
-            private set;
-        }
-
-        internal GameEngine Engine
-        {
-            get;
-            private set;
-        }
-
-        internal long ShotEngineStepIndex
-        {
-            get;
-            set;
-        }
-
-        #endregion
-
-        #region Internal Methods
-
-        internal void Reset()
-        {
-            this.IsDead = false;
-            this.ShotEngineStepIndex = -1;
-        }
-
-        internal bool CanSee(Point2D point)
-        {
-            var viewDirection = GameHelper.GetBeakTipPosition(this.Position, this.BeakAngle) - this.Position;
-            var pointDirection = point - this.Position;
-            return viewDirection.GetAngle(pointDirection).DegreeValue.Abs() <= GameConstants.ChickenUnit.ViewAngle;
-        }
-
-        internal bool CanShoot()
-        {
-            return this.ShotEngineStepIndex < 0
-                || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
         }
 
         #endregion
@@ -210,6 +156,60 @@ namespace SharpestBeak.Model
             {
                 return _beakAngle;
             }
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal ChickenUnitLogic Logic
+        {
+            get;
+            private set;
+        }
+
+        internal GameEngine Engine
+        {
+            get;
+            private set;
+        }
+
+        internal long ShotEngineStepIndex
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void Reset()
+        {
+            this.IsDead = false;
+            this.ShotEngineStepIndex = -1;
+        }
+
+        internal bool CanSee(Point2D point)
+        {
+            var viewDirection = GameHelper.GetBeakTipPosition(this.Position, this.BeakAngle) - this.Position;
+            var pointDirection = point - this.Position;
+            return viewDirection.GetAngle(pointDirection).DegreeValue.Abs() <= GameConstants.ChickenUnit.ViewAngle;
+        }
+
+        internal bool CanShoot()
+        {
+            return this.ShotEngineStepIndex < 0
+                || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ResetCachedElement()
+        {
+            _cachedElement = null;
         }
 
         #endregion

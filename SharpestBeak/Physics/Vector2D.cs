@@ -9,7 +9,7 @@ namespace SharpestBeak.Physics
     [Serializable]
     public struct Vector2D : IEquatable<Vector2D>
     {
-        #region Fields
+        #region Constants and Fields
 
         public static readonly Vector2D Zero = new Vector2D();
         public static readonly Vector2D UnitX = new Vector2D(1f, 0f);

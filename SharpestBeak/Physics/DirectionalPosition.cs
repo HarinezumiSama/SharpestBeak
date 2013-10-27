@@ -6,7 +6,7 @@ namespace SharpestBeak.Physics
 {
     public struct DirectionalPosition : IDirectionalPosition
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly Point2D _position;
         private readonly GameAngle _angle;

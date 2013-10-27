@@ -7,9 +7,9 @@ namespace SharpestBeak.Model
 {
     public sealed class MoveInfo
     {
-        #region Fields
+        #region Constants and Fields
 
-        private static readonly MoveInfo _emptyField = new MoveInfo(MoveDirection.None, BeakTurn.None, FireMode.None);
+        private static readonly MoveInfo EmptyField = new MoveInfo(MoveDirection.None, BeakTurn.None, FireMode.None);
 
         #endregion
 
@@ -45,7 +45,7 @@ namespace SharpestBeak.Model
         public static MoveInfo Empty
         {
             [DebuggerStepThrough]
-            get { return _emptyField; }
+            get { return EmptyField; }
         }
 
         public MoveDirection MoveDirection

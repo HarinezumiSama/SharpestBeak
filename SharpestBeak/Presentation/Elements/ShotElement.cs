@@ -10,7 +10,7 @@ namespace SharpestBeak.Presentation.Elements
 {
     public sealed class ShotElement : BaseElement, ICollidableElement
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly IList<ICollidablePrimitive> _primitives;
 
@@ -30,15 +30,6 @@ namespace SharpestBeak.Presentation.Elements
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
             .AsReadOnly();
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnDraw(Graphics graphics, DrawData data)
-        {
-            DrawElement(graphics, data, this);
         }
 
         #endregion
@@ -93,6 +84,15 @@ namespace SharpestBeak.Presentation.Elements
         public bool HasCollision(ICollidable other)
         {
             return CollisionDetector.CheckElementCollision(this, other);
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnDraw(Graphics graphics, DrawData data)
+        {
+            DrawElement(graphics, data, this);
         }
 
         #endregion

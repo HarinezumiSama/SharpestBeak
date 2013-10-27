@@ -9,7 +9,7 @@ namespace SharpestBeak.Model
 {
     internal sealed class ShotUnit : IDirectionalPosition
     {
-        #region Fields
+        #region Constants and Fields
 
         private Point2D _position;
         private readonly GameAngle _angle;
@@ -44,25 +44,6 @@ namespace SharpestBeak.Model
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
             _angle = owner.BeakAngle;
             this.CreationTime = DateTime.Now;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void ResetCachedElement()
-        {
-            _cachedElement = null;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal DateTime CreationTime
-        {
-            get;
-            private set;
         }
 
         #endregion
@@ -160,6 +141,25 @@ namespace SharpestBeak.Model
             {
                 return _angle;
             }
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal DateTime CreationTime
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ResetCachedElement()
+        {
+            _cachedElement = null;
         }
 
         #endregion

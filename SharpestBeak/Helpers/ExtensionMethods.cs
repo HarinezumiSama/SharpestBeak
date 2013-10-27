@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -13,47 +14,6 @@ namespace SharpestBeak
 {
     public static class ExtensionMethods
     {
-        #region Private Methods
-
-        [DebuggerNonUserCode]
-        private static bool IsSetInternal<TEnum>(this TEnum enumerationValue, TEnum flags, bool all)
-            where TEnum : struct
-        {
-            #region Argument Check
-
-            var enumType = typeof(TEnum);
-            if (!enumType.IsEnum)
-            {
-                throw new ArgumentException(
-                    string.Format("The type must be an enumeration ({0}).", enumType.FullName),
-                    "TEnum");
-            }
-            if (!enumType.IsDefined(typeof(FlagsAttribute), true))
-            {
-                throw new ArgumentException(
-                    string.Format("The type must be a flag enumeration ({0}).", enumType.FullName),
-                    "TEnum");
-            }
-
-            #endregion
-
-            var underlyingType = Enum.GetUnderlyingType(enumType);
-            if (underlyingType == typeof(ulong))
-            {
-                var castFlags = Convert.ToUInt64(flags);
-                var andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
-                return all ? andedValue == castFlags : andedValue != 0;
-            }
-            else
-            {
-                var castFlags = Convert.ToInt64(flags);
-                var andedValue = Convert.ToInt64(enumerationValue) & castFlags;
-                return all ? andedValue == castFlags : andedValue != 0;
-            }
-        }
-
-        #endregion
-
         #region Public Methods
 
         public static T EnsureNotNull<T>(this T value)
@@ -441,6 +401,51 @@ namespace SharpestBeak
         public static PointF Scale(this PointF value, float coefficient)
         {
             return new PointF(value.X * coefficient, value.Y * coefficient);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        [DebuggerNonUserCode]
+        private static bool IsSetInternal<TEnum>(this TEnum enumerationValue, TEnum flags, bool all)
+            where TEnum : struct
+        {
+            #region Argument Check
+
+            var enumType = typeof(TEnum);
+            if (!enumType.IsEnum)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "The type must be an enumeration ({0}).",
+                        enumType.FullName));
+            }
+            if (!enumType.IsDefined(typeof(FlagsAttribute), true))
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "The type must be a flag enumeration ({0}).",
+                        enumType.FullName));
+            }
+
+            #endregion
+
+            var underlyingType = Enum.GetUnderlyingType(enumType);
+            if (underlyingType == typeof(ulong))
+            {
+                var castFlags = Convert.ToUInt64(flags);
+                var andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
+                return all ? andedValue == castFlags : andedValue != 0;
+            }
+            else
+            {
+                var castFlags = Convert.ToInt64(flags);
+                var andedValue = Convert.ToInt64(enumerationValue) & castFlags;
+                return all ? andedValue == castFlags : andedValue != 0;
+            }
         }
 
         #endregion

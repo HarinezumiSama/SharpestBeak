@@ -6,6 +6,44 @@ namespace SharpestBeak
 {
     public static class GameConstants
     {
+        #region Constants and Fields
+
+        private const float MinSlowDownRatio = 1f / 16f;
+        private const float MaxSlowDownRatio = 16f;
+
+        private const double LogicPollFrequencyMsec = 20d;
+
+        internal static readonly float SlowDownRatio = GetSlowDownRatio();
+
+        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(LogicPollFrequencyMsec);
+
+        public static readonly float ShotToChickenRectilinearSpeedRatio = 4f;
+
+        public static readonly float NominalCellSize = 100f;
+
+        public static readonly ValueRange<int> NominalCellCountRange = new ValueRange<int>(5, 128);
+
+        public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
+
+        public static readonly float FullRevolutionAngle = MathHelper.RevolutionDegrees;
+
+        public static readonly ValueRange<int> TeamPlayerUnitCountRange = new ValueRange<int>(1, int.MaxValue);
+
+        #endregion
+
+        #region Private Methods
+
+        [DebuggerNonUserCode]
+        private static float GetSlowDownRatio()
+        {
+            var result = Math.Min(
+                MaxSlowDownRatio,
+                Math.Max(MinSlowDownRatio, Properties.Settings.Default.SlowDownRatio));
+            return result;
+        }
+
+        #endregion
+
         #region Nested Types
 
         #region ChickenUnit Class
@@ -87,48 +125,6 @@ namespace SharpestBeak
         }
 
         #endregion
-
-        #endregion
-
-        #region Constants
-
-        private const float MinSlowDownRatio = 1f / 16f;
-        private const float MaxSlowDownRatio = 16f;
-
-        #endregion
-
-        #region Fields
-
-        private const double LogicPollFrequencyMsec = 20d;
-
-        internal static readonly float SlowDownRatio = GetSlowDownRatio();
-
-        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(LogicPollFrequencyMsec);
-
-        public static readonly float ShotToChickenRectilinearSpeedRatio = 4f;
-
-        public static readonly float NominalCellSize = 100f;
-
-        public static readonly ValueRange<int> NominalCellCountRange = new ValueRange<int>(5, 128);
-
-        public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
-
-        public static readonly float FullRevolutionAngle = MathHelper.RevolutionDegrees;
-
-        public static readonly ValueRange<int> TeamPlayerUnitCountRange = new ValueRange<int>(1, int.MaxValue);
-
-        #endregion
-
-        #region Private Methods
-
-        [DebuggerNonUserCode]
-        private static float GetSlowDownRatio()
-        {
-            var result = Math.Min(
-                MaxSlowDownRatio,
-                Math.Max(MinSlowDownRatio, Properties.Settings.Default.SlowDownRatio));
-            return result;
-        }
 
         #endregion
     }

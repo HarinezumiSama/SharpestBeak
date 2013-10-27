@@ -24,13 +24,9 @@ namespace SharpestBeak
 
     public sealed class GameEngine : IDisposable
     {
-        #region Constants
+        #region Constants and Fields
 
         public const int InstrumentationMoveCountLimit = 500;
-
-        #endregion
-
-        #region Fields
 
         private static readonly ThreadSafeRandom RandomGenerator = new ThreadSafeRandom();
         private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(5d);
@@ -136,6 +132,202 @@ namespace SharpestBeak
             #endregion
 
             ResetInternal();
+        }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        ///     Occurs when the game has ended. <b>NOTE</b>: handlers of this event are called from engine thread!
+        /// </summary>
+        public event EventHandler<GameEndedEventArgs> GameEnded;
+
+        #endregion
+
+        #region Public Properties
+
+        public GameEngineData Data
+        {
+            get;
+            private set;
+        }
+
+        // TODO: [VM] Remove this property, or change to some GetExtraBlaBlaBla for logics
+        public IList<ChickenUnitLogic> Teams
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return _logics;
+            }
+        }
+
+        public long MoveCount
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return _moveCount.Value;
+            }
+        }
+
+        public bool IsRunning
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return _syncLock.ExecuteInReadLock(() => _engineThread != null);
+            }
+        }
+
+        public GameTeam? WinningTeam
+        {
+            [DebuggerNonUserCode]
+            get
+            {
+                return _winningTeam.Value;
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Start()
+        {
+            _syncLock.ExecuteInWriteLock(this.StartInternal);
+        }
+
+        public void Stop()
+        {
+            EnsureNotDisposed();
+
+            //Application.Idle -= this.Application_Idle;
+
+            _syncLock.ExecuteInWriteLock(
+                () => _logics.DoForEach(
+                    item =>
+                    {
+                        if (item.Thread != null)
+                        {
+                            item.Thread.Abort();
+                            item.Thread = null;
+                        }
+                    }));
+
+            _stopEvent.Set();
+            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
+            _syncLock.ExecuteInWriteLock(
+                () =>
+                {
+                    if (_engineThread != null)
+                    {
+                        if (!_engineThread.Join(StopTimeout))
+                        {
+                            _engineThread.Abort();
+                            _engineThread.Join();
+                        }
+
+                        _engineThread = null;
+                    }
+                });
+        }
+
+        public void Reset()
+        {
+            if (this.IsRunning)
+            {
+                throw new GameException("Cannot reset game engine while it is running.");
+            }
+
+            _syncLock.ExecuteInWriteLock(this.ResetInternal);
+            CallPaintCallback();
+        }
+
+        public void CallPaint()
+        {
+            CallPaintCallback();
+        }
+
+        public GamePresentation GetPresentation()
+        {
+            _syncLock.EnterReadLock();
+            try
+            {
+                //if (this.IsRunning)
+                //{
+                //    throw new InvalidOperationException(
+                //        "Presentation cannot be obtained directly while the engine is running.");
+                //}
+
+                return _lastGamePresentation.Value;
+            }
+            finally
+            {
+                _syncLock.ExitReadLock();
+            }
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _syncLock.EnterWriteLock();
+            try
+            {
+                _stopEvent.DisposeSafely();
+                _lightTeamLogic.DisposeSafely();
+                _darkTeamLogic.DisposeSafely();
+
+                _disposed = true;
+            }
+            finally
+            {
+                _syncLock.ExitWriteLock();
+            }
+            _syncLock.DisposeSafely();
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal IList<ChickenUnit> AllChickens
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _allChickens;
+            }
+        }
+
+        internal IList<ChickenUnit> AliveChickens
+        {
+            get;
+            private set;
+        }
+
+        internal IList<ShotUnit> ShotUnits
+        {
+            get;
+            private set;
+        }
+
+        internal IList<ChickenUnitLogic> Logics
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _logics;
+            }
         }
 
         #endregion
@@ -867,202 +1059,6 @@ namespace SharpestBeak
             _winningTeam.Value = winningTeam;
             var e = new GameEndedEventArgs(winningTeam, winningLogic);
             OnGameEnded(e);
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal IList<ChickenUnit> AllChickens
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _allChickens;
-            }
-        }
-
-        internal IList<ChickenUnit> AliveChickens
-        {
-            get;
-            private set;
-        }
-
-        internal IList<ShotUnit> ShotUnits
-        {
-            get;
-            private set;
-        }
-
-        internal IList<ChickenUnitLogic> Logics
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _logics;
-            }
-        }
-
-        #endregion
-
-        #region Public Events
-
-        /// <summary>
-        ///     Occurs when the game has ended. <b>NOTE</b>: handlers of this event are called from engine thread!
-        /// </summary>
-        public event EventHandler<GameEndedEventArgs> GameEnded;
-
-        #endregion
-
-        #region Public Properties
-
-        public GameEngineData Data
-        {
-            get;
-            private set;
-        }
-
-        // TODO: [VM] Remove this property, or change to some GetExtraBlaBlaBla for logics
-        public IList<ChickenUnitLogic> Teams
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _logics;
-            }
-        }
-
-        public long MoveCount
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _moveCount.Value;
-            }
-        }
-
-        public bool IsRunning
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _syncLock.ExecuteInReadLock(() => _engineThread != null);
-            }
-        }
-
-        public GameTeam? WinningTeam
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _winningTeam.Value;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public void Start()
-        {
-            _syncLock.ExecuteInWriteLock(this.StartInternal);
-        }
-
-        public void Stop()
-        {
-            EnsureNotDisposed();
-
-            //Application.Idle -= this.Application_Idle;
-
-            _syncLock.ExecuteInWriteLock(
-                () => _logics.DoForEach(
-                    item =>
-                    {
-                        if (item.Thread != null)
-                        {
-                            item.Thread.Abort();
-                            item.Thread = null;
-                        }
-                    }));
-
-            _stopEvent.Set();
-            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
-            _syncLock.ExecuteInWriteLock(
-                () =>
-                {
-                    if (_engineThread != null)
-                    {
-                        if (!_engineThread.Join(StopTimeout))
-                        {
-                            _engineThread.Abort();
-                            _engineThread.Join();
-                        }
-
-                        _engineThread = null;
-                    }
-                });
-        }
-
-        public void Reset()
-        {
-            if (this.IsRunning)
-            {
-                throw new GameException("Cannot reset game engine while it is running.");
-            }
-
-            _syncLock.ExecuteInWriteLock(this.ResetInternal);
-            CallPaintCallback();
-        }
-
-        public void CallPaint()
-        {
-            CallPaintCallback();
-        }
-
-        public GamePresentation GetPresentation()
-        {
-            _syncLock.EnterReadLock();
-            try
-            {
-                //if (this.IsRunning)
-                //{
-                //    throw new InvalidOperationException(
-                //        "Presentation cannot be obtained directly while the engine is running.");
-                //}
-
-                return _lastGamePresentation.Value;
-            }
-            finally
-            {
-                _syncLock.ExitReadLock();
-            }
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            _syncLock.EnterWriteLock();
-            try
-            {
-                _stopEvent.DisposeSafely();
-                _lightTeamLogic.DisposeSafely();
-                _darkTeamLogic.DisposeSafely();
-
-                _disposed = true;
-            }
-            finally
-            {
-                _syncLock.ExitWriteLock();
-            }
-            _syncLock.DisposeSafely();
         }
 
         #endregion

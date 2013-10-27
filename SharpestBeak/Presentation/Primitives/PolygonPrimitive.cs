@@ -29,13 +29,9 @@ namespace SharpestBeak.Presentation.Primitives
 
         #endregion
 
-        #region Constants
+        #region Constants and Fields
 
         public const int MinVertexCount = 3;
-
-        #endregion
-
-        #region Fields
 
         private readonly IList<LinePrimitive> _edges;
         private ConvexState? _convexState;
@@ -71,6 +67,50 @@ namespace SharpestBeak.Presentation.Primitives
             : this((IEnumerable<Point2D>)vertices)
         {
             // Nothing to do
+        }
+
+        #endregion
+
+        #region Public Properties
+
+        public IList<Point2D> Vertices
+        {
+            get;
+            private set;
+        }
+
+        public IList<LinePrimitive> Edges
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _edges;
+            }
+        }
+
+        public int Count
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public ConvexState GetConvexState()
+        {
+            if (!_convexState.HasValue)
+            {
+                _convexState = GetConvexState(this.Edges);
+            }
+            return _convexState.Value;
+        }
+
+        public bool IsConvex()
+        {
+            var state = GetConvexState();
+            return state == ConvexState.ConvexClockwise || state == ConvexState.ConvexCounterClockwise;
         }
 
         #endregion
@@ -177,50 +217,6 @@ namespace SharpestBeak.Presentation.Primitives
                 data.Brush,
                 this.Vertices.Select(v => v * data.Coefficient).ToPointF(),
                 FillMode.Winding);
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public IList<Point2D> Vertices
-        {
-            get;
-            private set;
-        }
-
-        public IList<LinePrimitive> Edges
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _edges;
-            }
-        }
-
-        public int Count
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public ConvexState GetConvexState()
-        {
-            if (!_convexState.HasValue)
-            {
-                _convexState = GetConvexState(this.Edges);
-            }
-            return _convexState.Value;
-        }
-
-        public bool IsConvex()
-        {
-            var state = GetConvexState();
-            return state == ConvexState.ConvexClockwise || state == ConvexState.ConvexCounterClockwise;
         }
 
         #endregion

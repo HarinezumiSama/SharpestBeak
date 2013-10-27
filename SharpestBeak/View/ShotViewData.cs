@@ -34,22 +34,6 @@ namespace SharpestBeak.View
 
         #endregion
 
-        #region Internal Properties
-
-        internal GameObjectId OwnerUniqueId
-        {
-            get;
-            private set;
-        }
-
-        internal GameTeam Team
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
         #region Public Properties
 
         public GameObjectId UniqueId
@@ -104,6 +88,22 @@ namespace SharpestBeak.View
             {
                 return this.Angle;
             }
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal GameObjectId OwnerUniqueId
+        {
+            get;
+            private set;
+        }
+
+        internal GameTeam Team
+        {
+            get;
+            private set;
         }
 
         #endregion

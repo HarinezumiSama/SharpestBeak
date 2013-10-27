@@ -20,6 +20,28 @@ namespace SharpestBeak.Presentation.Elements
 
         #endregion
 
+        #region Public Methods
+
+        public void Draw(Graphics graphics, DrawData data)
+        {
+            #region Argument Check
+
+            if (graphics == null)
+            {
+                throw new ArgumentNullException("graphics");
+            }
+            if (data == null)
+            {
+                throw new ArgumentNullException("data");
+            }
+
+            #endregion
+
+            OnDraw(graphics, data);
+        }
+
+        #endregion
+
         #region Protected Methods
 
         protected static void DrawElement(Graphics graphics, DrawData data, ICollidableElement element)
@@ -46,28 +68,6 @@ namespace SharpestBeak.Presentation.Elements
         }
 
         protected abstract void OnDraw(Graphics graphics, DrawData data);
-
-        #endregion
-
-        #region Public Methods
-
-        public void Draw(Graphics graphics, DrawData data)
-        {
-            #region Argument Check
-
-            if (graphics == null)
-            {
-                throw new ArgumentNullException("graphics");
-            }
-            if (data == null)
-            {
-                throw new ArgumentNullException("data");
-            }
-
-            #endregion
-
-            OnDraw(graphics, data);
-        }
 
         #endregion
     }

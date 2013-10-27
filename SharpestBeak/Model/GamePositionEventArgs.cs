@@ -7,7 +7,7 @@ namespace SharpestBeak.Model
 {
     public sealed class GamePositionEventArgs : EventArgs
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly Dictionary<ChickenUnit, DirectionalPosition> _unitToPositionMap;
 
@@ -42,29 +42,6 @@ namespace SharpestBeak.Model
             }
 
             _unitToPositionMap = new Dictionary<ChickenUnit, DirectionalPosition>();
-        }
-
-        #endregion
-
-        #region Internal Methods
-
-        internal void Reset()
-        {
-            _unitToPositionMap.Clear();
-        }
-
-        internal DirectionalPosition GetPosition(ChickenUnit unit)
-        {
-            #region Argument Check
-
-            if (unit == null)
-            {
-                throw new ArgumentNullException("unit");
-            }
-
-            #endregion
-
-            return _unitToPositionMap[unit];
         }
 
         #endregion
@@ -133,6 +110,29 @@ namespace SharpestBeak.Model
             #endregion
 
             _unitToPositionMap[unitState.Unit] = position;
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void Reset()
+        {
+            _unitToPositionMap.Clear();
+        }
+
+        internal DirectionalPosition GetPosition(ChickenUnit unit)
+        {
+            #region Argument Check
+
+            if (unit == null)
+            {
+                throw new ArgumentNullException("unit");
+            }
+
+            #endregion
+
+            return _unitToPositionMap[unit];
         }
 
         #endregion

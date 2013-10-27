@@ -8,30 +8,6 @@ namespace SharpestBeak.Physics
 {
     public struct GameAngle : IEquatable<GameAngle>, IFormattable
     {
-        #region Internal Methods
-
-        internal static float NormalizeDegreeAngle(float value)
-        {
-            var result = value;
-            // TODO: [VM] Use tolerance when comparing values - (?)
-            while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
-            {
-                result -= MathHelper.RevolutionDegrees;
-            }
-            while (result <= -MathHelper.HalfRevolutionDegrees && result <= MathHelper.HalfRevolutionDegrees)
-            {
-                result += MathHelper.RevolutionDegrees;
-            }
-
-            if (result > MathHelper.HalfRevolutionDegrees || result <= -MathHelper.HalfRevolutionDegrees)
-            {
-                throw new InvalidOperationException("Computed angle was not fixed correctly.");
-            }
-            return result;
-        }
-
-        #endregion
-
         #region Public Properties
 
         public float DegreeValue
@@ -205,6 +181,30 @@ namespace SharpestBeak.Physics
             }
             sb.Append("}");
             return sb.ToString();
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal static float NormalizeDegreeAngle(float value)
+        {
+            var result = value;
+            // TODO: [VM] Use tolerance when comparing values - (?)
+            while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
+            {
+                result -= MathHelper.RevolutionDegrees;
+            }
+            while (result <= -MathHelper.HalfRevolutionDegrees && result <= MathHelper.HalfRevolutionDegrees)
+            {
+                result += MathHelper.RevolutionDegrees;
+            }
+
+            if (result > MathHelper.HalfRevolutionDegrees || result <= -MathHelper.HalfRevolutionDegrees)
+            {
+                throw new InvalidOperationException("Computed angle was not fixed correctly.");
+            }
+            return result;
         }
 
         #endregion

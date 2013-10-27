@@ -5,7 +5,7 @@ namespace SharpestBeak.Model
 {
     public struct GameObjectId : IEquatable<GameObjectId>
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly GameObjectId NoneField = new GameObjectId();
 
@@ -33,16 +33,6 @@ namespace SharpestBeak.Model
             #endregion
 
             _value = value;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal int Value
-        {
-            [DebuggerStepThrough]
-            get { return _value; }
         }
 
         #endregion
@@ -99,6 +89,16 @@ namespace SharpestBeak.Model
         public bool Equals(GameObjectId other)
         {
             return _value == other._value;
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal int Value
+        {
+            [DebuggerStepThrough]
+            get { return _value; }
         }
 
         #endregion

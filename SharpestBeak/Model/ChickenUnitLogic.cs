@@ -8,7 +8,7 @@ namespace SharpestBeak.Model
 {
     public abstract class ChickenUnitLogic : IDisposable
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly List<ChickenUnit> _unitsDirect = new List<ChickenUnit>();
         private readonly ThreadSafeValue<Exception> _error;
@@ -38,16 +38,30 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Private Methods
+        #region Public Properties
 
-        private GameState GetGameState()
+        public GameTeam Team
         {
-            GameState result;
-            lock (this.UnitsStatesLock)
+            get;
+            private set;
+        }
+
+        public string Caption
+        {
+            [DebuggerNonUserCode]
+            get
             {
-                result = new GameState(this.Engine, this.UnitsStates.Values);
+                return _caption.Value;
             }
-            return result;
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            this.MakeMoveEvent.DisposeSafely();
         }
 
         #endregion
@@ -181,30 +195,16 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Public Properties
+        #region Private Methods
 
-        public GameTeam Team
+        private GameState GetGameState()
         {
-            get;
-            private set;
-        }
-
-        public string Caption
-        {
-            [DebuggerNonUserCode]
-            get
+            GameState result;
+            lock (this.UnitsStatesLock)
             {
-                return _caption.Value;
+                result = new GameState(this.Engine, this.UnitsStates.Values);
             }
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            this.MakeMoveEvent.DisposeSafely();
+            return result;
         }
 
         #endregion

@@ -14,7 +14,7 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Fields
+        #region Constants and Fields
 
         public static readonly ValueRange<float> ValueRange = new ValueRange<float>(MinValue, MaxValue);
 

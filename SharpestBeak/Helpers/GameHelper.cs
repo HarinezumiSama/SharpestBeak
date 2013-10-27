@@ -12,7 +12,7 @@ namespace SharpestBeak
 {
     public static class GameHelper
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly Dictionary<MoveDirection, GameAngle?> DirectionToAngleMap =
             new Dictionary<MoveDirection, GameAngle?>

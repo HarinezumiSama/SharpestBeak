@@ -8,7 +8,7 @@ namespace SharpestBeak
 {
     internal sealed class SettingsCache
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly SettingsCache InstanceField = new SettingsCache();
 
@@ -19,20 +19,6 @@ namespace SharpestBeak
         private SettingsCache()
         {
             ReadSettings();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void ReadSettings()
-        {
-            var settings = Settings.Default.EnsureNotNull();
-
-            this.UsePerformanceCounters = settings.UsePerformanceCounters;
-            this.EnableDebugOutput = settings.EnableDebugOutput;
-            this.InstrumentationMode = settings.InstrumentationMode;
-            this.DebugModeDisableShooting = settings.DebugModeDisableShooting;
         }
 
         #endregion
@@ -81,6 +67,20 @@ namespace SharpestBeak
         public void Reload()
         {
             ReadSettings();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void ReadSettings()
+        {
+            var settings = Settings.Default.EnsureNotNull();
+
+            this.UsePerformanceCounters = settings.UsePerformanceCounters;
+            this.EnableDebugOutput = settings.EnableDebugOutput;
+            this.InstrumentationMode = settings.InstrumentationMode;
+            this.DebugModeDisableShooting = settings.DebugModeDisableShooting;
         }
 
         #endregion

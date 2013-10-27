@@ -7,20 +7,6 @@ namespace SharpestBeak.Diagnostics
 {
     public static class DebugHelper
     {
-        #region Private Methods
-
-        private static void WriteLineInternal(string message)
-        {
-            Trace.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToFixedString(), message));
-        }
-
-        private static void WriteLineInternal(string format, params object[] args)
-        {
-            WriteLineInternal(string.Format(format, args));
-        }
-
-        #endregion
-
         #region Public Methods
 
         public static void WriteLine(string message)
@@ -86,6 +72,20 @@ namespace SharpestBeak.Diagnostics
             {
                 return action();
             }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static void WriteLineInternal(string message)
+        {
+            Trace.WriteLine(string.Format("[{0}] {1}", DateTime.Now.ToFixedString(), message));
+        }
+
+        private static void WriteLineInternal(string format, params object[] args)
+        {
+            WriteLineInternal(string.Format(format, args));
         }
 
         #endregion

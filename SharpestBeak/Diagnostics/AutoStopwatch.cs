@@ -9,7 +9,7 @@ namespace SharpestBeak.Diagnostics
 {
     public sealed class AutoStopwatch : IDisposable
     {
-        #region Fields
+        #region Constants and Fields
 
         public static readonly string FullOutputFormat = "{0}, {1} ms, {2} ticks";
         public static readonly string TimeSpanOnlyOutputFormat = "{0}";

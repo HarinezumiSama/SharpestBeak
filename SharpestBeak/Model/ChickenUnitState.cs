@@ -43,16 +43,6 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Internal Properties
-
-        internal ChickenUnit Unit
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
         #region Public Properties
 
         public GameObjectId UniqueId
@@ -145,6 +135,16 @@ namespace SharpestBeak.Model
             {
                 return this.BeakAngle;
             }
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal ChickenUnit Unit
+        {
+            get;
+            private set;
         }
 
         #endregion

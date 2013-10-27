@@ -9,7 +9,7 @@ namespace SharpestBeak
     public struct ValueRange<T>
         where T : struct, IComparable<T>
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly T _min;
         private readonly T _max;

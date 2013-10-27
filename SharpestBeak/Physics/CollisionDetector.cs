@@ -10,38 +10,96 @@ namespace SharpestBeak.Physics
 {
     public static class CollisionDetector
     {
-        #region Fields
+        #region Constants and Fields
 
         private static readonly ValueRange<float> LineCollisionRange = new ValueRange<float>(0f, 1f);
 
         #endregion
 
-        #region Private Methods
+        #region Public Methods
 
-        private static bool HasSeparatingAxis(
-            ConvexPolygonPrimitive polygon,
-            ConvexPolygonPrimitive otherPolygon)
+        public static bool CheckCollision(ICollidable first, ICollidable second)
         {
-            for (var index = 0; index < polygon.Edges.Count; index++)
+            #region Argument Check
+
+            if (first == null)
             {
-                var direction = polygon.Edges[index].Direction.GetNormal();
-
-                var projections = polygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
-                var otherProjections = otherPolygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
-
-                float min, max;
-                projections.MinMax(out min, out max);
-
-                float otherMin, otherMax;
-                otherProjections.MinMax(out otherMin, out otherMax);
-
-                if (min > otherMax || max < otherMin)
-                {
-                    return true;
-                }
+                throw new ArgumentNullException("first");
+            }
+            if (second == null)
+            {
+                throw new ArgumentNullException("second");
             }
 
-            return false;
+            #endregion
+
+            var result = first.HasCollision(second);
+            if (SettingsCache.Instance.UsePerformanceCounters)
+            {
+                PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
+            }
+            return result;
+        }
+
+        public static LineSide GetLineSide(Point2D lineStart, Point2D lineEnd, Point2D point)
+        {
+            var lineVector = lineEnd - lineStart;
+            var pointVector = point - lineStart;
+            var product = lineVector ^ pointVector;
+            return (LineSide)Math.Sign(product.IsZero() ? 0f : product);
+        }
+
+        public static LineSide GetLineSide(LinePrimitive line, Point2D point)
+        {
+            #region Argument Check
+
+            if (line == null)
+            {
+                throw new ArgumentNullException("line");
+            }
+
+            #endregion
+
+            return GetLineSide(line.Start, line.End, point);
+        }
+
+        // Is the point inside or on the circle?
+        public static bool IsPointInCircle(Point2D point, CirclePrimitive circle)
+        {
+            #region Argument Check
+
+            if (circle == null)
+            {
+                throw new ArgumentNullException("circle");
+            }
+
+            #endregion
+
+            // If a point is on a circle, it is considered to be in this circle
+            return (point.GetDistanceSquared(circle.Center) - circle.RadiusSquared).IsNegativeOrZero();
+        }
+
+        public static bool IsPointInPolygon(Point2D point, ConvexPolygonPrimitive polygon)
+        {
+            #region Argument Check
+
+            if (polygon == null)
+            {
+                throw new ArgumentNullException("polygon");
+            }
+
+            #endregion
+
+            // If a point is on a polygon's line, it is considered to be in this polygon
+            for (var index = 0; index < polygon.Edges.Count; index++)
+            {
+                var edge = polygon.Edges[index];
+                if (GetLineSide(edge, point) == LineSide.Right)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         #endregion
@@ -305,90 +363,30 @@ namespace SharpestBeak.Physics
 
         #endregion
 
-        #region Public Methods
+        #region Private Methods
 
-        public static bool CheckCollision(ICollidable first, ICollidable second)
+        private static bool HasSeparatingAxis(PolygonPrimitive polygon, PolygonPrimitive otherPolygon)
         {
-            #region Argument Check
-
-            if (first == null)
-            {
-                throw new ArgumentNullException("first");
-            }
-            if (second == null)
-            {
-                throw new ArgumentNullException("second");
-            }
-
-            #endregion
-
-            var result = first.HasCollision(second);
-            if (SettingsCache.Instance.UsePerformanceCounters)
-            {
-                PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
-            }
-            return result;
-        }
-
-        public static LineSide GetLineSide(Point2D lineStart, Point2D lineEnd, Point2D point)
-        {
-            var lineVector = lineEnd - lineStart;
-            var pointVector = point - lineStart;
-            var product = lineVector ^ pointVector;
-            return (LineSide)Math.Sign(product.IsZero() ? 0f : product);
-        }
-
-        public static LineSide GetLineSide(LinePrimitive line, Point2D point)
-        {
-            #region Argument Check
-
-            if (line == null)
-            {
-                throw new ArgumentNullException("line");
-            }
-
-            #endregion
-
-            return GetLineSide(line.Start, line.End, point);
-        }
-
-        // Is the point inside or on the circle?
-        public static bool IsPointInCircle(Point2D point, CirclePrimitive circle)
-        {
-            #region Argument Check
-
-            if (circle == null)
-            {
-                throw new ArgumentNullException("circle");
-            }
-
-            #endregion
-
-            // If a point is on a circle, it is considered to be in this circle
-            return (point.GetDistanceSquared(circle.Center) - circle.RadiusSquared).IsNegativeOrZero();
-        }
-
-        public static bool IsPointInPolygon(Point2D point, ConvexPolygonPrimitive polygon)
-        {
-            #region Argument Check
-
-            if (polygon == null)
-            {
-                throw new ArgumentNullException("polygon");
-            }
-
-            #endregion
-
-            // If a point is on a polygon's line, it is considered to be in this polygon
             for (var index = 0; index < polygon.Edges.Count; index++)
             {
-                var edge = polygon.Edges[index];
-                if (GetLineSide(edge, point) == LineSide.Right)
+                var direction = polygon.Edges[index].Direction.GetNormal();
+
+                var projections = polygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
+                var otherProjections = otherPolygon.Vertices.Select(p => p.ProjectScalar(direction)).ToArray();
+
+                float min, max;
+                projections.MinMax(out min, out max);
+
+                float otherMin, otherMax;
+                otherProjections.MinMax(out otherMin, out otherMax);
+
+                if (min > otherMax || max < otherMin)
                 {
-                    return false;
+                    return true;
                 }
             }
-            return true;
+
+            return false;
         }
 
         #endregion

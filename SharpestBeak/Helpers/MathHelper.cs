@@ -8,7 +8,7 @@ namespace SharpestBeak
 {
     public static class MathHelper
     {
-        #region Constants
+        #region Constants and Fields
 
         public const float ZeroTolerance = 1E-6f;
 
