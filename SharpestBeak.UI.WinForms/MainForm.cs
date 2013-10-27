@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using SharpestBeak;
 using SharpestBeak.Configuration;
 using SharpestBeak.UI.WinForms.Properties;
 
@@ -74,7 +70,7 @@ namespace SharpestBeak.UI.WinForms
                         break;
 
                     default:
-                        throw new NotImplementedException();
+                        throw new NotSupportedException();
                 }
             }
             catch (Exception ex)

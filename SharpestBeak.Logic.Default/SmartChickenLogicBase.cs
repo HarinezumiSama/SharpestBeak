@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using SharpestBeak;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Primitives;

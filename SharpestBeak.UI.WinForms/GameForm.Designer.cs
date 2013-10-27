@@ -1,5 +1,4 @@
-﻿using SharpestBeak;
-namespace SharpestBeak.UI.WinForms
+﻿namespace SharpestBeak.UI.WinForms
 {
     partial class GameForm
     {
