@@ -35,8 +35,8 @@ namespace SharpestBeak.View
             var engine = unit.Logic.Engine;
             var unitTeam = unit.Team;
 
-            // TODO: [VM] Improve computing details according to actual unit view
-            // [VM] Currently, algorithm of determining if other chicken or shot is visible is very simple
+            //// TODO: [VM] Improve computing details according to actual unit view
+            //// [VM] Currently, algorithm of determining if other chicken or shot is visible is very simple
 
             if (unit.IsDead)
             {
@@ -55,6 +55,7 @@ namespace SharpestBeak.View
                         chickens.Add(new ChickenViewData(aliveChicken));
                     }
                 }
+
                 this.Chickens = chickens.AsReadOnly();
 
                 var shots = new List<ShotViewData>(unit.IsDead ? 0 : engine.ShotUnits.Count);
@@ -65,6 +66,7 @@ namespace SharpestBeak.View
                         shots.Add(new ShotViewData(shotUnit));
                     }
                 }
+
                 this.Shots = shots.AsReadOnly();
             }
         }

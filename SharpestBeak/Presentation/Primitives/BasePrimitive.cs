@@ -40,6 +40,7 @@ namespace SharpestBeak.Presentation.Primitives
             {
                 throw new ArgumentNullException("graphics");
             }
+
             if (data == null)
             {
                 throw new ArgumentNullException("data");

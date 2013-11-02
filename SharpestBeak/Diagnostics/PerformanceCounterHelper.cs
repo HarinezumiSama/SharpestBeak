@@ -86,21 +86,19 @@ namespace SharpestBeak.Diagnostics
                 PerformanceCounterCategory.Delete(CategoryName);
             }
 
-            var counters = new CounterCreationDataCollection();
-
-            counters.Add(
+            var counters = new CounterCreationDataCollection
+            {
                 new CounterCreationData(
                     CollisionCountPerStepCounterName,
                     "The number of collision detection calls per one game engine step.",
-                    PerformanceCounterType.AverageCount64));
-
-            counters.Add(
+                    PerformanceCounterType.AverageCount64),
                 new CounterCreationData(
                     CollisionCountPerStepBaseCounterName,
                     string.Format("Base counter for '{0}'.", CollisionCountPerStepCounterName),
-                    PerformanceCounterType.AverageBase));
+                    PerformanceCounterType.AverageBase)
+            };
 
-            var category = PerformanceCounterCategory.Create(
+            PerformanceCounterCategory.Create(
                 CategoryName,
                 "Sharpest Beak performance counters.",
                 PerformanceCounterCategoryType.Unknown,

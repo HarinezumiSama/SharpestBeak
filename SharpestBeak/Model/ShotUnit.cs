@@ -11,8 +11,8 @@ namespace SharpestBeak.Model
     {
         #region Constants and Fields
 
-        private Point2D _position;
         private readonly GameAngle _angle;
+        private Point2D _position;
         private ShotElement _cachedElement;
 
         #endregion
@@ -30,6 +30,7 @@ namespace SharpestBeak.Model
             {
                 throw new ArgumentNullException("owner");
             }
+
             if (!uniqueId.IsValid)
             {
                 throw new ArgumentException("Invalid shot ID.", "uniqueId");

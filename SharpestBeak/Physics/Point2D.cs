@@ -89,6 +89,100 @@ namespace SharpestBeak.Physics
 
         #endregion
 
+        #region Operators
+
+        public static bool operator ==(Point2D left, Point2D right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Point2D left, Point2D right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static Point2D operator +(Point2D value)
+        {
+            return value;
+        }
+
+        public static Point2D operator -(Point2D value)
+        {
+            return value.Negate();
+        }
+
+        public static Point2D operator +(Vector2D left, Point2D right)
+        {
+            return new Point2D(left.X + right.X, left.Y + right.Y);
+        }
+
+        public static Point2D operator +(Point2D left, Vector2D right)
+        {
+            return new Point2D(left.X + right.X, left.Y + right.Y);
+        }
+
+        public static Vector2D operator -(Point2D left, Point2D right)
+        {
+            return new Vector2D(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Point2D operator -(Vector2D left, Point2D right)
+        {
+            return new Point2D(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Point2D operator -(Point2D left, Vector2D right)
+        {
+            return new Point2D(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Point2D operator *(Point2D left, float right)
+        {
+            return new Point2D(left.X * right, left.Y * right);
+        }
+
+        public static Point2D operator *(float left, Point2D right)
+        {
+            return new Point2D(left * right.X, left * right.Y);
+        }
+
+        public static Point2D operator /(Point2D left, float right)
+        {
+            return new Point2D(left.X / right, left.Y / right);
+        }
+
+        public static implicit operator Point2D(Point value)
+        {
+            return new Point2D(value);
+        }
+
+        public static implicit operator Point2D(PointF value)
+        {
+            return new Point2D(value);
+        }
+
+        public static implicit operator Point2D(SizeF value)
+        {
+            return new Point2D(value);
+        }
+
+        public static explicit operator Point2D(Vector2D value)
+        {
+            return new Point2D(value);
+        }
+
+        public static explicit operator PointF(Point2D value)
+        {
+            return value.ToPointF();
+        }
+
+        public static explicit operator SizeF(Point2D value)
+        {
+            return value.ToSizeF();
+        }
+
+        #endregion
+
         #region Public Methods
 
         public static Point2D[] Rotate(IEnumerable<Point2D> values, Point2D center, GameAngle angle)
@@ -184,105 +278,13 @@ namespace SharpestBeak.Physics
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(Point2D left, Point2D right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Point2D left, Point2D right)
-        {
-            return !left.Equals(right);
-        }
-
-        public static Point2D operator +(Point2D value)
-        {
-            return value;
-        }
-
-        public static Point2D operator -(Point2D value)
-        {
-            return value.Negate();
-        }
-
-        public static Point2D operator +(Vector2D left, Point2D right)
-        {
-            return new Point2D(left.X + right.X, left.Y + right.Y);
-        }
-
-        public static Point2D operator +(Point2D left, Vector2D right)
-        {
-            return new Point2D(left.X + right.X, left.Y + right.Y);
-        }
-
-        public static Vector2D operator -(Point2D left, Point2D right)
-        {
-            return new Vector2D(left.X - right.X, left.Y - right.Y);
-        }
-
-        public static Point2D operator -(Vector2D left, Point2D right)
-        {
-            return new Point2D(left.X - right.X, left.Y - right.Y);
-        }
-
-        public static Point2D operator -(Point2D left, Vector2D right)
-        {
-            return new Point2D(left.X - right.X, left.Y - right.Y);
-        }
-
-        public static Point2D operator *(Point2D left, float right)
-        {
-            return new Point2D(left.X * right, left.Y * right);
-        }
-
-        public static Point2D operator *(float left, Point2D right)
-        {
-            return new Point2D(left * right.X, left * right.Y);
-        }
-
-        public static Point2D operator /(Point2D left, float right)
-        {
-            return new Point2D(left.X / right, left.Y / right);
-        }
-
-        public static implicit operator Point2D(Point value)
-        {
-            return new Point2D(value);
-        }
-
-        public static implicit operator Point2D(PointF value)
-        {
-            return new Point2D(value);
-        }
-
-        public static implicit operator Point2D(SizeF value)
-        {
-            return new Point2D(value);
-        }
-
-        public static explicit operator Point2D(Vector2D value)
-        {
-            return new Point2D(value);
-        }
-
-        public static explicit operator PointF(Point2D value)
-        {
-            return value.ToPointF();
-        }
-
-        public static explicit operator SizeF(Point2D value)
-        {
-            return value.ToSizeF();
-        }
-
-        #endregion
-
         #region IEquatable<Point2D> Members
 
         public bool Equals(Point2D other)
         {
+            //// ReSharper disable CompareOfFloatsByEqualityOperator
             return _x == other.X && _y == other.Y;
+            //// ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         #endregion

@@ -31,154 +31,6 @@ namespace SharpestBeak.Mapper
 
         #endregion
 
-        #region Private Methods
-
-        private static PropertyInfo FindInterfaceProperty(
-            IEnumerable<PropertyInfo> allSourceProperties,
-            MethodInfo basePropertyGetter,
-            ref InterfaceMapping sourceInterfaceMapping)
-        {
-            var sourceIndex = Array.IndexOf(sourceInterfaceMapping.InterfaceMethods, basePropertyGetter);
-            if (sourceIndex < 0)
-            {
-                return null;
-            }
-
-            var sourcePropertyGetter = sourceInterfaceMapping.TargetMethods[sourceIndex];
-            var sourceProperty = allSourceProperties.SingleOrDefault(
-                item => item.GetGetMethod(true) == sourcePropertyGetter);
-            return sourceProperty;
-        }
-
-        private static KeyValuePair<PropertyInfo, PropertyInfo>[] GetMappedProperties(
-            Type sourceType,
-            Type destinationType,
-            Type baseType)
-        {
-            const BindingFlags PropertyBindingFlags = BindingFlags.Instance
-                | BindingFlags.Public
-                | BindingFlags.NonPublic;
-
-            var allSourceProperties = sourceType.GetProperties(PropertyBindingFlags);
-            var allDestinationProperties = destinationType.GetProperties(PropertyBindingFlags);
-            var allBaseProperties = baseType.GetProperties(PropertyBindingFlags);
-
-            var resultList = new List<KeyValuePair<PropertyInfo, PropertyInfo>>(allBaseProperties.Length);
-            if (baseType.IsInterface)
-            {
-                var sourceInterfaceMapping = sourceType.GetInterfaceMap(baseType);
-                var destinationInterfaceMapping = destinationType.GetInterfaceMap(baseType);
-
-                foreach (var allBaseProperty in allBaseProperties)
-                {
-                    var indexParameters = allBaseProperty.GetIndexParameters().EnsureNotNull();
-                    if (indexParameters.Length != 0)
-                    {
-                        continue;
-                    }
-
-                    var basePropertyGetter = allBaseProperty.GetGetMethod(true);
-
-                    var sourceProperty = FindInterfaceProperty(
-                        allSourceProperties,
-                        basePropertyGetter,
-                        ref sourceInterfaceMapping);
-                    if (sourceProperty == null)
-                    {
-                        continue;
-                    }
-
-                    var destinationProperty = FindInterfaceProperty(
-                        allDestinationProperties,
-                        basePropertyGetter,
-                        ref destinationInterfaceMapping);
-                    if (destinationProperty == null)
-                    {
-                        continue;
-                    }
-
-                    resultList.Add(new KeyValuePair<PropertyInfo, PropertyInfo>(sourceProperty, destinationProperty));
-                }
-            }
-            else
-            {
-                //TODO: [VM] GetMappedProperties: Implement for non-interface types
-                throw new NotImplementedException();
-            }
-
-            return resultList.ToArray();
-        }
-
-        private void MapInternal<TSource, TDestination>(
-            TSource source,
-            ref TDestination destination,
-            bool createDestination)
-        {
-            #region Argument Check
-
-            if (!createDestination)
-            {
-                if (ReferenceEquals(source, null))
-                {
-                    throw new ArgumentNullException("source");
-                }
-                if (ReferenceEquals(destination, null))
-                {
-                    throw new ArgumentNullException("destination");
-                }
-            }
-
-            #endregion
-
-            if (ReferenceEquals(source, null))
-            {
-                destination = default(TDestination);
-                return;
-            }
-
-            var key = MappingKey.Create<TSource, TDestination>();
-
-            MappingInfo mapping;
-            lock (_syncLock)
-            {
-                mapping = _typeMappings.GetValueOrDefault(key);
-            }
-
-            if (mapping == null)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "There is no registered mapping from '{0}' to '{1}'.",
-                        key.Source.FullName,
-                        key.Destination.FullName));
-            }
-
-            if (createDestination)
-            {
-                // TODO: [VM] Check if constructor can be omitted for structures
-                destination = (TDestination)mapping.DestinationConstructor.Invoke(null);
-            }
-
-            var validate = (Expression<Func<TSource, string>>)mapping.ValidateExpression;
-            if (validate != null)
-            {
-                var validationResult = validate.Compile().Invoke(source);
-                if (!string.IsNullOrWhiteSpace(validationResult))
-                {
-                    throw new ArgumentException(validationResult, "source");
-                }
-            }
-
-            var propertyInfoPairs = GetMappedProperties(key.Source, key.Destination, mapping.BaseType);
-            foreach (var propertyInfoPair in propertyInfoPairs)
-            {
-                var propertyValue = propertyInfoPair.Key.GetValue(source, null);
-                propertyInfoPair.Value.SetValue(destination, propertyValue, null);
-            }
-        }
-
-        #endregion
-
         #region Public Properties
 
         public ObjectMapper Instance
@@ -213,6 +65,7 @@ namespace SharpestBeak.Mapper
                             sourceType.FullName,
                             baseType.FullName));
                 }
+
                 if (baseType.IsAssignableFrom(destinationType))
                 {
                     throw new ArgumentException(
@@ -225,7 +78,7 @@ namespace SharpestBeak.Mapper
             }
             else
             {
-                //TODO: [VM] Register: Validate non-interface types
+                // TODO: [VM] Register: Validate non-interface types
                 throw new NotImplementedException();
             }
 
@@ -298,6 +151,155 @@ namespace SharpestBeak.Mapper
 
         #endregion
 
+        #region Private Methods
+
+        private static PropertyInfo FindInterfaceProperty(
+            IEnumerable<PropertyInfo> allSourceProperties,
+            MethodInfo basePropertyGetter,
+            ref InterfaceMapping sourceInterfaceMapping)
+        {
+            var sourceIndex = Array.IndexOf(sourceInterfaceMapping.InterfaceMethods, basePropertyGetter);
+            if (sourceIndex < 0)
+            {
+                return null;
+            }
+
+            var sourcePropertyGetter = sourceInterfaceMapping.TargetMethods[sourceIndex];
+            var sourceProperty = allSourceProperties.SingleOrDefault(
+                item => item.GetGetMethod(true) == sourcePropertyGetter);
+            return sourceProperty;
+        }
+
+        private static KeyValuePair<PropertyInfo, PropertyInfo>[] GetMappedProperties(
+            Type sourceType,
+            Type destinationType,
+            Type baseType)
+        {
+            const BindingFlags PropertyBindingFlags = BindingFlags.Instance
+                | BindingFlags.Public
+                | BindingFlags.NonPublic;
+
+            var allSourceProperties = sourceType.GetProperties(PropertyBindingFlags);
+            var allDestinationProperties = destinationType.GetProperties(PropertyBindingFlags);
+            var allBaseProperties = baseType.GetProperties(PropertyBindingFlags);
+
+            var resultList = new List<KeyValuePair<PropertyInfo, PropertyInfo>>(allBaseProperties.Length);
+            if (baseType.IsInterface)
+            {
+                var sourceInterfaceMapping = sourceType.GetInterfaceMap(baseType);
+                var destinationInterfaceMapping = destinationType.GetInterfaceMap(baseType);
+
+                foreach (var allBaseProperty in allBaseProperties)
+                {
+                    var indexParameters = allBaseProperty.GetIndexParameters().EnsureNotNull();
+                    if (indexParameters.Length != 0)
+                    {
+                        continue;
+                    }
+
+                    var basePropertyGetter = allBaseProperty.GetGetMethod(true);
+
+                    var sourceProperty = FindInterfaceProperty(
+                        allSourceProperties,
+                        basePropertyGetter,
+                        ref sourceInterfaceMapping);
+                    if (sourceProperty == null)
+                    {
+                        continue;
+                    }
+
+                    var destinationProperty = FindInterfaceProperty(
+                        allDestinationProperties,
+                        basePropertyGetter,
+                        ref destinationInterfaceMapping);
+                    if (destinationProperty == null)
+                    {
+                        continue;
+                    }
+
+                    resultList.Add(new KeyValuePair<PropertyInfo, PropertyInfo>(sourceProperty, destinationProperty));
+                }
+            }
+            else
+            {
+                // TODO: [VM] GetMappedProperties: Implement for non-interface types
+                throw new NotImplementedException();
+            }
+
+            return resultList.ToArray();
+        }
+
+        private void MapInternal<TSource, TDestination>(
+            TSource source,
+            ref TDestination destination,
+            bool createDestination)
+        {
+            #region Argument Check
+
+            if (!createDestination)
+            {
+                if (ReferenceEquals(source, null))
+                {
+                    throw new ArgumentNullException("source");
+                }
+
+                if (ReferenceEquals(destination, null))
+                {
+                    throw new ArgumentNullException("destination");
+                }
+            }
+
+            #endregion
+
+            if (ReferenceEquals(source, null))
+            {
+                destination = default(TDestination);
+                return;
+            }
+
+            var key = MappingKey.Create<TSource, TDestination>();
+
+            MappingInfo mapping;
+            lock (_syncLock)
+            {
+                mapping = _typeMappings.GetValueOrDefault(key);
+            }
+
+            if (mapping == null)
+            {
+                throw new ArgumentException(
+                    string.Format(
+                        "There is no registered mapping from '{0}' to '{1}'.",
+                        key.Source.FullName,
+                        key.Destination.FullName));
+            }
+
+            if (createDestination)
+            {
+                // TODO: [VM] Check if constructor can be omitted for structures
+                destination = (TDestination)mapping.DestinationConstructor.Invoke(null);
+            }
+
+            var validate = (Expression<Func<TSource, string>>)mapping.ValidateExpression;
+            if (validate != null)
+            {
+                var validationResult = validate.Compile().Invoke(source);
+                if (!string.IsNullOrWhiteSpace(validationResult))
+                {
+                    throw new ArgumentException(validationResult, "source");
+                }
+            }
+
+            var propertyInfoPairs = GetMappedProperties(key.Source, key.Destination, mapping.BaseType);
+            foreach (var propertyInfoPair in propertyInfoPairs)
+            {
+                var propertyValue = propertyInfoPair.Key.GetValue(source, null);
+                propertyInfoPair.Value.SetValue(destination, propertyValue, null);
+            }
+        }
+
+        #endregion
+
         #region Nested Types
 
         #region MappingKey Structure
@@ -321,6 +323,7 @@ namespace SharpestBeak.Mapper
                 {
                     throw new ArgumentNullException("source");
                 }
+
                 if (destination == null)
                 {
                     throw new ArgumentNullException("destination");
@@ -407,6 +410,7 @@ namespace SharpestBeak.Mapper
                 {
                     throw new ArgumentNullException("baseType");
                 }
+
                 if (destinationConstructor == null)
                 {
                     throw new ArgumentNullException("destinationConstructor");

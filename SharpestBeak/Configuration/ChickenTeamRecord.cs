@@ -19,6 +19,7 @@ namespace SharpestBeak.Configuration
             {
                 throw new ArgumentNullException("type");
             }
+
             if (!unitCount.IsInRange(GameConstants.TeamPlayerUnitCountRange))
             {
                 throw new ArgumentOutOfRangeException(

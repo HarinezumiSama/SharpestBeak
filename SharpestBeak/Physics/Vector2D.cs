@@ -92,6 +92,118 @@ namespace SharpestBeak.Physics
 
         #endregion
 
+        #region Operators
+
+        public static bool operator ==(Vector2D left, Vector2D right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Vector2D left, Vector2D right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static Vector2D operator +(Vector2D value)
+        {
+            return value;
+        }
+
+        public static Vector2D operator -(Vector2D value)
+        {
+            return value.Negate();
+        }
+
+        public static Vector2D operator !(Vector2D value)
+        {
+            return value.GetNormal();
+        }
+
+        public static Vector2D operator +(Vector2D left, Vector2D right)
+        {
+            return new Vector2D(left.X + right.X, left.Y + right.Y);
+        }
+
+        public static Vector2D operator -(Vector2D left, Vector2D right)
+        {
+            return new Vector2D(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Vector2D operator *(Vector2D left, float right)
+        {
+            return new Vector2D(left.X * right, left.Y * right);
+        }
+
+        public static Vector2D operator *(float left, Vector2D right)
+        {
+            return new Vector2D(left * right.X, left * right.Y);
+        }
+
+        public static Vector2D operator /(Vector2D left, float right)
+        {
+            if (right.IsZero())
+            {
+                throw new DivideByZeroException();
+            }
+
+            return left * (1f / right);
+        }
+
+        public static float operator *(Vector2D left, Vector2D right)
+        {
+            return DotProduct(left, right);
+        }
+
+        /// <summary>
+        ///     Computes the cross product of the specified vectors.
+        ///     Returns the Z component of the resulting 3D vector (0, 0, Z).
+        /// </summary>
+        /// <param name="left">
+        ///     The first vector of the cross product.
+        /// </param>
+        /// <param name="right">
+        ///     The second vector of the cross product.
+        /// </param>
+        /// <returns>
+        ///     The Z component of the resulting 3D vector (0, 0, Z).
+        /// </returns>
+        public static float operator ^(Vector2D left, Vector2D right)
+        {
+            return CrossProduct(left, right);
+        }
+
+        public static implicit operator Vector2D(Point value)
+        {
+            return new Vector2D(value);
+        }
+
+        public static implicit operator Vector2D(PointF value)
+        {
+            return new Vector2D(value);
+        }
+
+        public static implicit operator Vector2D(SizeF value)
+        {
+            return new Vector2D(value);
+        }
+
+        public static explicit operator Vector2D(Point2D value)
+        {
+            return new Vector2D(value);
+        }
+
+        public static explicit operator PointF(Vector2D value)
+        {
+            return value.ToPointF();
+        }
+
+        public static explicit operator SizeF(Vector2D value)
+        {
+            return value.ToSizeF();
+        }
+
+        #endregion
+
         #region Public Methods
 
         public static float DotProduct(Vector2D left, Vector2D right)
@@ -202,117 +314,6 @@ namespace SharpestBeak.Physics
         public float GetAngleCosine(Vector2D target)
         {
             return (this * target) / (this.GetLength() * target.GetLength());
-        }
-
-        #endregion
-
-        #region Operators
-
-        public static bool operator ==(Vector2D left, Vector2D right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Vector2D left, Vector2D right)
-        {
-            return !left.Equals(right);
-        }
-
-        public static Vector2D operator +(Vector2D value)
-        {
-            return value;
-        }
-
-        public static Vector2D operator -(Vector2D value)
-        {
-            return value.Negate();
-        }
-
-        public static Vector2D operator !(Vector2D value)
-        {
-            return value.GetNormal();
-        }
-
-        public static Vector2D operator +(Vector2D left, Vector2D right)
-        {
-            return new Vector2D(left.X + right.X, left.Y + right.Y);
-        }
-
-        public static Vector2D operator -(Vector2D left, Vector2D right)
-        {
-            return new Vector2D(left.X - right.X, left.Y - right.Y);
-        }
-
-        public static Vector2D operator *(Vector2D left, float right)
-        {
-            return new Vector2D(left.X * right, left.Y * right);
-        }
-
-        public static Vector2D operator *(float left, Vector2D right)
-        {
-            return new Vector2D(left * right.X, left * right.Y);
-        }
-
-        public static Vector2D operator /(Vector2D left, float right)
-        {
-            if (right.IsZero())
-            {
-                throw new DivideByZeroException();
-            }
-            return left * (1f / right);
-        }
-
-        public static float operator *(Vector2D left, Vector2D right)
-        {
-            return DotProduct(left, right);
-        }
-
-        /// <summary>
-        ///     Computes the cross product of the specified vectors.
-        ///     Returns the Z component of the resulting 3D vector (0, 0, Z).
-        /// </summary>
-        /// <param name="left">
-        ///     The first vector of the cross product.
-        /// </param>
-        /// <param name="right">
-        ///     The second vector of the cross product.
-        /// </param>
-        /// <returns>
-        ///     The Z component of the resulting 3D vector (0, 0, Z).
-        /// </returns>
-        public static float operator ^(Vector2D left, Vector2D right)
-        {
-            return CrossProduct(left, right);
-        }
-
-        public static implicit operator Vector2D(Point value)
-        {
-            return new Vector2D(value);
-        }
-
-        public static implicit operator Vector2D(PointF value)
-        {
-            return new Vector2D(value);
-        }
-
-        public static implicit operator Vector2D(SizeF value)
-        {
-            return new Vector2D(value);
-        }
-
-        public static explicit operator Vector2D(Point2D value)
-        {
-            return new Vector2D(value);
-        }
-
-        public static explicit operator PointF(Vector2D value)
-        {
-            return value.ToPointF();
-        }
-
-        public static explicit operator SizeF(Vector2D value)
-        {
-            return value.ToSizeF();
         }
 
         #endregion

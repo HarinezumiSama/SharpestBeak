@@ -47,11 +47,10 @@ namespace SharpestBeak.Diagnostics
                 return;
             }
 
-            using (var asw =
-                new AutoStopwatch(s => WriteLineInternal(s))
-                {
-                    OutputFormat = string.Format("{0} took {{0}}.", action.Method.GetQualifiedName())
-                })
+            using (new AutoStopwatch(WriteLineInternal)
+            {
+                OutputFormat = string.Format("{0} took {{0}}.", action.Method.GetQualifiedName())
+            })
             {
                 action();
             }
@@ -64,11 +63,10 @@ namespace SharpestBeak.Diagnostics
                 return action();
             }
 
-            using (var asw =
-                new AutoStopwatch(s => WriteLineInternal(s))
-                {
-                    OutputFormat = string.Format("{0} took {{0}}.", action.Method.GetQualifiedName())
-                })
+            using (new AutoStopwatch(WriteLineInternal)
+            {
+                OutputFormat = string.Format("{0} took {{0}}.", action.Method.GetQualifiedName())
+            })
             {
                 return action();
             }

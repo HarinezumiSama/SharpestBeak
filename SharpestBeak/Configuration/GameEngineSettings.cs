@@ -33,14 +33,17 @@ namespace SharpestBeak.Configuration
                         GameConstants.NominalCellCountRange.Max),
                     "nominalSize");
             }
+
             if (lightTeam == null)
             {
                 throw new ArgumentNullException("lightTeam");
             }
+
             if (darkTeam == null)
             {
                 throw new ArgumentNullException("darkTeam");
             }
+
             if (paintCallback == null)
             {
                 throw new ArgumentNullException("paintCallback");

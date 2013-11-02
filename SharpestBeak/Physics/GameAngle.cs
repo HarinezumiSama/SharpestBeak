@@ -24,6 +24,50 @@ namespace SharpestBeak.Physics
 
         #endregion
 
+        #region Operators
+
+        public static bool operator ==(GameAngle left, GameAngle right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(GameAngle left, GameAngle right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static GameAngle operator +(GameAngle value)
+        {
+            return value;
+        }
+
+        public static GameAngle operator -(GameAngle value)
+        {
+            return FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
+        }
+
+        public static GameAngle operator +(GameAngle left, GameAngle right)
+        {
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
+        }
+
+        public static GameAngle operator -(GameAngle left, GameAngle right)
+        {
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
+        }
+
+        public static GameAngle operator *(GameAngle left, float right)
+        {
+            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
+        }
+
+        public static GameAngle operator *(float left, GameAngle right)
+        {
+            return FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
+        }
+
+        #endregion
+
         #region Public Methods
 
         public static GameAngle FromRadians(float radianAngle)
@@ -91,50 +135,6 @@ namespace SharpestBeak.Physics
 
         #endregion
 
-        #region Operators
-
-        public static bool operator ==(GameAngle left, GameAngle right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(GameAngle left, GameAngle right)
-        {
-            return !left.Equals(right);
-        }
-
-        public static GameAngle operator +(GameAngle value)
-        {
-            return value;
-        }
-
-        public static GameAngle operator -(GameAngle value)
-        {
-            return FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
-        }
-
-        public static GameAngle operator +(GameAngle left, GameAngle right)
-        {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
-        }
-
-        public static GameAngle operator -(GameAngle left, GameAngle right)
-        {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
-        }
-
-        public static GameAngle operator *(GameAngle left, float right)
-        {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
-        }
-
-        public static GameAngle operator *(float left, GameAngle right)
-        {
-            return FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
-        }
-
-        #endregion
-
         #region IEquatable<GameAngle> Members
 
         public bool Equals(GameAngle other)
@@ -171,15 +171,19 @@ namespace SharpestBeak.Physics
             {
                 sb.AppendFormat(formatProvider, "{0:N1}°", this.DegreeValue);
             }
+
             if (separator)
             {
                 sb.Append(" : ");
             }
+
             if (radians)
             {
                 sb.AppendFormat(formatProvider, "{0:N3} rad", this.RadianValue);
             }
+
             sb.Append("}");
+
             return sb.ToString();
         }
 
@@ -190,11 +194,13 @@ namespace SharpestBeak.Physics
         internal static float NormalizeDegreeAngle(float value)
         {
             var result = value;
+
             // TODO: [VM] Use tolerance when comparing values - (?)
             while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
             {
                 result -= MathHelper.RevolutionDegrees;
             }
+
             while (result <= -MathHelper.HalfRevolutionDegrees && result <= MathHelper.HalfRevolutionDegrees)
             {
                 result += MathHelper.RevolutionDegrees;
@@ -204,6 +210,7 @@ namespace SharpestBeak.Physics
             {
                 throw new InvalidOperationException("Computed angle was not fixed correctly.");
             }
+
             return result;
         }
 

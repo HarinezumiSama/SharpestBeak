@@ -22,6 +22,7 @@ namespace SharpestBeak.Model
             {
                 throw new ArgumentNullException("unit");
             }
+
             if (previousMove == null)
             {
                 throw new ArgumentNullException("previousMove");

@@ -26,6 +26,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("first");
             }
+
             if (second == null)
             {
                 throw new ArgumentNullException("second");
@@ -38,6 +39,7 @@ namespace SharpestBeak.Physics
             {
                 PerformanceCounterHelper.Instance.CollisionCountPerStep.Increment();
             }
+
             return result;
         }
 
@@ -99,6 +101,7 @@ namespace SharpestBeak.Physics
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -114,6 +117,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("primitive");
             }
+
             if (other == null)
             {
                 throw new ArgumentNullException("other");
@@ -144,6 +148,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("element");
             }
+
             if (other == null)
             {
                 throw new ArgumentNullException("other");
@@ -162,6 +167,7 @@ namespace SharpestBeak.Physics
                             "The element {{{0}}} has empty rough primitives collection.",
                             element));
                 }
+
                 for (var index = 0; index < roughPrimitives.Count; index++)
                 {
                     var roughPrimitive = roughPrimitives[index];
@@ -186,6 +192,7 @@ namespace SharpestBeak.Physics
                         "The element {{{0}}} has empty primitives collection.",
                         element));
             }
+
             for (var index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
@@ -206,6 +213,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("line1");
             }
+
             if (line2 == null)
             {
                 throw new ArgumentNullException("line2");
@@ -246,6 +254,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("circle1");
             }
+
             if (circle2 == null)
             {
                 throw new ArgumentNullException("circle2");
@@ -268,6 +277,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("line");
             }
+
             if (circle == null)
             {
                 throw new ArgumentNullException("circle");
@@ -299,6 +309,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("line");
             }
+
             if (polygon == null)
             {
                 throw new ArgumentNullException("polygon");
@@ -319,6 +330,7 @@ namespace SharpestBeak.Physics
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -330,6 +342,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("circle");
             }
+
             if (polygon == null)
             {
                 throw new ArgumentNullException("polygon");
@@ -351,6 +364,7 @@ namespace SharpestBeak.Physics
             {
                 throw new ArgumentNullException("polygon1");
             }
+
             if (polygon2 == null)
             {
                 throw new ArgumentNullException("polygon2");

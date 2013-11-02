@@ -36,24 +36,6 @@ namespace SharpestBeak
 
         #endregion
 
-        #region Private Methods
-
-        private static IList<MoveDirection> GetActiveMoveDirections()
-        {
-            var resultProxy = new HashSet<MoveDirection>(Helper.GetEnumValues<MoveDirection>());
-            resultProxy.Remove(MoveDirection.None);
-            return resultProxy.ToList().AsReadOnly();
-        }
-
-        private static float GetDistanceToLineInternal(Vector2D pointDirection, Vector2D lineDirection)
-        {
-            var projection = pointDirection.ProjectScalar(lineDirection);
-            var result = (pointDirection.GetLengthSquared() - projection.Sqr()).Sqrt();
-            return result;
-        }
-
-        #endregion
-
         #region Public Properties
 
         public static IList<MoveDirection> MoveDirections
@@ -351,6 +333,24 @@ namespace SharpestBeak
             #endregion
 
             return GetBestBeakTurnNormalized(directionalPosition.Position, directionalPosition.Angle, targetPoint);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static IList<MoveDirection> GetActiveMoveDirections()
+        {
+            var resultProxy = new HashSet<MoveDirection>(Helper.GetEnumValues<MoveDirection>());
+            resultProxy.Remove(MoveDirection.None);
+            return resultProxy.ToList().AsReadOnly();
+        }
+
+        private static float GetDistanceToLineInternal(Vector2D pointDirection, Vector2D lineDirection)
+        {
+            var projection = pointDirection.ProjectScalar(lineDirection);
+            var result = (pointDirection.GetLengthSquared() - projection.Sqr()).Sqrt();
+            return result;
         }
 
         #endregion

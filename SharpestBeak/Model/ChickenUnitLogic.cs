@@ -66,19 +66,6 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Protected Methods
-
-        protected abstract void OnReset(GameState gameState);
-
-        protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
-
-        protected virtual string GetCaption()
-        {
-            return GetType().Name;
-        }
-
-        #endregion
-
         #region Internal Properties
 
         internal GameEngine Engine
@@ -156,6 +143,7 @@ namespace SharpestBeak.Model
             {
                 throw new ArgumentNullException("engine");
             }
+
             if (unitCount <= 0)
             {
                 throw new ArgumentOutOfRangeException(
@@ -163,6 +151,7 @@ namespace SharpestBeak.Model
                     unitCount,
                     "The number of units must be positive.");
             }
+
             if (team == GameTeam.None)
             {
                 throw new ArgumentException("The team must be specific.", "team");
@@ -195,6 +184,19 @@ namespace SharpestBeak.Model
 
         #endregion
 
+        #region Protected Methods
+
+        protected abstract void OnReset(GameState gameState);
+
+        protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
+
+        protected virtual string GetCaption()
+        {
+            return GetType().Name;
+        }
+
+        #endregion
+
         #region Private Methods
 
         private GameState GetGameState()
@@ -204,6 +206,7 @@ namespace SharpestBeak.Model
             {
                 result = new GameState(this.Engine, this.UnitsStates.Values);
             }
+
             return result;
         }
 

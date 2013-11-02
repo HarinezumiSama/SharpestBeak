@@ -57,7 +57,7 @@ namespace SharpestBeak.Presentation.Primitives
             this.Vertices = vertices.ToList().AsReadOnly();
             _edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
-            base.BasePoint = this.Vertices.First();
+            this.BasePoint = this.Vertices.First();
         }
 
         /// <summary>
@@ -104,6 +104,7 @@ namespace SharpestBeak.Presentation.Primitives
             {
                 _convexState = GetConvexState(this.Edges);
             }
+
             return _convexState.Value;
         }
 
@@ -125,6 +126,7 @@ namespace SharpestBeak.Presentation.Primitives
             {
                 throw new ArgumentNullException("vertices");
             }
+
             if (vertices.Count < MinVertexCount)
             {
                 throw new ArgumentException(
@@ -146,10 +148,12 @@ namespace SharpestBeak.Presentation.Primitives
                 resultProxy.Add(new LinePrimitive(currentPoint, nextPoint));
                 currentPoint = nextPoint;
             }
+
             if (resultProxy.Count != count)
             {
                 throw new InvalidOperationException();
             }
+
             return resultProxy.AsReadOnly();
         }
 
@@ -161,6 +165,7 @@ namespace SharpestBeak.Presentation.Primitives
             {
                 throw new ArgumentNullException("edges");
             }
+
             if (edges.Count < MinVertexCount)
             {
                 throw new ArgumentException(

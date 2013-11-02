@@ -17,10 +17,10 @@ namespace SharpestBeak.Diagnostics
         public static readonly string DefaultOutputFormat = TimeSpanOnlyOutputFormat;
 
         private readonly object _syncLock = new object();
+        private readonly bool _ownsTextWriter;
         private Stopwatch _stopwatch;
         private TimeSpan? _elapsed;
         private TextWriter _textWriter;
-        private readonly bool _ownsTextWriter;
         private Action<string> _write;
         private Action<TimeSpan> _callback;
 
@@ -29,6 +29,30 @@ namespace SharpestBeak.Diagnostics
         #endregion
 
         #region Constructors
+
+        public AutoStopwatch(Action<TimeSpan> callback = null)
+            : this(null, false, null, callback)
+        {
+            // Nothing to do
+        }
+
+        public AutoStopwatch(TextWriter textWriter, Action<TimeSpan> callback = null)
+            : this(textWriter.EnsureNotNull(), false, null, callback)
+        {
+            // Nothing to do
+        }
+
+        public AutoStopwatch(StringBuilder stringBuilder, Action<TimeSpan> callback = null)
+            : this(new StringWriter(stringBuilder.EnsureNotNull()), true, null, callback)
+        {
+            // Nothing to do
+        }
+
+        public AutoStopwatch(Action<string> write, Action<TimeSpan> callback = null)
+            : this(null, false, write.EnsureNotNull(), callback)
+        {
+            // Nothing to do
+        }
 
         private AutoStopwatch(
             TextWriter textWriter,
@@ -53,30 +77,6 @@ namespace SharpestBeak.Diagnostics
 
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
-        }
-
-        public AutoStopwatch(Action<TimeSpan> callback = null)
-            : this(null, false, null, callback)
-        {
-            // Nothing to do
-        }
-
-        public AutoStopwatch(TextWriter textWriter, Action<TimeSpan> callback = null)
-            : this(textWriter.EnsureNotNull(), false, null, callback)
-        {
-            // Nothing to do
-        }
-
-        public AutoStopwatch(StringBuilder stringBuilder, Action<TimeSpan> callback = null)
-            : this(new StringWriter(stringBuilder.EnsureNotNull()), true, null, callback)
-        {
-            // Nothing to do
-        }
-
-        public AutoStopwatch(Action<string> write, Action<TimeSpan> callback = null)
-            : this(null, false, write.EnsureNotNull(), callback)
-        {
-            // Nothing to do
         }
 
         #endregion
@@ -213,6 +213,7 @@ namespace SharpestBeak.Diagnostics
                     {
                         output = string.Format(" * [Invalid output format \"{0}\": {1}] *", outputFormat, ex.Message);
                     }
+
                     _write(output);
 
                     _write = null;
@@ -224,6 +225,7 @@ namespace SharpestBeak.Diagnostics
                     {
                         _textWriter.Dispose();
                     }
+
                     _textWriter = null;
                 }
             }

@@ -26,6 +26,7 @@ namespace SharpestBeak.Model
             {
                 throw new ArgumentOutOfRangeException("moveDirection", moveDirection, "Invalid move action.");
             }
+
             if (!Enum.IsDefined(typeof(FireMode), fireMode))
             {
                 throw new ArgumentOutOfRangeException("fireMode", fireMode, "Invalid fire mode.");

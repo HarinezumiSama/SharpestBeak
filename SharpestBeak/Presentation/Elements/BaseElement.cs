@@ -30,6 +30,7 @@ namespace SharpestBeak.Presentation.Elements
             {
                 throw new ArgumentNullException("graphics");
             }
+
             if (data == null)
             {
                 throw new ArgumentNullException("data");
@@ -52,10 +53,12 @@ namespace SharpestBeak.Presentation.Elements
             {
                 throw new ArgumentNullException("graphics");
             }
+
             if (data == null)
             {
                 throw new ArgumentNullException("data");
             }
+
             if (element == null)
             {
                 throw new ArgumentNullException("element");

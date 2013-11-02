@@ -13,7 +13,7 @@ namespace SharpestBeak.Presentation.Primitives
         /// <summary>
         ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
         /// </summary>
-        public ConvexPolygonPrimitive(IEnumerable<Point2D> vertices)
+        public ConvexPolygonPrimitive(ICollection<Point2D> vertices)
             : base(AdjustPolygon(vertices))
         {
             // Nothing to do
@@ -23,7 +23,7 @@ namespace SharpestBeak.Presentation.Primitives
         ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
         /// </summary>
         public ConvexPolygonPrimitive(params Point2D[] vertices)
-            : this((IEnumerable<Point2D>)vertices)
+            : this((ICollection<Point2D>)vertices)
         {
             // Nothing to do
         }
@@ -96,7 +96,7 @@ namespace SharpestBeak.Presentation.Primitives
         /// <returns>
         ///     The adjusted collection of vertices.
         /// </returns>
-        private static IEnumerable<Point2D> AdjustPolygon(IEnumerable<Point2D> vertices)
+        private static IEnumerable<Point2D> AdjustPolygon(ICollection<Point2D> vertices)
         {
             #region Argument Check
 
@@ -123,7 +123,7 @@ namespace SharpestBeak.Presentation.Primitives
                     return vertices.Reverse();
 
                 default:
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
             }
         }
 

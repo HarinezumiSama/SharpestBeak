@@ -35,7 +35,7 @@ namespace SharpestBeak.Presentation.Primitives
 
             this.Start = start;
             this.End = end;
-            base.BasePoint = start;
+            this.BasePoint = start;
         }
 
         #endregion
@@ -63,6 +63,7 @@ namespace SharpestBeak.Presentation.Primitives
                 {
                     _direction = this.End - this.Start;
                 }
+
                 return _direction.Value;
             }
         }

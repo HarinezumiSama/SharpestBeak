@@ -33,6 +33,7 @@ namespace SharpestBeak.Physics
         {
             [DebuggerStepThrough]
             get { return _a; }
+
             [DebuggerStepThrough]
             set { _a = value; }
         }
@@ -41,6 +42,7 @@ namespace SharpestBeak.Physics
         {
             [DebuggerStepThrough]
             get { return _b; }
+
             [DebuggerStepThrough]
             set { _b = value; }
         }
@@ -49,6 +51,7 @@ namespace SharpestBeak.Physics
         {
             [DebuggerStepThrough]
             get { return _c; }
+
             [DebuggerStepThrough]
             set { _c = value; }
         }
@@ -66,7 +69,7 @@ namespace SharpestBeak.Physics
         {
             if (_a.IsZero())
             {
-                // Linear equation case
+                //// Linear equation case
 
                 if (_b.IsZero())
                 {
@@ -108,6 +111,7 @@ namespace SharpestBeak.Physics
                     x2 = temp;
                 }
             }
+
             return result;
         }
 

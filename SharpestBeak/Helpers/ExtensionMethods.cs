@@ -61,6 +61,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("collection");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -99,6 +100,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("list");
             }
+
             if (newContents == null)
             {
                 throw new ArgumentNullException("newContents");
@@ -154,6 +156,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -180,6 +183,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -206,6 +210,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -234,6 +239,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -260,6 +266,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -286,6 +293,7 @@ namespace SharpestBeak
             {
                 throw new ArgumentNullException("lock");
             }
+
             if (action == null)
             {
                 throw new ArgumentNullException("action");
@@ -422,6 +430,7 @@ namespace SharpestBeak
                         "The type must be an enumeration ({0}).",
                         enumType.FullName));
             }
+
             if (!enumType.IsDefined(typeof(FlagsAttribute), true))
             {
                 throw new ArgumentException(

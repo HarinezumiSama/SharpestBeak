@@ -176,11 +176,13 @@ namespace SharpestBeak
                 {
                     minProxy = item;
                 }
+
                 if (!maxProxy.HasValue || item > maxProxy.Value)
                 {
                     maxProxy = item;
                 }
             }
+
             if (!minProxy.HasValue || !maxProxy.HasValue)
             {
                 throw new InvalidOperationException("No elements in the collection.");
@@ -210,6 +212,7 @@ namespace SharpestBeak
             {
                 return range.Min;
             }
+
             if (Comparer<T>.Default.Compare(value, range.Max) >= 0)
             {
                 return range.Max;
@@ -224,6 +227,7 @@ namespace SharpestBeak
             {
                 return range.Min;
             }
+
             if ((value - range.Max).IsPositiveOrZero(tolerance))
             {
                 return range.Max;

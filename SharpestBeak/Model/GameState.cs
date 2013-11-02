@@ -11,7 +11,7 @@ namespace SharpestBeak.Model
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameState"/> class.
         /// </summary>
-        internal GameState(GameEngine engine, IEnumerable<ChickenUnitState> unitStates)
+        internal GameState(GameEngine engine, ICollection<ChickenUnitState> unitStates)
         {
             #region Argument Check
 
@@ -19,10 +19,12 @@ namespace SharpestBeak.Model
             {
                 throw new ArgumentNullException("engine");
             }
+
             if (unitStates == null)
             {
                 throw new ArgumentNullException("unitStates");
             }
+
             if (unitStates.Any(item => item == null))
             {
                 throw new ArgumentException("The collection contains a null element.", "unitStates");
