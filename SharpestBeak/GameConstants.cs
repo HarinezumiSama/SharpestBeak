@@ -11,7 +11,7 @@ namespace SharpestBeak
         private const float MinSlowDownRatio = 1f / 16f;
         private const float MaxSlowDownRatio = 16f;
 
-        private const double LogicPollFrequencyMsec = 20d;
+        private const double LogicPollFrequencyMsec = 5d;
 
         internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
