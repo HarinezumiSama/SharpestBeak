@@ -1,6 +1,6 @@
 ﻿namespace SharpestBeak.UI.WinForms
 {
-    partial class GameForm
+    sealed partial class GameForm
     {
         /// <summary>
         /// Required designer variable.
@@ -16,12 +16,12 @@
             if (disposing)
             {
                 Helper.DisposeAndNull(ref components);
-                Helper.DisposeAndNull(ref m_gameBoardBackground);
+                Helper.DisposeAndNull(ref _gameBoardBackground);
 
-                m_lightTeamUnitDrawData.DisposeSafely();
-                m_lightTeamShotDrawData.DisposeSafely();
-                m_darkTeamUnitDrawData.DisposeSafely();
-                m_darkTeamShotDrawData.DisposeSafely();
+                _lightTeamUnitDrawData.DisposeSafely();
+                _lightTeamShotDrawData.DisposeSafely();
+                _darkTeamUnitDrawData.DisposeSafely();
+                _darkTeamShotDrawData.DisposeSafely();
             }
 
             base.Dispose(disposing);

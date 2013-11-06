@@ -10,33 +10,30 @@ namespace SharpestBeak.Logic.Default
 {
     public sealed class RandomChickenLogic : ChickenUnitLogic
     {
-        #region Fields
+        #region Constants and Fields
 
-        private static readonly IList<MoveDirection> s_moveDirections =
-            Helper.GetEnumValues<MoveDirection>().AsReadOnly();
-        private static readonly IList<FireMode> s_fireModes = Helper.GetEnumValues<FireMode>().AsReadOnly();
+        private static readonly ThreadSafeRandom RandomGenerator = new ThreadSafeRandom();
 
-        private static readonly ThreadSafeRandom s_random = new ThreadSafeRandom();
-
-        private readonly Dictionary<GameObjectId, Point2D> m_unitIdToTargetPointMap =
+        private readonly Dictionary<GameObjectId, Point2D> _unitIdToTargetPointMap =
             new Dictionary<GameObjectId, Point2D>();
-        private readonly object m_targetPointsLock = new object();
+
+        private readonly object _targetPointsLock = new object();
 
         #endregion
 
-        #region Private Methods
+        #region Public Properties
 
-        private Point2D ChooseTargetPoint(GameState state, ChickenUnitState unitState)
+        // For debug only
+        public Point2D[] TargetPoints
         {
-            var point = new Point(
-                s_random.Next(state.Data.NominalSize.Width),
-                s_random.Next(state.Data.NominalSize.Height));
-            var result = GameHelper.NominalToReal(point);
-            lock (m_targetPointsLock)
+            [DebuggerStepThrough]
+            get
             {
-                m_unitIdToTargetPointMap[unitState.UniqueId] = result;
+                lock (_targetPointsLock)
+                {
+                    return _unitIdToTargetPointMap.Values.ToArray();
+                }
             }
-            return result;
         }
 
         #endregion
@@ -45,9 +42,9 @@ namespace SharpestBeak.Logic.Default
 
         protected override void OnReset(GameState gameState)
         {
-            lock (m_targetPointsLock)
+            lock (_targetPointsLock)
             {
-                m_unitIdToTargetPointMap.Clear();
+                _unitIdToTargetPointMap.Clear();
                 gameState.UnitStates.DoForEach(item => ChooseTargetPoint(gameState, item));
             }
         }
@@ -58,17 +55,17 @@ namespace SharpestBeak.Logic.Default
             {
                 if (unitState.IsDead)
                 {
-                    lock (m_targetPointsLock)
+                    lock (_targetPointsLock)
                     {
-                        m_unitIdToTargetPointMap.Remove(unitState.UniqueId);
+                        _unitIdToTargetPointMap.Remove(unitState.UniqueId);
                     }
                     continue;
                 }
 
                 Point2D targetPoint;
-                lock (m_targetPointsLock)
+                lock (_targetPointsLock)
                 {
-                    targetPoint = m_unitIdToTargetPointMap.GetValueOrDefault(unitState.UniqueId, unitState.Position);
+                    targetPoint = _unitIdToTargetPointMap.GetValueOrDefault(unitState.UniqueId, unitState.Position);
                 }
 
                 var needNewTargetPoint = unitState.PreviousMoveState.IsRejected()
@@ -81,7 +78,7 @@ namespace SharpestBeak.Logic.Default
 
                 var move = GameHelper.GetBestMoveDirection(unitState.Position, unitState.BeakAngle, targetPoint);
                 var turn = GameHelper.GetBestBeakTurnNormalized(unitState.Position, unitState.BeakAngle, targetPoint);
-                var fireMode = unitState.CanShoot && s_random.Next(10) == 0 ? FireMode.Regular : FireMode.None;
+                var fireMode = unitState.CanShoot && RandomGenerator.Next(10) == 0 ? FireMode.Regular : FireMode.None;
 
                 var moveInfo = new MoveInfo(move, turn, fireMode);
                 moves.Set(unitState, moveInfo);
@@ -95,19 +92,19 @@ namespace SharpestBeak.Logic.Default
 
         #endregion
 
-        #region Public Properties
+        #region Private Methods
 
-        // For debug only
-        public Point2D[] TargetPoints
+        private Point2D ChooseTargetPoint(GameState state, ChickenUnitState unitState)
         {
-            [DebuggerStepThrough]
-            get
+            var point = new Point(
+                RandomGenerator.Next(state.Data.NominalSize.Width),
+                RandomGenerator.Next(state.Data.NominalSize.Height));
+            var result = GameHelper.NominalToReal(point);
+            lock (_targetPointsLock)
             {
-                lock (m_targetPointsLock)
-                {
-                    return m_unitIdToTargetPointMap.Values.ToArray();
-                }
+                _unitIdToTargetPointMap[unitState.UniqueId] = result;
             }
+            return result;
         }
 
         #endregion

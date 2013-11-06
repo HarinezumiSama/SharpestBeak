@@ -51,7 +51,7 @@ namespace SharpestBeak.UI.WinForms
 
             ShowErrorMessage(
                 form,
-                string.Format("An error occurred:{0}{0}{1}", Environment.NewLine, exception.ToString()),
+                string.Format("An error occurred:{0}{0}{1}", Environment.NewLine, exception),
                 "Error");
         }
 

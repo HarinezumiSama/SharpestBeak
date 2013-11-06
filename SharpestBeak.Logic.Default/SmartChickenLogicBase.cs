@@ -8,77 +8,26 @@ using SharpestBeak.View;
 
 namespace SharpestBeak.Logic.Default
 {
-    // TODO: [VM] Implement and use logic settings instead of inheritance
-    // [VM] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
-    // [VM] (b) each logic may be marked with a custom attribute specifying the the settings class to use.
+    //// TODO: [VM] Implement and use logic settings instead of inheritance
+    //// [VM] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
+    //// [VM] (b) each logic may be marked with a custom attribute specifying the the settings class to use.
 
     public abstract class SmartChickenLogicBase : ChickenUnitLogic
     {
-        #region Nested Types
+        #region Constants and Fields
 
-        #region Features Enumeration
+        private readonly Features _features;
 
-        [Flags]
-        protected enum Features
-        {
-            Default = 0,
-            PredictiveShot = 0x00000001,
-            TurningAway = 0x00000002
-        }
-
-        #endregion
-
-        #region PossibleActionInfo Class
-
-        private sealed class PossibleActionInfo
-        {
-            #region Public Properties
-
-            public ChickenViewData EnemyUnit
-            {
-                get;
-                set;
-            }
-
-            public MoveDirection MoveDirection
-            {
-                get;
-                set;
-            }
-
-            public float BeakTurn
-            {
-                get;
-                set;
-            }
-
-            public float DistanceSquared
-            {
-                get;
-                set;
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Fields
-
-        private readonly Features m_features;
-
-        private float m_forceFireDistance;
-        private float m_forceFireDistanceSquared;
-        private float m_tooCloseBorderDistance;
-        private float m_rotateOnlyBorderDistance;
-        private float m_boardDiagonalSize;
-        private float m_tooCloseShot;
-        private float m_dangerousRadius;
-
-        private readonly Dictionary<GameObjectId, HashSet<MoveDirection>> m_blockedDirectionMap =
+        private readonly Dictionary<GameObjectId, HashSet<MoveDirection>> _blockedDirectionMap =
             new Dictionary<GameObjectId, HashSet<MoveDirection>>();
+
+        private float _forceFireDistance;
+        private float _forceFireDistanceSquared;
+        private float _tooCloseBorderDistance;
+        private float _rotateOnlyBorderDistance;
+        private float _boardDiagonalSize;
+        private float _tooCloseShot;
+        private float _dangerousRadius;
 
         #endregion
 
@@ -88,22 +37,170 @@ namespace SharpestBeak.Logic.Default
         ///     Initializes a new instance of the <see cref="SmartChickenLogicBase"/> class.
         /// </summary>
         protected SmartChickenLogicBase(Features features)
-            : base()
         {
-            m_features = features;
+            _features = features;
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnReset(GameState gameState)
+        {
+            _blockedDirectionMap.Clear();
+
+            _forceFireDistance = 2f * GameConstants.NominalCellSize;
+            _forceFireDistanceSquared = _forceFireDistance.Sqr();
+            _tooCloseBorderDistance = 0.5f * GameConstants.NominalCellSize;
+            _rotateOnlyBorderDistance = GameConstants.NominalCellSize;
+            _boardDiagonalSize = new Vector2D(gameState.Data.RealSize).GetLength();
+            _tooCloseShot = 2f * GameConstants.ShotToChickenRectilinearSpeedRatio * GameConstants.NominalCellSize;
+            _dangerousRadius = 3f * GameConstants.ChickenUnit.BeakOffset;
+        }
+
+        protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
+        {
+            var allShots = gameState.UnitStates.SelectMany(item => item.View.Shots).ToList();
+            var enemyUnits = gameState
+                .UnitStates
+                .SelectMany(item => item.View.Chickens.Where(visibleUnit => visibleUnit.Team != this.Team))
+                .ToList();
+
+            foreach (var unitState in gameState.UnitStates)
+            {
+                if (unitState.IsDead)
+                {
+                    continue;
+                }
+
+                var safestMoveDirection = _features.IsAnySet(Features.TurningAway)
+                    ? FindSafestMove(allShots, unitState)
+                    : null;
+
+                if (unitState.PreviousMoveState.IsRejected())
+                {
+                    var blockedDirections = _blockedDirectionMap.GetValueOrDefault(unitState.UniqueId);
+                    if (blockedDirections == null)
+                    {
+                        blockedDirections = new HashSet<MoveDirection>();
+                        _blockedDirectionMap[unitState.UniqueId] = blockedDirections;
+                    }
+
+                    blockedDirections.Add(unitState.PreviousMove.MoveDirection);
+
+                    var moveDirection = GameHelper
+                        .ActiveMoveDirections
+                        .FirstOrDefault(item => !blockedDirections.Contains(item));
+                    var unblockingMove = moveDirection == MoveDirection.None
+                        ? new MoveInfo(MoveDirection.None, BeakTurn.FullyClockwise, FireMode.None)
+                        : new MoveInfo(moveDirection, BeakTurn.None, FireMode.None);
+                    moves.Set(unitState, unblockingMove);
+                    continue;
+                }
+
+                _blockedDirectionMap.Remove(unitState.UniqueId);
+
+                var possibleActions = new List<PossibleActionInfo>(unitState.View.Chickens.Count);
+                foreach (var enemyUnit in enemyUnits)
+                {
+                    var shotTargetPosition = GetShotTargetPosition(unitState, enemyUnit);
+
+                    var moveDirection = safestMoveDirection
+                        ?? GameHelper.GetBestMoveDirection(
+                            unitState.Position,
+                            unitState.BeakAngle,
+                            shotTargetPosition);
+                    var turn = GameHelper.GetBestBeakTurn(
+                        unitState.Position,
+                        unitState.BeakAngle,
+                        shotTargetPosition);
+
+                    possibleActions.Add(
+                        new PossibleActionInfo
+                        {
+                            EnemyUnit = enemyUnit,
+                            MoveDirection = moveDirection,
+                            BeakTurn = turn,
+                            DistanceSquared = unitState.Position.GetDistanceSquared(enemyUnit.Position)
+                        });
+                }
+
+                var bestAction = possibleActions
+                    .OrderBy(item => item.DistanceSquared)
+                    .ThenBy(item => item.BeakTurn)
+                    .FirstOrDefault();
+                if (bestAction == null)
+                {
+                    var minBorderDistance = gameState.Data.BoardBorder.Edges.Min(
+                        item => GameHelper.GetDistanceToLine(unitState.Position, item.Start, item.End));
+                    if (minBorderDistance <= _tooCloseBorderDistance)
+                    {
+                        var boardCenter = new Point2D(gameState.Data.RealSize) / 2f;
+                        var direction = GameHelper.GetBestMoveDirection(
+                            unitState.Position,
+                            unitState.BeakAngle,
+                            boardCenter);
+
+                        moves.Set(unitState, new MoveInfo(direction, BeakTurn.None, FireMode.None));
+                        continue;
+                    }
+
+                    if (safestMoveDirection.HasValue)
+                    {
+                        moves.Set(unitState, new MoveInfo(safestMoveDirection.Value, BeakTurn.None, FireMode.None));
+                    }
+                    else
+                    {
+                        var seekingMove = new MoveInfo(
+                            unitState.PreviousMoveState.IsRejected() || minBorderDistance <= _rotateOnlyBorderDistance
+                                ? MoveDirection.None
+                                : MoveDirection.MoveForward,
+                            BeakTurn.FullyClockwise,
+                            FireMode.None);
+                        moves.Set(unitState, seekingMove);
+                    }
+
+                    continue;
+                }
+
+                var beakTurn = bestAction.BeakTurn.NormalizeBeakTurn();
+                var doFire = bestAction.BeakTurn.IsInRange(BeakTurn.ValueRange)
+                    || bestAction.DistanceSquared <= _forceFireDistanceSquared;
+
+                var move = new MoveInfo(
+                    bestAction.MoveDirection,
+                    beakTurn,
+                    doFire ? FireMode.Regular : FireMode.None);
+                moves.Set(unitState, move);
+            }
+        }
+
+        protected override string GetCaption()
+        {
+            var selectedFeatures = Helper
+                .GetEnumValues<Features>()
+                .Where(item => item != 0 && _features.IsAllSet(item))
+                .Select(item => item.ToString());
+            var featuresString = string.Join(", ", selectedFeatures);
+            if (string.IsNullOrEmpty(featuresString))
+            {
+                featuresString = Features.Default.ToString();
+            }
+
+            return string.Format("Smart [{0}]", featuresString);
         }
 
         #endregion
 
         #region Private Methods
 
-        private MoveDirection? FindSafestMove(List<ShotViewData> allShots, ChickenUnitState unitState)
+        private MoveDirection? FindSafestMove(IEnumerable<ShotViewData> allShots, ChickenUnitState unitState)
         {
-            var safetyCircle = new CirclePrimitive(unitState.Position, m_dangerousRadius);
+            var safetyCircle = new CirclePrimitive(unitState.Position, _dangerousRadius);
             var dangerousShots = new List<ShotViewData>(unitState.View.Shots.Count);
             foreach (var shot in allShots)
             {
-                if (unitState.Position.GetDistance(shot.Position) > m_tooCloseShot)
+                if (unitState.Position.GetDistance(shot.Position) > _tooCloseShot)
                 {
                     continue;
                 }
@@ -118,7 +215,7 @@ namespace SharpestBeak.Logic.Default
 
                 var shotLine = new LinePrimitive(
                     shot.Position,
-                    shot.Position + shot.Angle.ToUnitVector() * m_boardDiagonalSize);
+                    shot.Position + shot.Angle.ToUnitVector() * _boardDiagonalSize);
                 if (CollisionDetector.CheckCollision(shotLine, safetyCircle))
                 {
                     dangerousShots.Add(shot);
@@ -155,6 +252,7 @@ namespace SharpestBeak.Logic.Default
                         maxDistanceMove = moveDirection;
                     }
                 }
+
                 safeMoves[maxDistanceMove]++;
             }
 
@@ -174,7 +272,7 @@ namespace SharpestBeak.Logic.Default
             ChickenUnitState unitState,
             ChickenViewData enemyUnit)
         {
-            if (!m_features.IsAnySet(Features.PredictiveShot))
+            if (!_features.IsAnySet(Features.PredictiveShot))
             {
                 return enemyUnit.Position;
             }
@@ -221,150 +319,55 @@ namespace SharpestBeak.Logic.Default
 
         #endregion
 
-        #region Protected Methods
+        #region Nested Types
 
-        protected override void OnReset(GameState gameState)
+        #region Features Enumeration
+
+        [Flags]
+        protected enum Features
         {
-            m_blockedDirectionMap.Clear();
-
-            m_forceFireDistance = 2f * GameConstants.NominalCellSize;
-            m_forceFireDistanceSquared = m_forceFireDistance.Sqr();
-            m_tooCloseBorderDistance = 0.5f * GameConstants.NominalCellSize;
-            m_rotateOnlyBorderDistance = GameConstants.NominalCellSize;
-            m_boardDiagonalSize = new Vector2D(gameState.Data.RealSize).GetLength();
-            m_tooCloseShot = 2f * GameConstants.ShotToChickenRectilinearSpeedRatio * GameConstants.NominalCellSize;
-            m_dangerousRadius = 3f * GameConstants.ChickenUnit.BeakOffset;
+            Default = 0,
+            PredictiveShot = 0x00000001,
+            TurningAway = 0x00000002
         }
 
-        protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
+        #endregion
+
+        #region PossibleActionInfo Class
+
+        private sealed class PossibleActionInfo
         {
-            var allShots = gameState.UnitStates.SelectMany(item => item.View.Shots).ToList();
-            var enemyUnits = gameState
-                .UnitStates
-                .SelectMany(item => item.View.Chickens.Where(visibleUnit => visibleUnit.Team != this.Team))
-                .ToList();
+            #region Public Properties
 
-            foreach (var unitState in gameState.UnitStates)
+            public ChickenViewData EnemyUnit
             {
-                if (unitState.IsDead)
-                {
-                    continue;
-                }
-
-                var safestMoveDirection = m_features.IsAnySet(Features.TurningAway)
-                    ? FindSafestMove(allShots, unitState)
-                    : null;
-
-                if (unitState.PreviousMoveState.IsRejected())
-                {
-                    var blockedDirections = m_blockedDirectionMap.GetValueOrDefault(unitState.UniqueId);
-                    if (blockedDirections == null)
-                    {
-                        blockedDirections = new HashSet<MoveDirection>();
-                        m_blockedDirectionMap[unitState.UniqueId] = blockedDirections;
-                    }
-                    blockedDirections.Add(unitState.PreviousMove.MoveDirection);
-
-                    var moveDirection = GameHelper
-                        .ActiveMoveDirections
-                        .FirstOrDefault(item => !blockedDirections.Contains(item));
-                    var unblockingMove = moveDirection == MoveDirection.None
-                        ? new MoveInfo(MoveDirection.None, BeakTurn.FullyClockwise, FireMode.None)
-                        : new MoveInfo(moveDirection, BeakTurn.None, FireMode.None);
-                    moves.Set(unitState, unblockingMove);
-                    continue;
-                }
-                m_blockedDirectionMap.Remove(unitState.UniqueId);
-
-                var possibleActions = new List<PossibleActionInfo>(unitState.View.Chickens.Count);
-                foreach (var enemyUnit in enemyUnits)
-                {
-                    var shotTargetPosition = GetShotTargetPosition(unitState, enemyUnit);
-
-                    var moveDirection = safestMoveDirection
-                        ?? GameHelper.GetBestMoveDirection(
-                            unitState.Position,
-                            unitState.BeakAngle,
-                            shotTargetPosition);
-                    var turn = GameHelper.GetBestBeakTurn(
-                        unitState.Position,
-                        unitState.BeakAngle,
-                        shotTargetPosition);
-
-                    possibleActions.Add(
-                        new PossibleActionInfo
-                        {
-                            EnemyUnit = enemyUnit,
-                            MoveDirection = moveDirection,
-                            BeakTurn = turn,
-                            DistanceSquared = unitState.Position.GetDistanceSquared(enemyUnit.Position)
-                        });
-                }
-
-                var bestAction = possibleActions
-                    .OrderBy(item => item.DistanceSquared)
-                    .ThenBy(item => item.BeakTurn)
-                    .FirstOrDefault();
-                if (bestAction == null)
-                {
-                    var minBorderDistance = gameState.Data.BoardBorder.Edges.Min(
-                        item => GameHelper.GetDistanceToLine(unitState.Position, item.Start, item.End));
-                    if (minBorderDistance <= m_tooCloseBorderDistance)
-                    {
-                        var boardCenter = new Point2D(gameState.Data.RealSize) / 2f;
-                        var direction = GameHelper.GetBestMoveDirection(
-                            unitState.Position,
-                            unitState.BeakAngle,
-                            boardCenter);
-
-                        moves.Set(unitState, new MoveInfo(direction, BeakTurn.None, FireMode.None));
-                        continue;
-                    }
-
-                    if (safestMoveDirection.HasValue)
-                    {
-                        moves.Set(unitState, new MoveInfo(safestMoveDirection.Value, BeakTurn.None, FireMode.None));
-                    }
-                    else
-                    {
-                        var seekingMove = new MoveInfo(
-                            unitState.PreviousMoveState.IsRejected() || minBorderDistance <= m_rotateOnlyBorderDistance
-                                ? MoveDirection.None
-                                : MoveDirection.MoveForward,
-                            BeakTurn.FullyClockwise,
-                            FireMode.None);
-                        moves.Set(unitState, seekingMove);
-                    }
-
-                    continue;
-                }
-
-                var beakTurn = GameHelper.NormalizeBeakTurn(bestAction.BeakTurn);
-                var doFire = bestAction.BeakTurn.IsInRange(BeakTurn.ValueRange)
-                    || bestAction.DistanceSquared <= m_forceFireDistanceSquared;
-
-                var move = new MoveInfo(
-                    bestAction.MoveDirection,
-                    beakTurn,
-                    doFire ? FireMode.Regular : FireMode.None);
-                moves.Set(unitState, move);
-            }
-        }
-
-        protected override string GetCaption()
-        {
-            var selectedFeatures = Helper
-                .GetEnumValues<Features>()
-                .Where(item => item != 0 && m_features.IsAllSet(item))
-                .Select(item => item.ToString());
-            var featuresString = string.Join(", ", selectedFeatures);
-            if (string.IsNullOrEmpty(featuresString))
-            {
-                featuresString = Features.Default.ToString();
+                // ReSharper disable once UnusedAutoPropertyAccessor.Local
+                get;
+                set;
             }
 
-            return string.Format("Smart [{0}]", featuresString);
+            public MoveDirection MoveDirection
+            {
+                get;
+                set;
+            }
+
+            public float BeakTurn
+            {
+                get;
+                set;
+            }
+
+            public float DistanceSquared
+            {
+                get;
+                set;
+            }
+
+            #endregion
         }
+
+        #endregion
 
         #endregion
     }

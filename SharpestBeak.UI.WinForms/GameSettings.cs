@@ -19,70 +19,36 @@ namespace SharpestBeak.UI.WinForms
         {
             this.UICellSize = Settings.Default.UICellSize;
             this.NominalSize = Settings.Default.NominalSize;
-            this.LightTeam = new TeamSettings()
-            {
-                PlayerCount = Settings.Default.TeamUnitCount
-            };
-            this.DarkTeam = new TeamSettings()
-            {
-                PlayerCount = Settings.Default.TeamUnitCount
-            };
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        // Do not delete this method - called by TypeDescriptor
-        private bool ShouldSerializeUICellSize()
-        {
-            return false;
-        }
-
-        // Do not delete this method - called by TypeDescriptor
-        private bool ShouldSerializeNominalSize()
-        {
-            return false;
-        }
-
-        // Do not delete this method - called by TypeDescriptor
-        private bool ShouldSerializeLightTeam()
-        {
-            return false;
-        }
-
-        // Do not delete this method - called by TypeDescriptor
-        private bool ShouldSerializeDarkTeam()
-        {
-            return false;
+            this.LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
+            this.DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
         }
 
         #endregion
 
         #region Public Properties
 
-        [DisplayName("View mode")]
+        [DisplayName(@"View mode")]
         public UIViewMode ViewMode
         {
             get;
             set;
         }
 
-        [DisplayName("UI cell size")]
+        [DisplayName(@"UI cell size")]
         public int UICellSize
         {
             get;
             set;
         }
 
-        [DisplayName("Nominal board size")]
+        [DisplayName(@"Nominal board size")]
         public Size NominalSize
         {
             get;
             set;
         }
 
-        [DisplayName("Light team")]
+        [DisplayName(@"Light team")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public TeamSettings LightTeam
         {
@@ -90,7 +56,7 @@ namespace SharpestBeak.UI.WinForms
             private set;
         }
 
-        [DisplayName("Dark team")]
+        [DisplayName(@"Dark team")]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
         public TeamSettings DarkTeam
         {
@@ -131,6 +97,34 @@ namespace SharpestBeak.UI.WinForms
             this.DarkTeam.ValidateInternal(resultBuilder, "Dark team");
 
             return resultBuilder.Length != 0 ? resultBuilder.ToString() : null;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializeUICellSize()
+        {
+            return false;
+        }
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializeNominalSize()
+        {
+            return false;
+        }
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializeLightTeam()
+        {
+            return false;
+        }
+
+        // Do not delete this method - called by TypeDescriptor
+        private bool ShouldSerializeDarkTeam()
+        {
+            return false;
         }
 
         #endregion

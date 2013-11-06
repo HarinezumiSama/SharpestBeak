@@ -1,3 +1,5 @@
+glob:bin/*
+glob:obj/*
 glob:*/bin/*
 glob:*/obj/*
 glob:_Output_/*
@@ -6,3 +8,8 @@ glob:*.csproj.user
 glob:build*.log
 glob:_ReSharper*
 glob:*.Publish.xml
+glob:*.wbk
+glob:~$*.doc
+glob:*.DotSettings.user
+glob:SolutionItems/GlobalVersion.cs
+glob:SolutionItems/Revision.txt
