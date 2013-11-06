@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SharpestBeak.UI.WinForms")]
+[assembly: AssemblyTitle("SharpestBeak.UI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SharpestBeak.UI.WinForms")]
+[assembly: AssemblyProduct("Sharpest Beak")]
 [assembly: AssemblyCopyright("Copyright © Vitalii Maklai")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

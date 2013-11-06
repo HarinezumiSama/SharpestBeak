@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SharpestBeak.Logic.Default")]
+[assembly: AssemblyProduct("Sharpest Beak")]
 [assembly: AssemblyCopyright("Copyright © Vitalii Maklai")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

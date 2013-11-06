@@ -8,8 +8,8 @@
     <ProjectGuid>{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpestBeak.UI.WinForms</RootNamespace>
-    <AssemblyName>SharpestBeak.UI.WinForms</AssemblyName>
+    <RootNamespace>SharpestBeak.UI</RootNamespace>
+    <AssemblyName>SharpestBeak.UI</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>

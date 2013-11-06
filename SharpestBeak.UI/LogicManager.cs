@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SharpestBeak.Model;
-using SharpestBeak.UI.WinForms.Properties;
+using SharpestBeak.UI.Properties;
 
 namespace SharpestBeak.UI.WinForms
 {

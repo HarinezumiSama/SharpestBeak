@@ -11,7 +11,7 @@ using SharpestBeak.Diagnostics;
 using SharpestBeak.Logic.Default;
 using SharpestBeak.Model;
 using SharpestBeak.Presentation;
-using SharpestBeak.UI.WinForms.Properties;
+using SharpestBeak.UI.Properties;
 
 namespace SharpestBeak.UI.WinForms
 {
