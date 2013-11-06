@@ -16,7 +16,7 @@ namespace SharpestBeak.UI
     /// <summary>
     ///     Contains interaction logic for GameWindow.xaml.
     /// </summary>
-    public partial class GameWindow : Window
+    public partial class GameWindow
     {
         #region Nested Types
 
@@ -28,7 +28,6 @@ namespace SharpestBeak.UI
 
             protected GameObjectData(
                 GameObjectId id,
-                GameTeam team,
                 Point3D position,
                 MatrixTransform3D transform)
             {
@@ -42,7 +41,6 @@ namespace SharpestBeak.UI
                 #endregion
 
                 this.Id = id;
-                this.Team = team;
                 this.Position = position;
                 this.Transform = transform;
             }
@@ -52,12 +50,6 @@ namespace SharpestBeak.UI
             #region Public Properties
 
             public GameObjectId Id
-            {
-                get;
-                private set;
-            }
-
-            public GameTeam Team
             {
                 get;
                 private set;
@@ -88,12 +80,11 @@ namespace SharpestBeak.UI
 
             public ChickenData(
                 GameObjectId id,
-                GameTeam team,
                 Point3D position,
                 double beakAngle,
                 ModelVisual3D visual,
                 MatrixTransform3D transform)
-                : base(id, team, position, transform)
+                : base(id, position, transform)
             {
                 #region Argument Check
 
@@ -137,11 +128,10 @@ namespace SharpestBeak.UI
 
             public ShotData(
                 GameObjectId id,
-                GameTeam team,
                 Point3D position,
                 GeometryModel3D model,
                 MatrixTransform3D transform)
-                : base(id, team, position, transform)
+                : base(id, position, transform)
             {
                 #region Argument Check
 
@@ -186,29 +176,29 @@ namespace SharpestBeak.UI
         private static readonly DiffuseMaterial DarkTeamShotMaterial =
             new DiffuseMaterial(new SolidColorBrush(Colors.DarkRed));
 
-        private readonly double m_uiCellSize;
-        private readonly double m_nominalSizeCoefficient;
-        private readonly MeshGeometry3D m_chickenGeometry;
-        private readonly MeshGeometry3D m_shotGeometry;
+        private readonly double _uiCellSize;
+        private readonly double _nominalSizeCoefficient;
+        private readonly MeshGeometry3D _chickenGeometry;
+        private readonly MeshGeometry3D _shotGeometry;
 
-        private readonly GameEngine m_gameEngine;
+        private readonly GameEngine _gameEngine;
 
-        private readonly Dictionary<GameObjectId, ChickenData> m_chickenDatas =
+        private readonly Dictionary<GameObjectId, ChickenData> _chickenDatas =
             new Dictionary<GameObjectId, ChickenData>();
 
-        private readonly Dictionary<ModelVisual3D, ChickenData> m_chickenVisualToData =
+        private readonly Dictionary<ModelVisual3D, ChickenData> _chickenVisualToData =
             new Dictionary<ModelVisual3D, ChickenData>();
 
-        private readonly Dictionary<GameObjectId, ShotData> m_shotDatas =
+        private readonly Dictionary<GameObjectId, ShotData> _shotDatas =
             new Dictionary<GameObjectId, ShotData>();
 
-        private Point3D m_defaultCameraPosition;
-        private Vector3D m_defaultCameraLookDirection;
-        private Vector3D m_defaultCameraUpDirection;
-        private double m_defaultCameraFieldOfView;
+        private Point3D _defaultCameraPosition;
+        private Vector3D _defaultCameraLookDirection;
+        private Vector3D _defaultCameraUpDirection;
+        private double _defaultCameraFieldOfView;
 
-        private GameObjectId? m_followedChickenId;
-        private GameTeam? m_winningTeam;
+        private GameObjectId? _followedChickenId;
+        private GameTeam? _winningTeam;
 
         #endregion
 
@@ -221,11 +211,11 @@ namespace SharpestBeak.UI
         {
             InitializeComponent();
 
-            m_uiCellSize = 1d;
-            m_nominalSizeCoefficient = GameConstants.NominalCellSize;
+            _uiCellSize = 1d;
+            _nominalSizeCoefficient = GameConstants.NominalCellSize;
 
-            m_chickenGeometry = CreateChickenGeometry(m_nominalSizeCoefficient);
-            m_shotGeometry = CreateShotGeometry(m_nominalSizeCoefficient);
+            _chickenGeometry = CreateChickenGeometry(_nominalSizeCoefficient);
+            _shotGeometry = CreateShotGeometry(_nominalSizeCoefficient);
 
             SaveCameraDefaults();
         }
@@ -238,8 +228,8 @@ namespace SharpestBeak.UI
             : this()
         {
             var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame);
-            m_gameEngine = new GameEngine(settings);
-            m_gameEngine.GameEnded += this.GameEngine_GameEnded;
+            _gameEngine = new GameEngine(settings);
+            _gameEngine.GameEnded += this.GameEngine_GameEnded;
 
             this.Title = string.Format(
                 "{0} [{1}x{2}] [L: {3}x {4}  -vs-  D: {5}x {6}]",
@@ -251,10 +241,10 @@ namespace SharpestBeak.UI
                 darkTeam.UnitCount,
                 darkTeam.Type.Name);
 
-            //var mb = (MeshBuilder)this.Resources["ChickenBuilder"];
-            //mb.AddSphere(new Point3D(0d, 0d, 1d), 1d);
-            //mb.AddCone(new Point3D(0d, 0d, 1d), new Vector3D(1, 0, 0), 0.5d, 0d, 1.5d, true, true, 20);
-            //mb.Scale(0.5d, 0.5d, 0.5d);
+            ////var mb = (MeshBuilder)this.Resources["ChickenBuilder"];
+            ////mb.AddSphere(new Point3D(0d, 0d, 1d), 1d);
+            ////mb.AddCone(new Point3D(0d, 0d, 1d), new Vector3D(1, 0, 0), 0.5d, 0d, 1.5d, true, true, 20);
+            ////mb.Scale(0.5d, 0.5d, 0.5d);
         }
 
         #endregion
@@ -270,7 +260,7 @@ namespace SharpestBeak.UI
                 throw new ArgumentOutOfRangeException(
                     "nominalSizeCoefficient",
                     nominalSizeCoefficient,
-                    "The value must be positive.");
+                    @"The value must be positive.");
             }
 
             #endregion
@@ -301,7 +291,7 @@ namespace SharpestBeak.UI
                 throw new ArgumentOutOfRangeException(
                     "nominalSizeCoefficient",
                     nominalSizeCoefficient,
-                    "The value must be positive.");
+                    @"The value must be positive.");
             }
 
             #endregion
@@ -320,27 +310,27 @@ namespace SharpestBeak.UI
         {
             const double BoardThickness = 1d / 4d;
 
-            // TODO: [3D] Draw target points for random chickens
+            //// TODO: [3D] Draw target points for random chickens
 
             try
             {
-                var boardSize = m_gameEngine.Data.NominalSize;
+                var boardSize = _gameEngine.Data.NominalSize;
                 var evenCellsMeshBuilder = new MeshBuilder();
                 var oddCellsMeshBuilder = new MeshBuilder();
 
-                for (int x = 0; x < boardSize.Width; x++)
+                for (var x = 0; x < boardSize.Width; x++)
                 {
-                    for (int y = 0; y < boardSize.Height; y++)
+                    for (var y = 0; y < boardSize.Height; y++)
                     {
                         var builder = (x + y) % 2 == 0 ? evenCellsMeshBuilder : oddCellsMeshBuilder;
 
                         builder.AddBox(
                             new Rect3D(
-                                x * m_uiCellSize,
-                                y * m_uiCellSize,
+                                x * _uiCellSize,
+                                y * _uiCellSize,
                                 -BoardThickness,
-                                m_uiCellSize,
-                                m_uiCellSize,
+                                _uiCellSize,
+                                _uiCellSize,
                                 BoardThickness));
                     }
                 }
@@ -349,19 +339,19 @@ namespace SharpestBeak.UI
                 this.BoardOddCellModel.Geometry = oddCellsMeshBuilder.ToMesh();
 
                 var boardCenter = new Vector3D(
-                    boardSize.Width * m_uiCellSize / 2,
-                    boardSize.Height * m_uiCellSize / 2,
+                    boardSize.Width * _uiCellSize / 2,
+                    boardSize.Height * _uiCellSize / 2,
                     0d);
                 this.Camera.Position += boardCenter;
                 this.Camera.LookDirection = boardCenter.ToPoint3D() - this.Camera.Position;
 
-                m_followedChickenId = null;
+                _followedChickenId = null;
                 SaveCameraDefaults();
 
-                //ClearStatusLabels();
-                //UpdateMoveCountStatus();
+                ////ClearStatusLabels();
+                ////UpdateMoveCountStatus();
 
-                m_gameEngine.CallPaint();
+                _gameEngine.CallPaint();
             }
             catch (Exception ex)
             {
@@ -388,9 +378,9 @@ namespace SharpestBeak.UI
                 var transform = new MatrixTransform3D(matrix);
                 var position = ConvertEnginePosition(chicken.Element.Position);
 
-                var chickenVisual = new ModelVisual3D()
+                var chickenVisual = new ModelVisual3D
                 {
-                    Content = new GeometryModel3D(m_chickenGeometry, material)
+                    Content = new GeometryModel3D(_chickenGeometry, material)
                     {
                         Transform = transform
                     }
@@ -398,23 +388,22 @@ namespace SharpestBeak.UI
 
                 var data = new ChickenData(
                     chicken.UniqueId,
-                    chicken.Team,
                     position,
                     chicken.Element.BeakAngle.DegreeValue,
                     chickenVisual,
                     transform);
-                m_chickenDatas.Add(data.Id, data);
-                m_chickenVisualToData.Add(chickenVisual, data);
+                _chickenDatas.Add(data.Id, data);
+                _chickenVisualToData.Add(chickenVisual, data);
                 this.BoardVisual.Children.Add(chickenVisual);
             }
         }
 
-        private Point3D ConvertEnginePosition(SharpestBeak.Physics.Point2D position)
+        private Point3D ConvertEnginePosition(Physics.Point2D position)
         {
             return new Point3D(
-                position.X / m_nominalSizeCoefficient,
-                position.Y / m_nominalSizeCoefficient,
-                GameConstants.ChickenUnit.BodyCircleRadius / m_nominalSizeCoefficient);
+                position.X / _nominalSizeCoefficient,
+                position.Y / _nominalSizeCoefficient,
+                GameConstants.ChickenUnit.BodyCircleRadius / _nominalSizeCoefficient);
         }
 
         private Matrix3D GetChickenTransformMatrix(ChickenPresentation chicken)
@@ -423,7 +412,7 @@ namespace SharpestBeak.UI
 
             result.Rotate(new Quaternion(new Vector3D(0d, 0d, 1d), chicken.Element.BeakAngle.DegreeValue));
 
-            var normalizedPosition = chicken.Element.Position / (float)m_nominalSizeCoefficient;
+            var normalizedPosition = chicken.Element.Position / (float)_nominalSizeCoefficient;
             result.Translate(new Vector3D(normalizedPosition.X, normalizedPosition.Y, 0d));
 
             return result;
@@ -433,7 +422,7 @@ namespace SharpestBeak.UI
         {
             var result = Matrix3D.Identity;
 
-            var normalizedPosition = shot.Element.Position / (float)m_nominalSizeCoefficient;
+            var normalizedPosition = shot.Element.Position / (float)_nominalSizeCoefficient;
             result.Translate(new Vector3D(normalizedPosition.X, normalizedPosition.Y, 0d));
 
             return result;
@@ -444,9 +433,9 @@ namespace SharpestBeak.UI
             this.BoardVisual.Children.Clear();
             this.ShotsModelGroup.Children.Clear();
 
-            m_chickenDatas.Clear();
-            m_chickenVisualToData.Clear();
-            m_shotDatas.Clear();
+            _chickenDatas.Clear();
+            _chickenVisualToData.Clear();
+            _shotDatas.Clear();
         }
 
         private void PaintGame(GamePaintEventArgs e)
@@ -474,15 +463,15 @@ namespace SharpestBeak.UI
                 return;
             }
 
-            if (!m_chickenDatas.Any())
+            if (!_chickenDatas.Any())
             {
                 InitializeVisualData(presentation);
             }
 
-            var deadChickenIds = new HashSet<GameObjectId>(m_chickenDatas.Keys);
+            var deadChickenIds = new HashSet<GameObjectId>(_chickenDatas.Keys);
             foreach (var chicken in presentation.Chickens)
             {
-                var data = m_chickenDatas[chicken.UniqueId];
+                var data = _chickenDatas[chicken.UniqueId];
                 data.Position = ConvertEnginePosition(chicken.Element.Position);
                 data.BeakAngle = chicken.Element.BeakAngle.DegreeValue;
                 data.Transform.Matrix = GetChickenTransformMatrix(chicken);
@@ -492,16 +481,16 @@ namespace SharpestBeak.UI
 
             foreach (var deadChickenId in deadChickenIds)
             {
-                var data = m_chickenDatas[deadChickenId];
+                var data = _chickenDatas[deadChickenId];
                 this.BoardVisual.Children.Remove(data.Visual);
-                m_chickenDatas.Remove(deadChickenId);
-                m_chickenVisualToData.Remove(data.Visual);
+                _chickenDatas.Remove(deadChickenId);
+                _chickenVisualToData.Remove(data.Visual);
             }
 
-            var explodedShotIds = new HashSet<GameObjectId>(m_shotDatas.Keys);
+            var explodedShotIds = new HashSet<GameObjectId>(_shotDatas.Keys);
             foreach (var shot in presentation.Shots)
             {
-                var data = m_shotDatas.GetValueOrDefault(shot.UniqueId);
+                var data = _shotDatas.GetValueOrDefault(shot.UniqueId);
                 if (data == null)
                 {
                     var material = shot.Owner.Team == GameTeam.Light ? LightTeamShotMaterial : DarkTeamShotMaterial;
@@ -509,13 +498,13 @@ namespace SharpestBeak.UI
                     var transform = new MatrixTransform3D(matrix);
                     var position = ConvertEnginePosition(shot.Element.Position);
 
-                    var model = new GeometryModel3D(m_shotGeometry, material)
+                    var model = new GeometryModel3D(_shotGeometry, material)
                     {
                         Transform = transform
                     };
 
-                    data = new ShotData(shot.UniqueId, shot.Owner.Team, position, model, transform);
-                    m_shotDatas.Add(data.Id, data);
+                    data = new ShotData(shot.UniqueId, position, model, transform);
+                    _shotDatas.Add(data.Id, data);
                     this.ShotsModelGroup.Children.Add(model);
                 }
                 else
@@ -530,9 +519,9 @@ namespace SharpestBeak.UI
 
             foreach (var explodedShotId in explodedShotIds)
             {
-                var data = m_shotDatas[explodedShotId];
+                var data = _shotDatas[explodedShotId];
                 this.ShotsModelGroup.Children.Remove(data.Model);
-                m_shotDatas.Remove(explodedShotId);
+                _shotDatas.Remove(explodedShotId);
             }
 
             FollowChicken();
@@ -542,12 +531,12 @@ namespace SharpestBeak.UI
         {
             try
             {
-                if (m_gameEngine.IsRunning)
+                if (_gameEngine.IsRunning)
                 {
                     return;
                 }
 
-                var winningTeam = m_gameEngine.WinningTeam;
+                var winningTeam = _gameEngine.WinningTeam;
                 if (winningTeam.HasValue)
                 {
                     var mbr = this.ShowQuestion(
@@ -565,9 +554,9 @@ namespace SharpestBeak.UI
                     return;
                 }
 
-                m_winningTeam = null;
-                m_gameEngine.Start();
-                //UpdateMoveCountStatus();
+                _winningTeam = null;
+                _gameEngine.Start();
+                ////UpdateMoveCountStatus();
             }
             catch (Exception ex)
             {
@@ -577,7 +566,6 @@ namespace SharpestBeak.UI
                 }
 
                 this.ShowErrorMessage(ex);
-                return;
             }
         }
 
@@ -585,13 +573,13 @@ namespace SharpestBeak.UI
         {
             try
             {
-                if (!m_gameEngine.IsRunning)
+                if (!_gameEngine.IsRunning)
                 {
                     return;
                 }
 
-                m_gameEngine.Stop();
-                //UpdateMoveCountStatus();
+                _gameEngine.Stop();
+                ////UpdateMoveCountStatus();
             }
             catch (Exception ex)
             {
@@ -601,46 +589,45 @@ namespace SharpestBeak.UI
                 }
 
                 this.ShowErrorMessage(ex);
-                return;
             }
         }
 
         private void ResetGame()
         {
             StopGame();
-            m_winningTeam = null;
+            _winningTeam = null;
 
             RestoreCameraDefaults();
 
             ClearData();
 
-            m_gameEngine.Reset();
+            _gameEngine.Reset();
         }
 
         private void SaveCameraDefaults()
         {
-            m_defaultCameraPosition = this.Camera.Position;
-            m_defaultCameraLookDirection = this.Camera.LookDirection;
-            m_defaultCameraUpDirection = this.Camera.UpDirection;
-            m_defaultCameraFieldOfView = this.Camera.FieldOfView;
+            _defaultCameraPosition = this.Camera.Position;
+            _defaultCameraLookDirection = this.Camera.LookDirection;
+            _defaultCameraUpDirection = this.Camera.UpDirection;
+            _defaultCameraFieldOfView = this.Camera.FieldOfView;
         }
 
         private void RestoreCameraDefaults()
         {
-            m_followedChickenId = null;
+            _followedChickenId = null;
 
-            this.Camera.Position = m_defaultCameraPosition;
-            this.Camera.LookDirection = m_defaultCameraLookDirection;
-            this.Camera.UpDirection = m_defaultCameraUpDirection;
-            this.Camera.FieldOfView = m_defaultCameraFieldOfView;
+            this.Camera.Position = _defaultCameraPosition;
+            this.Camera.LookDirection = _defaultCameraLookDirection;
+            this.Camera.UpDirection = _defaultCameraUpDirection;
+            this.Camera.FieldOfView = _defaultCameraFieldOfView;
             this.Camera.Transform = null;
         }
 
         private void StartFollowingChicken(GameObjectId chickenId)
         {
-            m_followedChickenId = chickenId;
+            _followedChickenId = chickenId;
 
-            var data = m_chickenDatas.GetValueOrDefault(m_followedChickenId.Value);
+            var data = _chickenDatas.GetValueOrDefault(_followedChickenId.Value);
             if (data == null)
             {
                 RestoreCameraDefaults();
@@ -648,7 +635,7 @@ namespace SharpestBeak.UI
             }
 
             this.Camera.Position = new Point3D(
-                GameConstants.ChickenUnit.BodyCircleRadius / m_nominalSizeCoefficient,
+                GameConstants.ChickenUnit.BodyCircleRadius / _nominalSizeCoefficient,
                 0d,
                 0d);
             this.Camera.LookDirection = new Vector3D(1d, 0d, 0d);
@@ -661,12 +648,12 @@ namespace SharpestBeak.UI
 
         private void FollowChicken()
         {
-            if (!m_followedChickenId.HasValue)
+            if (!_followedChickenId.HasValue)
             {
                 return;
             }
 
-            var data = m_chickenDatas.GetValueOrDefault(m_followedChickenId.Value);
+            var data = _chickenDatas.GetValueOrDefault(_followedChickenId.Value);
             if (data == null)
             {
                 RestoreCameraDefaults();
@@ -712,13 +699,14 @@ namespace SharpestBeak.UI
                         e.Handled = true;
                         StopGame();
                     }
+
                     break;
 
                 case Key.Space:
                 case Key.F5:
                     {
                         e.Handled = true;
-                        if (m_gameEngine.IsRunning)
+                        if (_gameEngine.IsRunning)
                         {
                             StopGame();
                         }
@@ -727,6 +715,7 @@ namespace SharpestBeak.UI
                             StartGame();
                         }
                     }
+
                     break;
 
                 case Key.F8:
@@ -749,7 +738,7 @@ namespace SharpestBeak.UI
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
-            var presentation = m_gameEngine.GetPresentation();
+            var presentation = _gameEngine.GetPresentation();
             DoPaintGame(presentation);
         }
 
@@ -765,10 +754,10 @@ namespace SharpestBeak.UI
                 return;
             }
 
-            m_winningTeam = e.WinningTeam;
+            _winningTeam = e.WinningTeam;
 
-            m_gameEngine.Stop();
-            m_gameEngine.CallPaint();
+            _gameEngine.Stop();
+            _gameEngine.CallPaint();
 
             var winningLogicName = e.WinningLogic == null ? "None" : e.WinningLogic.GetType().Name;
 
@@ -784,7 +773,6 @@ namespace SharpestBeak.UI
             if (!InitializeGameUI())
             {
                 System.Windows.Forms.Application.Exit();
-                return;
             }
         }
 
@@ -795,7 +783,7 @@ namespace SharpestBeak.UI
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (m_gameEngine.IsRunning)
+            if (_gameEngine.IsRunning)
             {
                 StopGame();
             }
@@ -822,7 +810,7 @@ namespace SharpestBeak.UI
                 return;
             }
 
-            var data = m_chickenVisualToData.GetValueOrDefault(visual);
+            var data = _chickenVisualToData.GetValueOrDefault(visual);
             if (data == null)
             {
                 return;

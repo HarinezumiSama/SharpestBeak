@@ -30,13 +30,6 @@ namespace SharpestBeak.UI
         {
             var properties = this.GameSettingPropertyGrid.Properties.OfType<PropertyItem>().ToArray();
             properties.DoForEach(item => item.IsExpanded = true);
-
-            var firstProperty = properties.FirstOrDefault();
-            ////if (firstProperty != null)
-            ////{
-            ////    firstProperty.IsSelected = true;
-            ////    firstProperty.Focus();
-            ////}
         }
 
         private void DoPlay()

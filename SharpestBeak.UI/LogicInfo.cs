@@ -9,7 +9,7 @@ namespace SharpestBeak.UI
     {
         #region Fields
 
-        private readonly string m_asString;
+        private readonly string _asString;
 
         #endregion
 
@@ -39,7 +39,7 @@ namespace SharpestBeak.UI
 
             this.Type = type;
             this.Caption = caption;
-            m_asString = string.Format("{0} ({1})", caption, type.Name);
+            _asString = string.Format("{0} ({1})", caption, type.Name);
         }
 
         #endregion
@@ -74,7 +74,7 @@ namespace SharpestBeak.UI
 
         public override string ToString()
         {
-            return m_asString;
+            return _asString;
         }
 
         #endregion
@@ -83,7 +83,7 @@ namespace SharpestBeak.UI
 
         public bool Equals(LogicInfo other)
         {
-            return !object.ReferenceEquals(other, null) && object.Equals(this.Type, other.Type);
+            return !ReferenceEquals(other, null) && Equals(this.Type, other.Type);
         }
 
         #endregion
