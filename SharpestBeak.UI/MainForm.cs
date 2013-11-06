@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using SharpestBeak.Configuration;
 using SharpestBeak.UI.Properties;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     public partial class MainForm : Form
     {

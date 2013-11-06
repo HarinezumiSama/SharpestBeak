@@ -13,7 +13,7 @@ using SharpestBeak.Model;
 using SharpestBeak.Presentation;
 using SharpestBeak.UI.Properties;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     public sealed partial class GameForm : Form
     {

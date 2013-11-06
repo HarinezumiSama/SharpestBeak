@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     /// <summary>
     ///     Contains extension methods for <see cref="System.Windows.Window"/> class.

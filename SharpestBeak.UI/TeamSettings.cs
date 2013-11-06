@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public sealed class TeamSettings

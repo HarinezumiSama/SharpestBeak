@@ -6,7 +6,7 @@ using System.Text;
 using SharpestBeak.Model;
 using SharpestBeak.UI.Properties;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     internal sealed class LogicManager
     {

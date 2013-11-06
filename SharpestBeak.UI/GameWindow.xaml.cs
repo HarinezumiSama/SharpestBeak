@@ -11,7 +11,7 @@ using SharpestBeak.Configuration;
 using SharpestBeak.Model;
 using SharpestBeak.Presentation;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     /// <summary>
     ///     Contains interaction logic for GameWindow.xaml.

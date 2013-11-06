@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using SharpestBeak.UI.Properties;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     public sealed class GameSettings
     {

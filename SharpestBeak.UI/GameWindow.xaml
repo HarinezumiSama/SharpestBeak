@@ -1,4 +1,4 @@
-﻿<Window x:Class="SharpestBeak.UI.WinForms.GameWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="SharpestBeak.UI.GameWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="Game -- Sharpest Beak (WPF 3D)" Height="400"
         Width="400" xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowState="Maximized" Loaded="Window_Loaded"

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace SharpestBeak.UI.WinForms
+namespace SharpestBeak.UI
 {
     internal static class Program
     {

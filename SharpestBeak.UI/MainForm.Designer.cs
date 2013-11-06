@@ -1,4 +1,7 @@
-﻿namespace SharpestBeak.UI.WinForms
+﻿using System;
+using System.Linq;
+
+namespace SharpestBeak.UI
 {
     partial class MainForm
     {
