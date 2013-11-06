@@ -56,7 +56,6 @@
     <Compile Include="Diagnostics\AutoStopwatch.cs" />
     <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
     <Compile Include="Physics\DirectionalPosition.cs" />
-    <Compile Include="Mapper\ObjectMapper.cs" />
     <Compile Include="Configuration\GameEngineSettings.cs" />
     <Compile Include="GameException.cs" />
     <Compile Include="Model\GameObjectId.cs" />

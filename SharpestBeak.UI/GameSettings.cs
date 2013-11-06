@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using SharpestBeak.UI.Properties;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
 {
@@ -17,7 +18,6 @@ namespace SharpestBeak.UI
         /// </summary>
         public GameSettings()
         {
-            this.UICellSize = Settings.Default.UICellSize;
             this.NominalSize = Settings.Default.NominalSize;
             this.LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
             this.DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
@@ -27,21 +27,8 @@ namespace SharpestBeak.UI
 
         #region Public Properties
 
-        [DisplayName(@"View mode")]
-        public UIViewMode ViewMode
-        {
-            get;
-            set;
-        }
-
-        [DisplayName(@"UI cell size")]
-        public int UICellSize
-        {
-            get;
-            set;
-        }
-
         [DisplayName(@"Nominal board size")]
+        [ExpandableObject]
         public Size NominalSize
         {
             get;
@@ -49,7 +36,7 @@ namespace SharpestBeak.UI
         }
 
         [DisplayName(@"Light team")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [ExpandableObject]
         public TeamSettings LightTeam
         {
             get;
@@ -57,7 +44,7 @@ namespace SharpestBeak.UI
         }
 
         [DisplayName(@"Dark team")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        [ExpandableObject]
         public TeamSettings DarkTeam
         {
             get;
@@ -71,16 +58,6 @@ namespace SharpestBeak.UI
         public string Validate()
         {
             var resultBuilder = new StringBuilder();
-
-            if (!this.UICellSize.IsInRange(GameForm.UICellSizeRange))
-            {
-                resultBuilder
-                    .AppendFormat(
-                        "The UI cell size must be in the range {0} to {1}.",
-                        GameForm.UICellSizeRange.Min,
-                        GameForm.UICellSizeRange.Max)
-                    .AppendLine();
-            }
 
             if (!this.NominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
                 || !this.NominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
@@ -103,25 +80,19 @@ namespace SharpestBeak.UI
 
         #region Private Methods
 
-        // Do not delete this method - called by TypeDescriptor
-        private bool ShouldSerializeUICellSize()
-        {
-            return false;
-        }
-
-        // Do not delete this method - called by TypeDescriptor
+        // Do not delete ShouldSerializeNominalSize method - called by TypeDescriptor
         private bool ShouldSerializeNominalSize()
         {
             return false;
         }
 
-        // Do not delete this method - called by TypeDescriptor
+        // Do not delete ShouldSerializeLightTeam method - called by TypeDescriptor
         private bool ShouldSerializeLightTeam()
         {
             return false;
         }
 
-        // Do not delete this method - called by TypeDescriptor
+        // Do not delete ShouldSerializeDarkTeam method - called by TypeDescriptor
         private bool ShouldSerializeDarkTeam()
         {
             return false;

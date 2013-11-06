@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace SharpestBeak.UI
     {
         #region Fields
 
-        private static readonly LogicManager s_instance = new LogicManager();
+        private static readonly LogicManager InstanceField = new LogicManager();
 
         #endregion
 
@@ -69,7 +70,10 @@ namespace SharpestBeak.UI
         public static LogicManager Instance
         {
             [DebuggerStepThrough]
-            get { return s_instance; }
+            get
+            {
+                return InstanceField;
+            }
         }
 
         public string Errors
@@ -78,7 +82,7 @@ namespace SharpestBeak.UI
             private set;
         }
 
-        public IList<LogicInfo> Logics
+        public ReadOnlyCollection<LogicInfo> Logics
         {
             get;
             private set;

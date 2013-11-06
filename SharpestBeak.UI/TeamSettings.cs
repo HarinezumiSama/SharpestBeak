@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
 {
@@ -121,8 +122,8 @@ namespace SharpestBeak.UI
 
         #region Public Properties
 
-        [DisplayName("Logic")]
-        [Editor(typeof(LogicTypeEditor), typeof(UITypeEditor))]
+        [DisplayName(@"Logic")]
+        [ItemsSource(typeof(LogicInfoItemSource))]
         [RefreshProperties(RefreshProperties.All)]
         public LogicInfo Logic
         {
@@ -130,7 +131,7 @@ namespace SharpestBeak.UI
             set;
         }
 
-        [DisplayName("Player count")]
+        [DisplayName(@"Player count")]
         [RefreshProperties(RefreshProperties.All)]
         public int PlayerCount
         {

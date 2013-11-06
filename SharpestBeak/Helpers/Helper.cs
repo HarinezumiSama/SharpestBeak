@@ -6,11 +6,14 @@ using System.Reflection;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 // ReSharper disable once CheckNamespace
+
 namespace SharpestBeak
 {
     public static class Helper
     {
         #region Constants and Fields
+
+        public static readonly bool DefaultInheritAttributeParameter = true;
 
         private const string InvalidExpressionMessageFmt =
             "Invalid expression (must be a getter of a property of the type '{0}'): {{ {1} }}.";
@@ -268,6 +271,70 @@ namespace SharpestBeak
             return (propertyInfo.DeclaringType ?? propertyInfo.ReflectedType).Name
                 + Type.Delimiter
                 + propertyInfo.Name;
+        }
+
+        public static TAttribute GetSoleAttribute<TAttribute>(
+            this ICustomAttributeProvider attributeProvider,
+            bool inherit)
+        {
+            #region Argument Check
+
+            if (attributeProvider == null)
+            {
+                throw new ArgumentNullException("attributeProvider");
+            }
+
+            #endregion
+
+            return GetSoleAttributeInternal<TAttribute>(attributeProvider, inherit, Enumerable.SingleOrDefault);
+        }
+
+        public static TAttribute GetSoleAttribute<TAttribute>(this ICustomAttributeProvider attributeProvider)
+        {
+            return GetSoleAttribute<TAttribute>(attributeProvider, DefaultInheritAttributeParameter);
+        }
+
+        public static TAttribute GetSoleAttributeStrict<TAttribute>(
+            this ICustomAttributeProvider attributeProvider,
+            bool inherit)
+        {
+            #region Argument Check
+
+            if (attributeProvider == null)
+            {
+                throw new ArgumentNullException("attributeProvider");
+            }
+
+            #endregion
+
+            return GetSoleAttributeInternal<TAttribute>(attributeProvider, inherit, Enumerable.Single);
+        }
+
+        public static TAttribute GetSoleAttributeStrict<TAttribute>(this ICustomAttributeProvider attributeProvider)
+        {
+            return GetSoleAttributeStrict<TAttribute>(attributeProvider, DefaultInheritAttributeParameter);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static TAttribute GetSoleAttributeInternal<TAttribute>(
+            this ICustomAttributeProvider attributeProvider,
+            bool inherit,
+            Func<IEnumerable<TAttribute>, TAttribute> getter)
+        {
+            #region Argument Check
+
+            if (attributeProvider == null)
+            {
+                throw new ArgumentNullException("attributeProvider");
+            }
+
+            #endregion
+
+            var attributes = attributeProvider.GetCustomAttributes(typeof(TAttribute), inherit).OfType<TAttribute>();
+            return getter(attributes);
         }
 
         #endregion

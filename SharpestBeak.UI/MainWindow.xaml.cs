@@ -1,0 +1,153 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Input;
+using SharpestBeak.Configuration;
+using SharpestBeak.UI.Properties;
+using Xceed.Wpf.Toolkit.PropertyGrid;
+using Size = System.Drawing.Size;
+
+namespace SharpestBeak.UI
+{
+    /// <summary>
+    ///     Interaction logic for MainWindow.xaml.
+    /// </summary>
+    public partial class MainWindow
+    {
+        #region Constructors
+
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            var properties = this.GameSettingPropertyGrid.Properties.OfType<PropertyItem>().ToArray();
+            properties.DoForEach(item => item.IsExpanded = true);
+
+            var firstProperty = properties.FirstOrDefault();
+            ////if (firstProperty != null)
+            ////{
+            ////    firstProperty.IsSelected = true;
+            ////    firstProperty.Focus();
+            ////}
+        }
+
+        private void DoPlay()
+        {
+            try
+            {
+                var lightTeam = this.CurrentGameSettings.LightTeam;
+                var darkTeam = this.CurrentGameSettings.DarkTeam;
+
+                var validationMessage = this.CurrentGameSettings.Validate();
+                if (!validationMessage.IsNullOrEmpty())
+                {
+                    this.ShowErrorMessage(validationMessage);
+                    return;
+                }
+
+                var lightTeamRecord = new ChickenTeamRecord(lightTeam.Logic.Type, lightTeam.PlayerCount);
+                var darkTeamRecord = new ChickenTeamRecord(darkTeam.Logic.Type, darkTeam.PlayerCount);
+
+                var gameWindow = new GameWindow(
+                    this.CurrentGameSettings.NominalSize,
+                    lightTeamRecord,
+                    darkTeamRecord);
+                gameWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                if (ex.IsThreadAbort())
+                {
+                    throw;
+                }
+
+                this.ShowErrorMessage(ex);
+            }
+        }
+
+        private void SetPreset(Size nominalSize, int playerCount)
+        {
+            this.CurrentGameSettings.NominalSize = nominalSize;
+            this.CurrentGameSettings.DarkTeam.PlayerCount = playerCount;
+            this.CurrentGameSettings.LightTeam.PlayerCount = playerCount;
+
+            this.GameSettingPropertyGrid.Update();
+        }
+
+        private void SetPreset(int nominalSizeDimension, int playerCount)
+        {
+            SetPreset(new Size(nominalSizeDimension, nominalSizeDimension), playerCount);
+        }
+
+        private void CanExecuteDefaultPreset(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteDefaultPreset(object sender, ExecutedRoutedEventArgs e)
+        {
+            var settings = Settings.Default;
+            SetPreset(settings.NominalSize, settings.TeamUnitCount);
+        }
+
+        private void CanExecuteSmallPreset(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteSmallPreset(object sender, ExecutedRoutedEventArgs e)
+        {
+            SetPreset(GameConstants.NominalCellCountRange.Min, 1);
+        }
+
+        private void CanExecuteMediumPreset(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteMediumPreset(object sender, ExecutedRoutedEventArgs e)
+        {
+            SetPreset(8, 4);
+        }
+
+        private void CanExecuteLargePreset(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteLargePreset(object sender, ExecutedRoutedEventArgs e)
+        {
+            SetPreset(new Size(24, 16), 16);
+        }
+
+        private void CanExecuteExtraLargePreset(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteExtraLargePreset(object sender, ExecutedRoutedEventArgs e)
+        {
+            SetPreset(new Size(48, 24), 32);
+        }
+
+        private void CanExecutePlay(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecutePlay(object sender, ExecutedRoutedEventArgs e)
+        {
+            DoPlay();
+        }
+
+        #endregion
+    }
+}
