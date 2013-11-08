@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -20,6 +21,9 @@ namespace SharpestBeak.UI
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Title = App.Current.FullProductName;
+            this.Width = SystemParameters.WorkArea.Width * 3f / 4f;
         }
 
         #endregion
@@ -30,6 +34,21 @@ namespace SharpestBeak.UI
         {
             var properties = this.GameSettingPropertyGrid.Properties.OfType<PropertyItem>().ToArray();
             properties.DoForEach(item => item.IsExpanded = true);
+
+            var logicManagerErrors = LogicManager.Instance.Errors;
+            if (!string.IsNullOrEmpty(logicManagerErrors))
+            {
+                MessageBox.Show(
+                    this,
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        "There were errors loading logic types:{0}{0}{1}",
+                        Environment.NewLine,
+                        logicManagerErrors),
+                    this.Title,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
 
         private void DoPlay()
@@ -50,9 +69,13 @@ namespace SharpestBeak.UI
                 var darkTeamRecord = new ChickenTeamRecord(darkTeam.Logic.Type, darkTeam.PlayerCount);
 
                 var gameWindow = new GameWindow(
-                    this.CurrentGameSettings.NominalSize,
+                    this.CurrentGameSettings.NominalSize.ToSize(),
                     lightTeamRecord,
-                    darkTeamRecord);
+                    darkTeamRecord)
+                {
+                    Owner = this
+                };
+
                 gameWindow.ShowDialog();
             }
             catch (Exception ex)
@@ -68,7 +91,7 @@ namespace SharpestBeak.UI
 
         private void SetPreset(Size nominalSize, int playerCount)
         {
-            this.CurrentGameSettings.NominalSize = nominalSize;
+            this.CurrentGameSettings.NominalSize.SetSize(nominalSize);
             this.CurrentGameSettings.DarkTeam.PlayerCount = playerCount;
             this.CurrentGameSettings.LightTeam.PlayerCount = playerCount;
 

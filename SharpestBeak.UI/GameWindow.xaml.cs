@@ -198,7 +198,6 @@ namespace SharpestBeak.UI
         private double _defaultCameraFieldOfView;
 
         private GameObjectId? _followedChickenId;
-        private GameTeam? _winningTeam;
 
         #endregion
 
@@ -554,7 +553,6 @@ namespace SharpestBeak.UI
                     return;
                 }
 
-                _winningTeam = null;
                 _gameEngine.Start();
                 ////UpdateMoveCountStatus();
             }
@@ -595,7 +593,6 @@ namespace SharpestBeak.UI
         private void ResetGame()
         {
             StopGame();
-            _winningTeam = null;
 
             RestoreCameraDefaults();
 
@@ -753,8 +750,6 @@ namespace SharpestBeak.UI
                     e);
                 return;
             }
-
-            _winningTeam = e.WinningTeam;
 
             _gameEngine.Stop();
             _gameEngine.CallPaint();

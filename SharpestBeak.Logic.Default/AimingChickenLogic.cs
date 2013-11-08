@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SharpestBeak.Logic.Default
 {
+    [Description("Aiming")]
     public sealed class AimingChickenLogic : SmartChickenLogicBase
     {
         #region Constructors

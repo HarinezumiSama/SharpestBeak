@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -8,6 +9,7 @@ using SharpestBeak.Physics;
 
 namespace SharpestBeak.Logic.Default
 {
+    [Description("Random")]
     public sealed class RandomChickenLogic : ChickenUnitLogic
     {
         #region Constants and Fields
@@ -83,11 +85,6 @@ namespace SharpestBeak.Logic.Default
                 var moveInfo = new MoveInfo(move, turn, fireMode);
                 moves.Set(unitState, moveInfo);
             }
-        }
-
-        protected override string GetCaption()
-        {
-            return "Random";
         }
 
         #endregion

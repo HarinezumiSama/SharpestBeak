@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SharpestBeak.Model;
 
@@ -29,12 +30,12 @@ namespace SharpestBeak.UI
 
             #endregion
 
-            var logic = (ChickenUnitLogic)Activator.CreateInstance(type).EnsureNotNull();
-            var caption = logic.Caption;
-
+            var caption = ChickenUnitLogic.GetCaption(type);
             if (caption.IsNullOrWhiteSpace())
             {
-                throw new ApplicationException(string.Format("Logic '{0}' has empty caption.", type.FullName));
+                throw new ArgumentException(
+                    string.Format(CultureInfo.InvariantCulture, "Logic '{0}' has empty caption.", type.FullName),
+                    "type");
             }
 
             this.Type = type;
@@ -83,7 +84,7 @@ namespace SharpestBeak.UI
 
         public bool Equals(LogicInfo other)
         {
-            return !ReferenceEquals(other, null) && Equals(this.Type, other.Type);
+            return !ReferenceEquals(other, null) && this.Type == other.Type;
         }
 
         #endregion

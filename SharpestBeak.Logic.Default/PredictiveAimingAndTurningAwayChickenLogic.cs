@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SharpestBeak.Logic.Default
 {
+    [Description("Predictive aiming and turning away")]
     public sealed class PredictiveAimingAndTurningAwayChickenLogic : SmartChickenLogicBase
     {
         #region Constructors

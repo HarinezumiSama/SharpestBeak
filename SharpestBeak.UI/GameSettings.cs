@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using SharpestBeak.UI.Properties;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
+using Size = System.Drawing.Size;
 
 namespace SharpestBeak.UI
 {
@@ -18,7 +18,8 @@ namespace SharpestBeak.UI
         /// </summary>
         public GameSettings()
         {
-            this.NominalSize = Settings.Default.NominalSize;
+            this.NominalSize = new SizeObject(Settings.Default.NominalSize);
+
             this.LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
             this.DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
         }
@@ -29,10 +30,11 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Nominal board size")]
         [ExpandableObject]
-        public Size NominalSize
+        ////[Editor(typeof(BoardSizeEditor), typeof(BoardSizeEditor))]
+        public SizeObject NominalSize
         {
             get;
-            set;
+            private set;
         }
 
         [DisplayName(@"Light team")]

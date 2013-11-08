@@ -10,7 +10,7 @@ namespace SharpestBeak.Logic.Default
 {
     //// TODO: [VM] Implement and use logic settings instead of inheritance
     //// [VM] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
-    //// [VM] (b) each logic may be marked with a custom attribute specifying the the settings class to use.
+    //// [VM] (b) each logic may be marked with a custom attribute specifying which settings class to use.
 
     public abstract class SmartChickenLogicBase : ChickenUnitLogic
     {
@@ -173,21 +173,6 @@ namespace SharpestBeak.Logic.Default
                     doFire ? FireMode.Regular : FireMode.None);
                 moves.Set(unitState, move);
             }
-        }
-
-        protected override string GetCaption()
-        {
-            var selectedFeatures = Helper
-                .GetEnumValues<Features>()
-                .Where(item => item != 0 && _features.IsAllSet(item))
-                .Select(item => item.ToString());
-            var featuresString = string.Join(", ", selectedFeatures);
-            if (string.IsNullOrEmpty(featuresString))
-            {
-                featuresString = Features.Default.ToString();
-            }
-
-            return string.Format("Smart [{0}]", featuresString);
         }
 
         #endregion

@@ -5,6 +5,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+using System.Windows;
+
 // ReSharper disable once CheckNamespace
 
 namespace SharpestBeak
@@ -313,6 +315,28 @@ namespace SharpestBeak
         public static TAttribute GetSoleAttributeStrict<TAttribute>(this ICustomAttributeProvider attributeProvider)
         {
             return GetSoleAttributeStrict<TAttribute>(attributeProvider, DefaultInheritAttributeParameter);
+        }
+
+        public static DependencyProperty RegisterDependencyProperty<TObject, TProperty>(
+            Expression<Func<TObject, TProperty>> propertyGetterExpression,
+            PropertyMetadata typeMetadata = null,
+            ValidateValueCallback validateValueCallback = null)
+        {
+            var propertyInfo = GetPropertyInfo(propertyGetterExpression);
+
+            if (propertyInfo.DeclaringType != typeof(TObject))
+            {
+                throw new ArgumentException(
+                    @"Inconsistency between property expression and declaring object type.",
+                    "propertyGetterExpression");
+            }
+
+            return DependencyProperty.Register(
+                propertyInfo.Name,
+                propertyInfo.PropertyType,
+                propertyInfo.DeclaringType.EnsureNotNull(),
+                typeMetadata,
+                validateValueCallback);
         }
 
         #endregion

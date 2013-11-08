@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -12,7 +13,6 @@ namespace SharpestBeak.Model
 
         private readonly List<ChickenUnit> _unitsDirect = new List<ChickenUnit>();
         private readonly ThreadSafeValue<Exception> _error;
-        private readonly Lazy<string> _caption;
 
         #endregion
 
@@ -27,7 +27,6 @@ namespace SharpestBeak.Model
             this.MakeMoveEvent = new AutoResetEvent(false);
 
             this.Units = _unitsDirect.AsReadOnly();
-            _caption = new Lazy<string>(this.GetCaption);
 
             this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(_unitsDirect.Count);
             this.UnitsStatesLock = new object();
@@ -46,13 +45,28 @@ namespace SharpestBeak.Model
             private set;
         }
 
-        public string Caption
+        #endregion
+
+        #region Public Methods
+
+        public static string GetCaption(Type logicType)
         {
-            [DebuggerNonUserCode]
-            get
+            #region Argument Check
+
+            if (logicType == null)
             {
-                return _caption.Value;
+                throw new ArgumentNullException("logicType");
             }
+
+            if (!typeof(ChickenUnitLogic).IsAssignableFrom(logicType))
+            {
+                throw new ArgumentException("The specified type is not inherited properly.", "logicType");
+            }
+
+            #endregion
+
+            var descriptionAttribute = logicType.GetSoleAttribute<DescriptionAttribute>(false);
+            return descriptionAttribute == null ? logicType.Name : descriptionAttribute.Description;
         }
 
         #endregion
@@ -189,11 +203,6 @@ namespace SharpestBeak.Model
         protected abstract void OnReset(GameState gameState);
 
         protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
-
-        protected virtual string GetCaption()
-        {
-            return GetType().Name;
-        }
 
         #endregion
 
