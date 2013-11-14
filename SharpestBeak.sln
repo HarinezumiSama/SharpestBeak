@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.Logic.Default", "SharpestBeak.Logic.Default\SharpestBeak.Logic.Default.csproj", "{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{74DBEB17-0010-43FE-85B5-1F60F268FE07}"
+	ProjectSection(SolutionItems) = preProject
+		Common\ApplicationVersion.cs = Common\ApplicationVersion.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{1B4E8F1C-ABF0-46E1-A144-FCE92F0B908A}"
 	ProjectSection(SolutionItems) = preProject
