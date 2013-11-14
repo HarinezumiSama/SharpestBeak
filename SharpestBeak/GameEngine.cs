@@ -635,7 +635,7 @@ namespace SharpestBeak
                         return;
                     }
 
-                    Thread.Yield();
+                    Thread.Sleep(0);
                 }
 
                 _lightTeamLogic.MakeMoveEvent.Reset();

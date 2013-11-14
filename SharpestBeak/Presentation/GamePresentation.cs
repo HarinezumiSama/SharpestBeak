@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SharpestBeak.Presentation
@@ -36,6 +37,9 @@ namespace SharpestBeak.Presentation
                 .Select(item => new ShotPresentation(item, chickenMap))
                 .ToList()
                 .AsReadOnly();
+
+            // This should be the very last statement
+            this.StepStopwatch = EngineStepStopwatch.CreateAndStart();
         }
 
         #endregion
@@ -48,13 +52,19 @@ namespace SharpestBeak.Presentation
             private set;
         }
 
-        public IList<ChickenPresentation> Chickens
+        public ReadOnlyCollection<ChickenPresentation> Chickens
         {
             get;
             private set;
         }
 
-        public IList<ShotPresentation> Shots
+        public ReadOnlyCollection<ShotPresentation> Shots
+        {
+            get;
+            private set;
+        }
+
+        public EngineStepStopwatch StepStopwatch
         {
             get;
             private set;

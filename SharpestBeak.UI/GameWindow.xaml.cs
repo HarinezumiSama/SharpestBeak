@@ -448,20 +448,11 @@ namespace SharpestBeak.UI
                 return;
             }
 
-            DoPaintGame(e.Presentation);
+            PaintGameNoThreadCheck(e.Presentation);
         }
 
-        private void DoPaintGame(GamePresentation presentation)
+        private void PaintGameNoThreadCheck(GamePresentation presentation)
         {
-            if (!this.Dispatcher.CheckAccess())
-            {
-                this.Dispatcher.BeginInvoke(
-                    (Action<GamePresentation>)this.DoPaintGame,
-                    DispatcherPriority.Render,
-                    presentation);
-                return;
-            }
-
             if (!_chickenDatas.Any())
             {
                 InitializeVisualData(presentation);
@@ -736,7 +727,7 @@ namespace SharpestBeak.UI
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
             var presentation = _gameEngine.GetPresentation();
-            DoPaintGame(presentation);
+            PaintGameNoThreadCheck(presentation);
         }
 
         private void GameEngine_GameEnded(object sender, GameEndedEventArgs e)

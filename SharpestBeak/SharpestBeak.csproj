@@ -48,6 +48,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Common\ApplicationVersion.cs">
+        <Link>Properties\ApplicationVersion.cs</Link>
+    </Compile>
+    <Compile Include="EngineStepStopwatch.cs" />
     <Compile Include="Model\BeakTurn.cs" />
     <Compile Include="Configuration\ChickenTeamRecord.cs" />
     <Compile Include="Model\ChickenUnit.cs" />
@@ -108,7 +113,6 @@
     <Compile Include="Physics\Point2D.cs" />
     <Compile Include="Model\MoveInfo.cs" />
     <Compile Include="Model\MoveDirection.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Model\ShotUnit.cs" />
     <Compile Include="ThreadSafeValue.cs" />
     <Compile Include="View\ChickenViewData.cs" />
