@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -86,7 +87,7 @@ namespace SharpestBeak.UI
             {
                 MessageBox.Show(
                     string.Format(
-                        "The application failed to initialize properly:{0}"
+                        "The application has failed to initialize properly:{0}"
                             + "{0}"
                             + "[{1}] {2}{0}"
                             + "{0}"
@@ -114,11 +115,23 @@ namespace SharpestBeak.UI
 
             //// Dependent properties
 
-            this.FullProductName = string.Format("{0} {1}", this.ProductName, this.ProductVersion);
-            this.FullProductDescription = string.Format(
-                "{0} {1} {2}",
+            var versionString = string.Format(
+                CultureInfo.InvariantCulture,
+                "v{0} rev. {1}",
+                this.ProductVersion.ToString(2),
+                this.ProductVersion.Revision);
+
+            this.FullProductName = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} ({1})",
                 this.ProductName,
-                this.ProductVersion,
+                versionString);
+
+            this.FullProductDescription = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0} ({1}) {2}",
+                this.ProductName,
+                versionString,
                 this.ProductCopyright);
         }
 

@@ -217,6 +217,8 @@ namespace SharpestBeak.UI
             _shotGeometry = CreateShotGeometry(_nominalSizeCoefficient);
 
             SaveCameraDefaults();
+
+            this.CopyrightTextVisual.Text = App.Current.FullProductDescription;
         }
 
         /// <summary>

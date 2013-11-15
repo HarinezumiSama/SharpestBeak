@@ -4,7 +4,7 @@
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowState="Maximized" Loaded="Window_Loaded"
         Unloaded="Window_Unloaded" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
-        <helix:MeshBuilder x:Key="ChickenBuilder" />
+        <!--<helix:MeshBuilder x:Key="ChickenBuilder" />-->
     </Window.Resources>
     <Grid>
         <helix:HelixViewport3D Name="MainViewport" ShowCameraInfo="True" ShowCameraTarget="True"
@@ -20,6 +20,9 @@
             </helix:HelixViewport3D.Camera>
 
             <helix:SunLight />
+
+            <helix:TextBillboardVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="10"
+                    Foreground="Gray" Position="1 -0.25 -0.5" />
 
             <ModelVisual3D x:Name="BoardVisual">
                 <ModelVisual3D.Content>
