@@ -49,8 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\Common\ApplicationVersion.cs">
-        <Link>Properties\ApplicationVersion.cs</Link>
+    <Compile Include="..\SolutionItems\ApplicationVersion.cs">
+      <Link>Properties\ApplicationVersion.cs</Link>
     </Compile>
     <Compile Include="EngineStepStopwatch.cs" />
     <Compile Include="Model\BeakTurn.cs" />
@@ -124,7 +124,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>

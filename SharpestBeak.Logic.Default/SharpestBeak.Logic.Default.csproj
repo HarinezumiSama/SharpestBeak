@@ -44,7 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\Common\ApplicationVersion.cs">
+    <Compile Include="..\SolutionItems\ApplicationVersion.cs">
         <Link>Properties\ApplicationVersion.cs</Link>
     </Compile>
     <Compile Include="AimingChickenLogic.cs" />
