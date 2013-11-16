@@ -149,20 +149,32 @@ namespace SharpestBeak.Physics
             return left * (1f / right);
         }
 
+        /// <summary>
+        ///     Computes the dot product of the two specified 2D vectors.
+        /// </summary>
+        /// <param name="left">
+        ///     The left operand.
+        /// </param>
+        /// <param name="right">
+        ///     The right operand.
+        /// </param>
+        /// <returns>
+        ///     A scalar value representing the dot product.
+        /// </returns>
         public static float operator *(Vector2D left, Vector2D right)
         {
             return DotProduct(left, right);
         }
 
         /// <summary>
-        ///     Computes the cross product of the specified vectors.
+        ///     Computes the cross product of the two specified vectors.
         ///     Returns the Z component of the resulting 3D vector (0, 0, Z).
         /// </summary>
         /// <param name="left">
-        ///     The first vector of the cross product.
+        ///     The first operand.
         /// </param>
         /// <param name="right">
-        ///     The second vector of the cross product.
+        ///     The second operand.
         /// </param>
         /// <returns>
         ///     The Z component of the resulting 3D vector (0, 0, Z).
@@ -211,7 +223,7 @@ namespace SharpestBeak.Physics
             return left.X * right.X + left.Y * right.Y;
         }
 
-        // Returns Z component of resulting Vector3D(0, 0, Z)
+        // Returns Z component of a resulting Vector3D(0, 0, Z)
         public static float CrossProduct(Vector2D left, Vector2D right)
         {
             return left.X * right.Y - left.Y * right.X;
