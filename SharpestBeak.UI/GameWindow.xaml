@@ -21,7 +21,7 @@
 
             <helix:SunLight />
 
-            <helix:TextBillboardVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="10"
+            <helix:BillboardTextVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="10"
                     Foreground="Gray" Position="1 -0.25 -0.5" />
 
             <ModelVisual3D x:Name="BoardVisual">
