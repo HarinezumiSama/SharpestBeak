@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Primitives;
 
 namespace SharpestBeak.Presentation.Elements
@@ -13,64 +14,20 @@ namespace SharpestBeak.Presentation.Elements
         /// <summary>
         ///     Initializes a new instance of the <see cref="BaseElement"/> class.
         /// </summary>
-        internal BaseElement()
+        internal BaseElement(Point2D position)
         {
-            // Nothing to do
+            this.Position = position;
         }
 
         #endregion
 
-        #region Public Methods
+        #region Public Properties
 
-        public void Draw(Graphics graphics, DrawData data)
+        public Point2D Position
         {
-            #region Argument Check
-
-            if (graphics == null)
-            {
-                throw new ArgumentNullException("graphics");
-            }
-
-            if (data == null)
-            {
-                throw new ArgumentNullException("data");
-            }
-
-            #endregion
-
-            OnDraw(graphics, data);
+            get;
+            private set;
         }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected static void DrawElement(Graphics graphics, DrawData data, ICollidableElement element)
-        {
-            #region Argument Check
-
-            if (graphics == null)
-            {
-                throw new ArgumentNullException("graphics");
-            }
-
-            if (data == null)
-            {
-                throw new ArgumentNullException("data");
-            }
-
-            if (element == null)
-            {
-                throw new ArgumentNullException("element");
-            }
-
-            #endregion
-
-            var primitives = element.GetPrimitives();
-            primitives.OfType<BasePrimitive>().DoForEach(item => item.Draw(graphics, data));
-        }
-
-        protected abstract void OnDraw(Graphics graphics, DrawData data);
 
         #endregion
     }

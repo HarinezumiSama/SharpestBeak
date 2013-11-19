@@ -22,24 +22,13 @@ namespace SharpestBeak.Presentation.Elements
         ///     Initializes a new instance of the <see cref="ShotElement"/> class.
         /// </summary>
         public ShotElement(Point2D position)
+            : base(position)
         {
-            this.Position = position;
-
             _primitives = new List<ICollidablePrimitive>(1)
             {
                 new CirclePrimitive(position, GameConstants.ShotUnit.Radius)
             }
             .AsReadOnly();
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public Point2D Position
-        {
-            get;
-            private set;
         }
 
         #endregion
@@ -84,15 +73,6 @@ namespace SharpestBeak.Presentation.Elements
         public bool HasCollision(ICollidable other)
         {
             return CollisionDetector.CheckElementCollision(this, other);
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnDraw(Graphics graphics, DrawData data)
-        {
-            DrawElement(graphics, data, this);
         }
 
         #endregion

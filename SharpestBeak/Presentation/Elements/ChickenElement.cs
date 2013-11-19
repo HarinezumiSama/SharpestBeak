@@ -23,8 +23,8 @@ namespace SharpestBeak.Presentation.Elements
         ///     Initializes a new instance of the <see cref="ChickenElement"/> class.
         /// </summary>
         public ChickenElement(Point2D position, GameAngle beakAngle)
+            : base(position)
         {
-            this.Position = position;
             this.BeakAngle = beakAngle;
 
             _roughPrimitives = new List<ICollidablePrimitive>(1)
@@ -52,12 +52,6 @@ namespace SharpestBeak.Presentation.Elements
         #endregion
 
         #region Public Properties
-
-        public Point2D Position
-        {
-            get;
-            private set;
-        }
 
         public GameAngle BeakAngle
         {
@@ -108,15 +102,6 @@ namespace SharpestBeak.Presentation.Elements
         public bool HasCollision(ICollidable other)
         {
             return CollisionDetector.CheckElementCollision(this, other);
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnDraw(Graphics graphics, DrawData data)
-        {
-            DrawElement(graphics, data, this);
         }
 
         #endregion
