@@ -13,9 +13,14 @@ namespace SharpestBeak.Presentation
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenPresentation"/> class.
         /// </summary>
-        internal ChickenPresentation(ChickenUnit chickenUnit)
+        internal ChickenPresentation(GamePresentation gamePresentation, ChickenUnit chickenUnit)
         {
             #region Argument Check
+
+            if (gamePresentation == null)
+            {
+                throw new ArgumentNullException("gamePresentation");
+            }
 
             if (chickenUnit == null)
             {
@@ -24,6 +29,7 @@ namespace SharpestBeak.Presentation
 
             #endregion
 
+            this.GamePresentation = gamePresentation;
             this.Element = chickenUnit.GetElement();
             this.UniqueId = chickenUnit.UniqueId;
             this.Team = chickenUnit.Team;
@@ -32,6 +38,12 @@ namespace SharpestBeak.Presentation
         #endregion
 
         #region Public Properties
+
+        public GamePresentation GamePresentation
+        {
+            get;
+            private set;
+        }
 
         public ChickenElement Element
         {

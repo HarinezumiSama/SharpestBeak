@@ -22,7 +22,7 @@ namespace SharpestBeak.Presentation.Elements
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenElement"/> class.
         /// </summary>
-        public ChickenElement(Point2D position, GameAngle beakAngle)
+        internal ChickenElement(Point2D position, GameAngle beakAngle)
             : base(position)
         {
             this.BeakAngle = beakAngle;

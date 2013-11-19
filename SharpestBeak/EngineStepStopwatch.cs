@@ -15,9 +15,12 @@ namespace SharpestBeak
 
         #region Constructors
 
-        private EngineStepStopwatch()
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="EngineStepStopwatch"/> class.
+        /// </summary>
+        internal EngineStepStopwatch()
         {
-            _stopwatch = Stopwatch.StartNew();
+            _stopwatch = new Stopwatch();
         }
 
         #endregion
@@ -36,11 +39,11 @@ namespace SharpestBeak
 
         #endregion
 
-        #region Public Methods
+        #region Internal Methods
 
-        public static EngineStepStopwatch CreateAndStart()
+        internal void Start()
         {
-            return new EngineStepStopwatch();
+            _stopwatch.Restart();
         }
 
         #endregion

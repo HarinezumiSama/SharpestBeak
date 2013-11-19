@@ -24,22 +24,23 @@ namespace SharpestBeak.Presentation
             #endregion
 
             this.Data = engine.Data;
+            this.StepStopwatch = new EngineStepStopwatch();
 
             this.Chickens = engine
                 .AliveChickens
-                .Select(item => new ChickenPresentation(item))
+                .Select(item => new ChickenPresentation(this, item))
                 .ToList()
                 .AsReadOnly();
 
             var chickenMap = this.Chickens.ToDictionary(item => item.UniqueId);
             this.Shots = engine
                 .ShotUnits
-                .Select(item => new ShotPresentation(item, chickenMap))
+                .Select(item => new ShotPresentation(this, item, chickenMap))
                 .ToList()
                 .AsReadOnly();
 
-            // This should be the very last statement
-            this.StepStopwatch = EngineStepStopwatch.CreateAndStart();
+            // This MUST be the very last statement
+            this.StepStopwatch.Start();
         }
 
         #endregion
@@ -64,7 +65,11 @@ namespace SharpestBeak.Presentation
             private set;
         }
 
-        public EngineStepStopwatch StepStopwatch
+        #endregion
+
+        #region Internal Properties
+
+        internal EngineStepStopwatch StepStopwatch
         {
             get;
             private set;

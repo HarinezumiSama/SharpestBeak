@@ -21,7 +21,7 @@ namespace SharpestBeak.Presentation.Elements
         /// <summary>
         ///     Initializes a new instance of the <see cref="ShotElement"/> class.
         /// </summary>
-        public ShotElement(Point2D position)
+        internal ShotElement(Point2D position)
             : base(position)
         {
             _primitives = new List<ICollidablePrimitive>(1)
