@@ -15,16 +15,6 @@ namespace SharpestBeak
     {
         #region Constants and Fields
 
-        private static readonly Dictionary<MoveDirection, GameAngle?> DirectionToAngleMap =
-            new Dictionary<MoveDirection, GameAngle?>
-            {
-                { MoveDirection.None, null },
-                { MoveDirection.MoveForward,  GameAngle.FromDegrees(0f) },
-                { MoveDirection.MoveBackward, GameAngle.FromDegrees(MathHelper.HalfRevolutionDegrees) },
-                { MoveDirection.StrafeLeft, GameAngle.FromDegrees(MathHelper.QuarterRevolutionDegrees) },
-                { MoveDirection.StrafeRight, GameAngle.FromDegrees(-MathHelper.QuarterRevolutionDegrees) }
-            };
-
         private static readonly Vector2D HalfNominalCellOffset =
             new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
 
@@ -132,13 +122,16 @@ namespace SharpestBeak
             MoveDirection direction,
             float distance)
         {
-            var relativeAngle = DirectionToAngleMap[direction];
-            if (relativeAngle == null)
+            if (direction.IsNone)
             {
                 return oldPosition;
             }
 
-            var actualAngle = currentAngle + relativeAngle.Value;
+            var rotated = direction.NormalizedDirection.ToPoint2D().RotateHalfRevolutionClockwise().ToVector2D();
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+            var relativeAngle = Vector2D.UnitX.GetAngle(rotated);
+
+            var actualAngle = currentAngle + relativeAngle;
 
             var result = GetNewPosition(oldPosition, actualAngle, distance);
             return result;

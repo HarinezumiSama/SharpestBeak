@@ -289,6 +289,15 @@ namespace SharpestBeak.Physics
 
         #endregion
 
+        #region Internal Methods
+
+        internal Point2D RotateHalfRevolutionClockwise()
+        {
+            return new Point2D(_y, -_x);
+        }
+
+        #endregion
+
         #region Private Methods
 
         private static Point2D RotatePointInternal(Point2D value, Point2D center, float cos, float sin)
