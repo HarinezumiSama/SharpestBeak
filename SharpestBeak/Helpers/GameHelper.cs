@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -27,36 +28,45 @@ namespace SharpestBeak
         private static readonly Vector2D HalfNominalCellOffset =
             new Vector2D(GameConstants.NominalCellSize / 2f, GameConstants.NominalCellSize / 2f);
 
-        private static readonly IList<MoveDirection> MoveDirectionsField =
-            Helper.GetEnumValues<MoveDirection>().AsReadOnly();
+        private static readonly ReadOnlyCollection<MoveDirection> BasicActiveMoveDirectionsField =
+            new[]
+            {
+                MoveDirection.MoveForward,
+                MoveDirection.MoveBackward,
+                MoveDirection.StrafeLeft,
+                MoveDirection.StrafeRight
+            }
+                .AsReadOnly();
 
-        private static readonly IList<MoveDirection> ActiveMoveDirectionsField = GetActiveMoveDirections();
+        private static readonly ReadOnlyCollection<MoveDirection> BasicMoveDirectionsField =
+            BasicActiveMoveDirectionsField.Concat(MoveDirection.None.AsCollection()).ToArray().AsReadOnly();
 
-        private static readonly IList<FireMode> FireModesField = Helper.GetEnumValues<FireMode>().AsReadOnly();
+        private static readonly ReadOnlyCollection<FireMode> FireModesField =
+            Helper.GetEnumValues<FireMode>().AsReadOnly();
 
         #endregion
 
         #region Public Properties
 
-        public static IList<MoveDirection> MoveDirections
+        public static ReadOnlyCollection<MoveDirection> BasicMoveDirections
         {
             [DebuggerStepThrough]
             get
             {
-                return MoveDirectionsField;
+                return BasicMoveDirectionsField;
             }
         }
 
-        public static IList<MoveDirection> ActiveMoveDirections
+        public static ReadOnlyCollection<MoveDirection> BasicActiveMoveDirections
         {
             [DebuggerStepThrough]
             get
             {
-                return ActiveMoveDirectionsField;
+                return BasicActiveMoveDirectionsField;
             }
         }
 
-        public static IList<FireMode> FireModes
+        public static ReadOnlyCollection<FireMode> FireModes
         {
             [DebuggerStepThrough]
             get
@@ -257,7 +267,7 @@ namespace SharpestBeak
         public static MoveDirection GetBestMoveDirection(Point2D position, GameAngle beakAngle, Point2D targetPoint)
         {
             var resultProxy = Tuple.Create(MoveDirection.None, float.MaxValue);
-            foreach (var item in MoveDirectionsField)
+            foreach (var item in BasicMoveDirectionsField)
             {
                 var potentialMovePoint = GetNewPosition(
                     position,
@@ -338,13 +348,6 @@ namespace SharpestBeak
         #endregion
 
         #region Private Methods
-
-        private static IList<MoveDirection> GetActiveMoveDirections()
-        {
-            var resultProxy = new HashSet<MoveDirection>(Helper.GetEnumValues<MoveDirection>());
-            resultProxy.Remove(MoveDirection.None);
-            return resultProxy.ToList().AsReadOnly();
-        }
 
         private static float GetDistanceToLineInternal(Vector2D pointDirection, Vector2D lineDirection)
         {

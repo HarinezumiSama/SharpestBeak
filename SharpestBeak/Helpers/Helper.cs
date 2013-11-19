@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -8,7 +9,6 @@ using System.Reflection;
 using System.Windows;
 
 // ReSharper disable once CheckNamespace
-
 namespace SharpestBeak
 {
     public static class Helper
@@ -37,6 +37,25 @@ namespace SharpestBeak
             }
         }
 
+        public static ReadOnlyCollection<T> AsReadOnly<T>(this T[] array)
+        {
+            #region Argument Check
+
+            if (array == null)
+            {
+                throw new ArgumentNullException("array");
+            }
+
+            #endregion
+
+            return new ReadOnlyCollection<T>(array);
+        }
+
+        public static IEnumerable<T> AsCollection<T>(this T value)
+        {
+            yield return value;
+        }
+
         public static string ToFixedString(this DateTime value)
         {
             return value.ToString("yyyy-MM-dd HH:mm:ss.fff");
@@ -46,6 +65,19 @@ namespace SharpestBeak
             where TEnum : struct
         {
             return Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToList();
+        }
+
+        public static void EnsureDefined(this Enum value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value");
+            }
+
+            if (!Enum.IsDefined(value.GetType(), value))
+            {
+                throw new ArgumentOutOfRangeException("value", value, "Invalid enumeration value.");
+            }
         }
 
         public static void Exchange<T>(ref T value1, ref T value2)

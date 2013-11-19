@@ -22,6 +22,8 @@ namespace SharpestBeak
 
         public static readonly ValueRange<int> TeamPlayerUnitCountRange = new ValueRange<int>(1, int.MaxValue);
 
+        public static readonly ValueRange<float> NormalizedScalarSpeedRange = new ValueRange<float>(0f, 1f);
+
         internal static readonly float SlowDownRatio = GetSlowDownRatio();
 
         private const float MinSlowDownRatio = 1f / 16f;

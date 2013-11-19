@@ -89,7 +89,7 @@ namespace SharpestBeak.Logic.Default
                     blockedDirections.Add(unitState.PreviousMove.MoveDirection);
 
                     var moveDirection = GameHelper
-                        .ActiveMoveDirections
+                        .BasicActiveMoveDirections
                         .FirstOrDefault(item => !blockedDirections.Contains(item));
                     var unblockingMove = moveDirection == MoveDirection.None
                         ? new MoveInfo(MoveDirection.None, BeakTurn.FullyClockwise, FireMode.None)
@@ -145,9 +145,9 @@ namespace SharpestBeak.Logic.Default
                         continue;
                     }
 
-                    if (safestMoveDirection.HasValue)
+                    if (safestMoveDirection != null)
                     {
-                        moves.Set(unitState, new MoveInfo(safestMoveDirection.Value, BeakTurn.None, FireMode.None));
+                        moves.Set(unitState, new MoveInfo(safestMoveDirection, BeakTurn.None, FireMode.None));
                     }
                     else
                     {
@@ -179,7 +179,7 @@ namespace SharpestBeak.Logic.Default
 
         #region Private Methods
 
-        private MoveDirection? FindSafestMove(IEnumerable<ShotViewData> allShots, ChickenUnitState unitState)
+        private MoveDirection FindSafestMove(IEnumerable<ShotViewData> allShots, ChickenUnitState unitState)
         {
             var safetyCircle = new CirclePrimitive(unitState.Position, _dangerousRadius);
             var dangerousShots = new List<ShotViewData>(unitState.View.Shots.Count);
@@ -212,14 +212,14 @@ namespace SharpestBeak.Logic.Default
                 return null;
             }
 
-            var safeMoves = GameHelper.MoveDirections.ToDictionary(item => item, item => 0);
+            var safeMoves = GameHelper.BasicMoveDirections.ToDictionary(item => item, item => 0);
             foreach (var dangerousShot in dangerousShots)
             {
                 var shotVector = dangerousShot.Angle.ToUnitVector();
 
                 var maxDistanceMove = MoveDirection.None;
                 var maxDistanceSqr = float.MinValue;
-                foreach (var moveDirection in GameHelper.MoveDirections)
+                foreach (var moveDirection in GameHelper.BasicMoveDirections)
                 {
                     var potentialPosition = GameHelper.GetNewPosition(
                        unitState.Position,

@@ -22,15 +22,12 @@ namespace SharpestBeak.Model
         {
             #region Argument Check
 
-            if (!Enum.IsDefined(typeof(MoveDirection), moveDirection))
+            if (moveDirection == null)
             {
-                throw new ArgumentOutOfRangeException("moveDirection", moveDirection, "Invalid move action.");
+                throw new ArgumentNullException("moveDirection");
             }
 
-            if (!Enum.IsDefined(typeof(FireMode), fireMode))
-            {
-                throw new ArgumentOutOfRangeException("fireMode", fireMode, "Invalid fire mode.");
-            }
+            fireMode.EnsureDefined();
 
             #endregion
 
@@ -74,7 +71,7 @@ namespace SharpestBeak.Model
         public override string ToString()
         {
             return string.Format(
-                "{0}. BeakTurn = {1}, MoveDirection = {2}, FireMode = {3}",
+                "{0}: BeakTurn = {{{1}}}, MoveDirection = {{{2}}}, FireMode = {3}",
                 GetType().Name,
                 this.BeakTurn,
                 this.MoveDirection,

@@ -564,7 +564,7 @@ namespace SharpestBeak.UI
         {
             try
             {
-                if (!_gameEngine.IsRunning)
+                if (_gameEngine == null || !_gameEngine.IsRunning)
                 {
                     return;
                 }
