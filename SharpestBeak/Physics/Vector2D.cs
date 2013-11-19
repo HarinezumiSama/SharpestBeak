@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
 
@@ -316,6 +317,7 @@ namespace SharpestBeak.Physics
             return (this * target) / target.GetLength();
         }
 
+        [Pure]
         public GameAngle GetAngle(Vector2D target)
         {
             var radianAngle = MathHelper.Atan2(target._y, target._x) - MathHelper.Atan2(_y, _x);

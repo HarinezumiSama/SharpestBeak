@@ -128,7 +128,6 @@ namespace SharpestBeak
             }
 
             var rotated = direction.NormalizedDirection.ToPoint2D().RotateHalfRevolutionClockwise().ToVector2D();
-            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
             var relativeAngle = Vector2D.UnitX.GetAngle(rotated);
 
             var actualAngle = currentAngle + relativeAngle;
