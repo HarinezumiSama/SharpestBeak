@@ -21,12 +21,12 @@ namespace SharpestBeak.Model
             -Vector2D.UnitY,
             GameConstants.NormalizedScalarSpeedRange.Max);
 
-        public static readonly MoveDirection StrafeRight = new MoveDirection(
-            Vector2D.UnitX,
-            GameConstants.NormalizedScalarSpeedRange.Max);
-
         public static readonly MoveDirection StrafeLeft = new MoveDirection(
             -Vector2D.UnitX,
+            GameConstants.NormalizedScalarSpeedRange.Max);
+
+        public static readonly MoveDirection StrafeRight = new MoveDirection(
+            Vector2D.UnitX,
             GameConstants.NormalizedScalarSpeedRange.Max);
 
         #endregion
