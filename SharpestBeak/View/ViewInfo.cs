@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using SharpestBeak.Model;
@@ -11,8 +12,10 @@ namespace SharpestBeak.View
     {
         #region Constants and Fields
 
-        private static readonly IList<ChickenViewData> EmptyChickens = new ChickenViewData[0];
-        private static readonly IList<ShotViewData> EmptyShots = new ShotViewData[0];
+        private static readonly ReadOnlyCollection<ChickenViewData> EmptyChickens =
+            new ChickenViewData[0].AsReadOnly();
+
+        private static readonly ReadOnlyCollection<ShotViewData> EmptyShots = new ShotViewData[0].AsReadOnly();
 
         #endregion
 
@@ -75,13 +78,13 @@ namespace SharpestBeak.View
 
         #region Public Properties
 
-        public IList<ChickenViewData> Chickens
+        public ReadOnlyCollection<ChickenViewData> Chickens
         {
             get;
             private set;
         }
 
-        public IList<ShotViewData> Shots
+        public ReadOnlyCollection<ShotViewData> Shots
         {
             get;
             private set;
