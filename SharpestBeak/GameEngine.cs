@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -35,10 +36,10 @@ namespace SharpestBeak
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         private readonly ManualResetEvent _stopEvent = new ManualResetEvent(false);
-        private readonly IList<ChickenUnit> _allChickens;
+        private readonly ReadOnlyCollection<ChickenUnit> _allChickens;
         private readonly List<ChickenUnit> _aliveChickensDirect;
         private readonly List<ShotUnit> _shotUnitsDirect;
-        private readonly IList<ChickenUnitLogic> _logics;
+        private readonly ReadOnlyCollection<ChickenUnitLogic> _logics;
         private readonly ChickenUnitLogic _lightTeamLogic;
         private readonly ChickenUnitLogic _darkTeamLogic;
         private readonly Action<GamePaintEventArgs> _paintCallback;
@@ -96,14 +97,9 @@ namespace SharpestBeak
             // Post-initialized fields and properties
             _lightTeamLogic = CreateLogic(this, settings.LightTeam, GameTeam.Light);
             _darkTeamLogic = CreateLogic(this, settings.DarkTeam, GameTeam.Dark);
-            _logics = new[] { _lightTeamLogic, _darkTeamLogic }
-                .ToList()
-                .AsReadOnly();
+            _logics = new[] { _lightTeamLogic, _darkTeamLogic }.ToArray().AsReadOnly();
 
-            _allChickens = _logics
-                .SelectMany(item => item.Units)
-                .ToList()
-                .AsReadOnly();
+            _allChickens = _logics.SelectMany(item => item.Units).ToArray().AsReadOnly();
             _allChickens.DoForEach((item, index) => item.UniqueId = new GameObjectId(index + 1));
 
             _aliveChickensDirect = new List<ChickenUnit>();
@@ -936,6 +932,7 @@ namespace SharpestBeak
                 {
                     unit.Position = newPosition;
                     unit.BeakAngle = newBeakAngle;
+                    unit.MoveDirection = unit.IsDead ? MoveDirection.None : moveInfo.MoveDirection;
 
                     DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
                 }

@@ -85,6 +85,7 @@ namespace SharpestBeak.Configuration
             private set;
         }
 
+        //// TODO [vmcl] Use various positioning schemes: eg. perimeter, opposite sides etc.
         public Action<GamePositionEventArgs> PositionCallback
         {
             get;

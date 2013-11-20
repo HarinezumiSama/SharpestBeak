@@ -91,7 +91,7 @@ namespace SharpestBeak.Logic.Default
                     var moveDirection = GameHelper
                         .BasicActiveMoveDirections
                         .FirstOrDefault(item => !blockedDirections.Contains(item));
-                    var unblockingMove = moveDirection == MoveDirection.None
+                    var unblockingMove = moveDirection == null || moveDirection.IsNone
                         ? new MoveInfo(MoveDirection.None, BeakTurn.FullyClockwise, FireMode.None)
                         : new MoveInfo(moveDirection, BeakTurn.None, FireMode.None);
                     moves.Set(unitState, unblockingMove);

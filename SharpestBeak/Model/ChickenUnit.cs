@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Elements;
@@ -14,6 +15,8 @@ namespace SharpestBeak.Model
         private Point2D _position;
         private GameAngle _beakAngle;
         private ChickenElement _cachedElement;
+        private bool _isDead;
+        private MoveDirection _moveDirection;
 
         #endregion
 
@@ -64,13 +67,37 @@ namespace SharpestBeak.Model
                 return _position;
             }
 
-            set
+            internal set
             {
-                if (_position != value)
+                if (_position == value)
                 {
-                    _position = value;
-                    ResetCachedElement();
+                    return;
                 }
+
+                _position = value;
+                ResetCachedElement();
+                ResetMoveDirection();
+            }
+        }
+
+        public MoveDirection MoveDirection
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _moveDirection;
+            }
+
+            internal set
+            {
+                if (this.IsDead && !value.IsNone)
+                {
+                    throw new ArgumentException(
+                        string.Format(CultureInfo.InvariantCulture, "The dead {{{0}}} cannot move.", ToShortString()),
+                        "value");
+                }
+
+                _moveDirection = value;
             }
         }
 
@@ -100,8 +127,21 @@ namespace SharpestBeak.Model
 
         public bool IsDead
         {
-            get;
-            internal set;
+            [DebuggerStepThrough]
+            get
+            {
+                return _isDead;
+            }
+
+            internal set
+            {
+                _isDead = value;
+
+                if (_isDead)
+                {
+                    ResetMoveDirection();
+                }
+            }
         }
 
         public int KillCount
@@ -117,13 +157,17 @@ namespace SharpestBeak.Model
         public override string ToString()
         {
             return string.Format(
-                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
-                this.GetType().Name,
-                this.UniqueId,
+                "[{0}] Position = {1}, BeakAngle = {2:D}, Team = {3}, IsDead = {4}",
+                ToShortString(),
                 this.Position,
                 this.BeakAngle,
                 this.Team,
                 this.IsDead);
+        }
+
+        public string ToShortString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "{0} #{1}", GetType().Name, this.UniqueId);
         }
 
         public ChickenElement GetElement()
@@ -188,6 +232,7 @@ namespace SharpestBeak.Model
         {
             this.IsDead = false;
             this.ShotEngineStepIndex = -1;
+            ResetMoveDirection();
         }
 
         internal bool CanSee(Point2D point)
@@ -210,6 +255,11 @@ namespace SharpestBeak.Model
         private void ResetCachedElement()
         {
             _cachedElement = null;
+        }
+
+        private void ResetMoveDirection()
+        {
+            _moveDirection = MoveDirection.None;
         }
 
         #endregion
