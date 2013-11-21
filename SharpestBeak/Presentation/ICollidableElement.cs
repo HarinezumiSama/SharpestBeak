@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SharpestBeak.Presentation
@@ -17,9 +18,9 @@ namespace SharpestBeak.Presentation
 
         #region Methods
 
-        IList<ICollidablePrimitive> GetRoughPrimitives();
+        ReadOnlyCollection<ICollidablePrimitive> GetRoughPrimitives();
 
-        IList<ICollidablePrimitive> GetPrimitives();
+        ReadOnlyCollection<ICollidablePrimitive> GetPrimitives();
 
         #endregion
     }

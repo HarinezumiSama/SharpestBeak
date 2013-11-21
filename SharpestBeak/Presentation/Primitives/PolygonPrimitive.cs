@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -33,7 +34,7 @@ namespace SharpestBeak.Presentation.Primitives
 
         public const int MinVertexCount = 3;
 
-        private readonly IList<LinePrimitive> _edges;
+        private readonly ReadOnlyCollection<LinePrimitive> _edges;
         private ConvexState? _convexState;
 
         #endregion
@@ -54,7 +55,7 @@ namespace SharpestBeak.Presentation.Primitives
 
             #endregion
 
-            this.Vertices = vertices.ToList().AsReadOnly();
+            this.Vertices = vertices.ToArray().AsReadOnly();
             _edges = GetEdges(this.Vertices);
             this.Count = this.Vertices.Count;
             this.BasePoint = this.Vertices.First();
@@ -73,13 +74,13 @@ namespace SharpestBeak.Presentation.Primitives
 
         #region Public Properties
 
-        public IList<Point2D> Vertices
+        public ReadOnlyCollection<Point2D> Vertices
         {
             get;
             private set;
         }
 
-        public IList<LinePrimitive> Edges
+        public ReadOnlyCollection<LinePrimitive> Edges
         {
             [DebuggerStepThrough]
             get
@@ -118,7 +119,7 @@ namespace SharpestBeak.Presentation.Primitives
 
         #region Protected Methods
 
-        protected static IList<LinePrimitive> GetEdges(IList<Point2D> vertices)
+        protected static ReadOnlyCollection<LinePrimitive> GetEdges(IList<Point2D> vertices)
         {
             #region Argument Check
 

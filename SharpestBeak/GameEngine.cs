@@ -152,8 +152,8 @@ namespace SharpestBeak
             private set;
         }
 
-        // TODO: [VM] Remove this property, or change to some GetExtraBlaBlaBla for logics
-        public IList<ChickenUnitLogic> Teams
+        // TODO: [vmcl] Remove this property, or change to some GetExtraBlaBlaBla for logics
+        public ReadOnlyCollection<ChickenUnitLogic> Teams
         {
             [DebuggerNonUserCode]
             get
@@ -300,7 +300,7 @@ namespace SharpestBeak
 
         #region Internal Properties
 
-        internal IList<ChickenUnit> AllChickens
+        internal ReadOnlyCollection<ChickenUnit> AllChickens
         {
             [DebuggerStepThrough]
             get
@@ -309,19 +309,19 @@ namespace SharpestBeak
             }
         }
 
-        internal IList<ChickenUnit> AliveChickens
+        internal ReadOnlyCollection<ChickenUnit> AliveChickens
         {
             get;
             private set;
         }
 
-        internal IList<ShotUnit> ShotUnits
+        internal ReadOnlyCollection<ShotUnit> ShotUnits
         {
             get;
             private set;
         }
 
-        internal IList<ChickenUnitLogic> Logics
+        internal ReadOnlyCollection<ChickenUnitLogic> Logics
         {
             [DebuggerStepThrough]
             get

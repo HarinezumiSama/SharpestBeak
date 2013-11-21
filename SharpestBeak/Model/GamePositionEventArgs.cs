@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using SharpestBeak.Physics;
 
@@ -54,7 +55,7 @@ namespace SharpestBeak.Model
             private set;
         }
 
-        public IList<ChickenUnitState> UnitStates
+        public ReadOnlyCollection<ChickenUnitState> UnitStates
         {
             get;
             private set;

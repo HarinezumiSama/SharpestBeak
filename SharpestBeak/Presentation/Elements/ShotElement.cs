@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Primitives;
@@ -12,7 +12,7 @@ namespace SharpestBeak.Presentation.Elements
     {
         #region Constants and Fields
 
-        private readonly IList<ICollidablePrimitive> _primitives;
+        private readonly ReadOnlyCollection<ICollidablePrimitive> _primitives;
 
         #endregion
 
@@ -56,12 +56,12 @@ namespace SharpestBeak.Presentation.Elements
             }
         }
 
-        public IList<ICollidablePrimitive> GetRoughPrimitives()
+        public ReadOnlyCollection<ICollidablePrimitive> GetRoughPrimitives()
         {
             throw new NotSupportedException();
         }
 
-        public IList<ICollidablePrimitive> GetPrimitives()
+        public ReadOnlyCollection<ICollidablePrimitive> GetPrimitives()
         {
             return _primitives;
         }

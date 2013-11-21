@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace SharpestBeak.Model
@@ -33,7 +34,7 @@ namespace SharpestBeak.Model
             #endregion
 
             this.Data = engine.Data;
-            this.UnitStates = unitStates.ToList().AsReadOnly();
+            this.UnitStates = unitStates.ToArray().AsReadOnly();
         }
 
         #endregion
@@ -46,7 +47,7 @@ namespace SharpestBeak.Model
             private set;
         }
 
-        public IList<ChickenUnitState> UnitStates
+        public ReadOnlyCollection<ChickenUnitState> UnitStates
         {
             get;
             private set;
