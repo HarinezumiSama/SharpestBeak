@@ -3,8 +3,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:cmd="clr-namespace:SharpestBeak.UI.Commands" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:local="clr-namespace:SharpestBeak.UI" mc:Ignorable="d" Title="MainWindow" MinWidth="600"
-        MinHeight="400" FontFamily="{StaticResource DefaultFontFamily}" FontSize="{StaticResource DefaultFontSize}"
+        xmlns:local="clr-namespace:SharpestBeak.UI" xmlns:sb="clr-namespace:SharpestBeak;assembly=SharpestBeak"
+        mc:Ignorable="d" Title="MainWindow" MinWidth="600" MinHeight="400"
+        FontFamily="{StaticResource DefaultFontFamily}" FontSize="{StaticResource DefaultFontSize}"
         WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded">
     <Window.CommandBindings>
         <CommandBinding Command="cmd:AppCommands.Play" CanExecute="CanExecutePlay" Executed="ExecutePlay" />
@@ -45,6 +46,16 @@
             <xctk:PropertyGrid.SelectedObject>
                 <local:GameSettings x:Name="CurrentGameSettings" />
             </xctk:PropertyGrid.SelectedObject>
+            <xctk:PropertyGrid.EditorDefinitions>
+                <xctk:EditorTemplateDefinition TargetProperties="{x:Type local:SizeObject}">
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <TextBlock d:DataContext="{d:DesignInstance Type=xctk:PropertyItem}"
+                                    Text="{Binding Path=Value.(local:SizeObject.AsString),Converter={x:Static sb:Helper.DebugConverterInstance}}" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
+            </xctk:PropertyGrid.EditorDefinitions>
         </xctk:PropertyGrid>
     </Grid>
 </Window>

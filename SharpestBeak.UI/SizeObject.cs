@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -12,14 +13,23 @@ namespace SharpestBeak.UI
         #region Constants and Fields
 
         public static readonly DependencyProperty WidthProperty =
-            Helper.RegisterDependencyProperty<SizeObject, int>(
-                control => control.Width);
+            Helper.RegisterDependencyProperty(
+                (SizeObject control) => control.Width,
+                new PropertyMetadata(OnWidthChanged));
 
         public static readonly DependencyProperty HeightProperty =
-            Helper.RegisterDependencyProperty<SizeObject, int>(
-                control => control.Height);
+            Helper.RegisterDependencyProperty(
+                (SizeObject control) => control.Height,
+                new PropertyMetadata(OnHeightChanged));
 
-        private static readonly string[] VisibleNames = new[] { WidthProperty.Name, HeightProperty.Name };
+        private static readonly DependencyPropertyKey AsStringKey =
+            Helper.RegisterReadOnlyDependencyProperty((SizeObject control) => control.AsString);
+
+        [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1202:ElementsMustBeOrderedByAccess",
+            Justification = "Such field order is required in this case (AsStringProperty depends on AsStringKey).")]
+        public static readonly DependencyProperty AsStringProperty = AsStringKey.DependencyProperty;
+
+        private static readonly string[] VisibleNames = { WidthProperty.Name, HeightProperty.Name };
 
         #endregion
 
@@ -57,6 +67,19 @@ namespace SharpestBeak.UI
             set
             {
                 SetValue(HeightProperty, value);
+            }
+        }
+
+        public string AsString
+        {
+            get
+            {
+                return ToString();
+            }
+
+            set
+            {
+                throw new NotSupportedException();
             }
         }
 
@@ -148,6 +171,22 @@ namespace SharpestBeak.UI
         public object GetPropertyOwner(PropertyDescriptor pd)
         {
             return this;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private static void OnWidthChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            var self = (obj as SizeObject).EnsureNotNull();
+            self.InvalidateProperty(AsStringProperty);
+        }
+
+        private static void OnHeightChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            var self = (obj as SizeObject).EnsureNotNull();
+            self.InvalidateProperty(AsStringProperty);
         }
 
         #endregion

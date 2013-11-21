@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using SharpestBeak.UI.Properties;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
-using Size = System.Drawing.Size;
 
 namespace SharpestBeak.UI
 {
@@ -30,7 +29,6 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Nominal board size")]
         [ExpandableObject]
-        ////[Editor(typeof(BoardSizeEditor), typeof(BoardSizeEditor))]
         public SizeObject NominalSize
         {
             get;
