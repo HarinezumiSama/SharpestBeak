@@ -9,6 +9,12 @@ namespace SharpestBeak.UI.Commands
     {
         #region Constants and Fields
 
+        public static readonly RoutedUICommand Exit = new RoutedUICommand(
+            "E_xit",
+            "Exit",
+            typeof(AppCommands),
+            new InputGestureCollection { new KeyGesture(Key.Q, ModifierKeys.Control) });
+
         public static readonly RoutedUICommand Play = new RoutedUICommand(
             "_Play",
             "Play",

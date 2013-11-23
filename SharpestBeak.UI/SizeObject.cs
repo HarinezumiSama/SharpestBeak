@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Size = System.Drawing.Size;
 
 namespace SharpestBeak.UI
@@ -44,6 +45,7 @@ namespace SharpestBeak.UI
 
         #region Public Properties
 
+        [PropertyOrder(1)]
         public int Width
         {
             get
@@ -57,6 +59,7 @@ namespace SharpestBeak.UI
             }
         }
 
+        [PropertyOrder(2)]
         public int Height
         {
             get
@@ -74,12 +77,12 @@ namespace SharpestBeak.UI
         {
             get
             {
-                return ToString();
+                return (string)GetValue(AsStringProperty);
             }
 
-            set
+            private set
             {
-                throw new NotSupportedException();
+                SetValue(AsStringKey, value);
             }
         }
 
@@ -180,13 +183,18 @@ namespace SharpestBeak.UI
         private static void OnWidthChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             var self = (obj as SizeObject).EnsureNotNull();
-            self.InvalidateProperty(AsStringProperty);
+            self.UpdateAsStringProperty();
         }
 
         private static void OnHeightChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             var self = (obj as SizeObject).EnsureNotNull();
-            self.InvalidateProperty(AsStringProperty);
+            self.UpdateAsStringProperty();
+        }
+
+        private void UpdateAsStringProperty()
+        {
+            this.AsString = ToString();
         }
 
         #endregion

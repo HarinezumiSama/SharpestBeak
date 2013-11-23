@@ -27,6 +27,7 @@ namespace SharpestBeak.UI
         [DisplayName(@"Logic")]
         [ItemsSource(typeof(LogicInfoItemSource))]
         [RefreshProperties(RefreshProperties.All)]
+        [PropertyOrder(1)]
         public LogicInfo Logic
         {
             get;
@@ -35,6 +36,7 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Player count")]
         [RefreshProperties(RefreshProperties.All)]
+        [PropertyOrder(2)]
         public int PlayerCount
         {
             get;

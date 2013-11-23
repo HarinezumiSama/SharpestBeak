@@ -29,6 +29,7 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Nominal board size")]
         [ExpandableObject]
+        [PropertyOrder(1)]
         public SizeObject NominalSize
         {
             get;
@@ -37,6 +38,7 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Light team")]
         [ExpandableObject]
+        [PropertyOrder(2)]
         public TeamSettings LightTeam
         {
             get;
@@ -45,6 +47,7 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Dark team")]
         [ExpandableObject]
+        [PropertyOrder(3)]
         public TeamSettings DarkTeam
         {
             get;

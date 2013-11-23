@@ -164,6 +164,16 @@ namespace SharpestBeak.UI
             DoPlay();
         }
 
+        private void CanExecuteExit(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void ExecuteExit(object sender, ExecutedRoutedEventArgs e)
+        {
+            Close();
+        }
+
         #endregion
     }
 }
