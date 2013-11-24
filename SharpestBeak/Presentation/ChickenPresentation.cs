@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SharpestBeak.Model;
+using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Elements;
 
 namespace SharpestBeak.Presentation
@@ -30,9 +31,14 @@ namespace SharpestBeak.Presentation
             #endregion
 
             this.GamePresentation = gamePresentation;
-            this.Element = chickenUnit.GetElement();
             this.UniqueId = chickenUnit.UniqueId;
             this.Team = chickenUnit.Team;
+
+            this.InitialPosition = chickenUnit.Position;
+            this.Movement = chickenUnit.Movement;
+
+            this.InitialBeakAngle = chickenUnit.BeakAngle;
+            this.BeakMovement = chickenUnit.BeakMovement;
         }
 
         #endregion
@@ -40,12 +46,6 @@ namespace SharpestBeak.Presentation
         #region Public Properties
 
         public GamePresentation GamePresentation
-        {
-            get;
-            private set;
-        }
-
-        public ChickenElement Element
         {
             get;
             private set;
@@ -61,6 +61,60 @@ namespace SharpestBeak.Presentation
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public DirectionalPosition GetCurrentPosition()
+        {
+            var ratio = GetCurrentRatio();
+            
+            var currentMovement = this.Movement * ratio;
+            var currentBeakMovement = this.BeakMovement * ratio;
+
+            var position = this.InitialPosition + currentMovement;
+            var angle = this.InitialBeakAngle + currentBeakMovement;
+            
+            return new DirectionalPosition(position, angle);
+        }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal Point2D InitialPosition
+        {
+            get;
+            private set;
+        }
+
+        internal Vector2D Movement
+        {
+            get;
+            private set;
+        }
+
+        internal GameAngle InitialBeakAngle
+        {
+            get;
+            private set;
+        }
+
+        internal GameAngle BeakMovement
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private float GetCurrentRatio()
+        {
+            return this.GamePresentation.StepStopwatch.StepRatio;
         }
 
         #endregion

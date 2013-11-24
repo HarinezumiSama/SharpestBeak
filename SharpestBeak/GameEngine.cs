@@ -254,12 +254,6 @@ namespace SharpestBeak
             _syncLock.EnterReadLock();
             try
             {
-                ////if (this.IsRunning)
-                ////{
-                ////    throw new InvalidOperationException(
-                ////        "Presentation cannot be obtained directly while the engine is running.");
-                ////}
-
                 return _lastGamePresentation.Value;
             }
             finally
@@ -421,7 +415,7 @@ namespace SharpestBeak
 
                 var plainAngle = (float)Math.Floor(
                     MathHelper.HalfRevolutionDegrees - RandomGenerator.NextDouble() * MathHelper.RevolutionDegrees);
-                var angle = GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(plainAngle));
+                var angle = GameAngle.FromDegrees(plainAngle);
 
                 e.SetPosition(unitState, new DirectionalPosition(position, angle));
             }
@@ -441,9 +435,8 @@ namespace SharpestBeak
         {
             foreach (var unit in _allChickens)
             {
-                var position = e.GetPosition(unit);
-                unit.Position = position.Position;
-                unit.BeakAngle = position.Angle;
+                var directionalPosition = e.GetPosition(unit);
+                unit.ResetPosition(directionalPosition.Position, directionalPosition.Angle);
             }
         }
 
@@ -710,17 +703,18 @@ namespace SharpestBeak
 
             foreach (var shotUnit in _shotUnitsDirect)
             {
-                shotUnit.Position = GameHelper.GetNewPosition(
-                    shotUnit.Position,
+                var movement = GameHelper.GetMovement(
                     shotUnit.Angle,
                     MoveDirection.MoveForward,
                     GameConstants.ShotUnit.DefaultRectilinearStepDistance);
+
+                shotUnit.SetMovement(movement);
                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", shotUnit);
 
-                if (HasOutOfBoardCollision(shotUnit.GetElement()))
+                var hasOutOfBoardCollision = HasOutOfBoardCollision(shotUnit.GetElement());
+                if (hasOutOfBoardCollision)
                 {
                     shotUnit.Exploded = true;
-
                     DebugHelper.WriteLine("Shot {{{0}}} has exploded outside of game board.", shotUnit);
                 }
             }
@@ -734,16 +728,21 @@ namespace SharpestBeak
                 {
                     var otherShotUnit = _shotUnitsDirect[otherIndex];
 
-                    if (CollisionDetector.CheckCollision(shotUnit.GetElement(), otherShotUnit.GetElement()))
+                    var isCollision = CollisionDetector.CheckCollision(
+                        shotUnit.GetElement(),
+                        otherShotUnit.GetElement());
+                    if (!isCollision)
                     {
-                        shotUnit.Exploded = true;
-                        otherShotUnit.Exploded = true;
-
-                        DebugHelper.WriteLine(
-                            "Mutual annihilation of shots {{{0}}} and {{{1}}}.",
-                            shotUnit,
-                            otherShotUnit);
+                        continue;
                     }
+
+                    shotUnit.Exploded = true;
+                    otherShotUnit.Exploded = true;
+
+                    DebugHelper.WriteLine(
+                        "Mutual annihilation of shots {{{0}}} and {{{1}}}.",
+                        shotUnit,
+                        otherShotUnit);
                 }
 
                 var shotElement = shotUnit.GetElement();
@@ -761,7 +760,7 @@ namespace SharpestBeak
 
                 foreach (var injuredChicken in injuredChickens)
                 {
-                    shotUnit.Exploded = true;
+                    shotUnit.Exploded = true; //// TODO [vmcl] Move out of loop
 
                     injuredChicken.IsDead = true;
                     injuredChicken.KilledBy = shotUnit.Owner;
@@ -784,7 +783,10 @@ namespace SharpestBeak
             UpdateLastGamePresentation();
 
             _aliveChickensDirect.RemoveAll(item => item.IsDead);
+            _aliveChickensDirect.DoForEach(item => item.ApplyMovement());
+
             _shotUnitsDirect.RemoveAll(item => item.Exploded);
+            _shotUnitsDirect.DoForEach(item => item.ApplyMovement());
 
             var aliveTeams = _aliveChickensDirect.Select(item => item.Team).Distinct().ToList();
             if (aliveTeams.Count > 1)
@@ -799,7 +801,8 @@ namespace SharpestBeak
             }
 
             var winningTeam = aliveTeams.SingleOrDefault();
-            ChickenUnitLogic winningLogic = null;
+
+            ChickenUnitLogic winningLogic;
             switch (winningTeam)
             {
                 case GameTeam.Light:
@@ -808,6 +811,10 @@ namespace SharpestBeak
 
                 case GameTeam.Dark:
                     winningLogic = _darkTeamLogic;
+                    break;
+
+                default:
+                    winningLogic = null;
                     break;
             }
 
@@ -887,14 +894,17 @@ namespace SharpestBeak
                     moveInfo,
                     unit);
 
-                var newPosition = GameHelper.GetNewPosition(
+                var movementAndNewPosition = GameHelper.GetMovementAndNewPosition(
                     unit.Position,
                     unit.BeakAngle,
                     moveInfo.MoveDirection,
                     GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
-                var newBeakAngle = GameHelper.GetNewBeakAngle(unit.BeakAngle, moveInfo.BeakTurn);
 
-                var newPositionElement = new ChickenElement(newPosition, newBeakAngle);
+                var beakMovementAndNewAngle = GameHelper.GetBeakMovementAndNewAngle(unit.BeakAngle, moveInfo.BeakTurn);
+
+                var newPositionElement = new ChickenElement(
+                    movementAndNewPosition.Item2,
+                    beakMovementAndNewAngle.Item2);
                 if (HasOutOfBoardCollision(newPositionElement))
                 {
                     _moveInfoStates[unit] = MoveInfoStates.RejectedBoardCollision;
@@ -927,15 +937,12 @@ namespace SharpestBeak
                         "Blocked collision of chicken {{{0}}} with {{{1}}}.",
                         unit,
                         conflictingChicken);
+                    continue;
                 }
-                else
-                {
-                    unit.Position = newPosition;
-                    unit.BeakAngle = newBeakAngle;
-                    unit.MoveDirection = unit.IsDead ? MoveDirection.None : moveInfo.MoveDirection;
 
-                    DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
-                }
+                unit.SetMovement(movementAndNewPosition.Item1, beakMovementAndNewAngle.Item1);
+
+                DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
             }
 
             return true;

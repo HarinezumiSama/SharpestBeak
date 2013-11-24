@@ -11,8 +11,6 @@ namespace SharpestBeak.Model
     {
         #region Constants and Fields
 
-        private readonly GameAngle _angle;
-        private Point2D _position;
         private ShotElement _cachedElement;
 
         #endregion
@@ -43,7 +41,7 @@ namespace SharpestBeak.Model
             this.UniqueId = uniqueId;
             this.Owner = owner;
             this.Position = GameHelper.GetNewPosition(beakTipPosition, owner.BeakAngle, GameConstants.ShotUnit.Radius);
-            _angle = owner.BeakAngle;
+            this.Angle = owner.BeakAngle;
             this.CreationTime = DateTime.Now;
         }
 
@@ -57,34 +55,31 @@ namespace SharpestBeak.Model
             private set;
         }
 
-        public Point2D Position
+        public ChickenUnit Owner
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _position;
-            }
-
-            set
-            {
-                if (_position != value)
-                {
-                    _position = value;
-                    ResetCachedElement();
-                }
-            }
+            get;
+            private set;
         }
 
         public GameAngle Angle
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _angle;
-            }
+            get;
+            private set;
         }
 
-        public ChickenUnit Owner
+        public Point2D Position
+        {
+            get;
+            private set;
+        }
+
+        public Vector2D Movement
+        {
+            get;
+            private set;
+        }
+
+        public Point2D NextPosition
         {
             get;
             private set;
@@ -114,9 +109,10 @@ namespace SharpestBeak.Model
 
         public ShotElement GetElement()
         {
+            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (_cachedElement == null)
             {
-                _cachedElement = new ShotElement(this.Position);
+                _cachedElement = new ShotElement(this.NextPosition);
             }
 
             return _cachedElement;
@@ -131,7 +127,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return _position;
+                return this.Position;  //// TODO [vmcl] Position or NextPosition?
             }
         }
 
@@ -140,7 +136,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return _angle;
+                return this.Angle;
             }
         }
 
@@ -152,6 +148,32 @@ namespace SharpestBeak.Model
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        internal void SetMovement(Vector2D movement)
+        {
+            //// TODO [vmcl] Temporary argument check
+            if (movement.GetLength().IsZero())
+            {
+                throw new ArgumentException("Shot must always move until exploded.", "movement");
+            }
+
+            this.Movement = movement;
+            this.NextPosition = this.Position + this.Movement;
+
+            ResetCachedElement();
+        }
+
+        internal void ApplyMovement()
+        {
+            this.Position = this.NextPosition;
+            this.Movement = Vector2D.Zero;
+
+            ResetCachedElement();
         }
 
         #endregion

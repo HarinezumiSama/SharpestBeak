@@ -12,11 +12,7 @@ namespace SharpestBeak.Model
     {
         #region Constants and Fields
 
-        private Point2D _position;
-        private GameAngle _beakAngle;
         private ChickenElement _cachedElement;
-        private bool _isDead;
-        private MoveDirection _moveDirection;
 
         #endregion
 
@@ -61,62 +57,38 @@ namespace SharpestBeak.Model
 
         public Point2D Position
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _position;
-            }
-
-            internal set
-            {
-                if (_position == value)
-                {
-                    return;
-                }
-
-                _position = value;
-                ResetCachedElement();
-                ResetMoveDirection();
-            }
+            get;
+            private set;
         }
 
-        public MoveDirection MoveDirection
+        public Vector2D Movement
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _moveDirection;
-            }
+            get;
+            private set;
+        }
 
-            internal set
-            {
-                if (this.IsDead && !value.IsNone)
-                {
-                    throw new ArgumentException(
-                        string.Format(CultureInfo.InvariantCulture, "The dead {{{0}}} cannot move.", ToShortString()),
-                        "value");
-                }
-
-                _moveDirection = value;
-            }
+        public Point2D NextPosition
+        {
+            get;
+            private set;
         }
 
         public GameAngle BeakAngle
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _beakAngle;
-            }
+            get;
+            private set;
+        }
 
-            set
-            {
-                if (_beakAngle != value)
-                {
-                    _beakAngle = value;
-                    ResetCachedElement();
-                }
-            }
+        public GameAngle BeakMovement
+        {
+            get;
+            private set;
+        }
+
+        public GameAngle NextBeakAngle
+        {
+            get;
+            private set;
         }
 
         public ChickenUnit KilledBy
@@ -127,21 +99,8 @@ namespace SharpestBeak.Model
 
         public bool IsDead
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _isDead;
-            }
-
-            internal set
-            {
-                _isDead = value;
-
-                if (_isDead)
-                {
-                    ResetMoveDirection();
-                }
-            }
+            get;
+            internal set;
         }
 
         public int KillCount
@@ -172,9 +131,10 @@ namespace SharpestBeak.Model
 
         public ChickenElement GetElement()
         {
+            // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
             if (_cachedElement == null)
             {
-                _cachedElement = new ChickenElement(this.Position, this.BeakAngle);
+                _cachedElement = new ChickenElement(this.NextPosition, this.NextBeakAngle);
             }
 
             return _cachedElement;
@@ -189,7 +149,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return _position;
+                return this.Position;  //// TODO [vmcl] Position or NextPosition?
             }
         }
 
@@ -198,7 +158,7 @@ namespace SharpestBeak.Model
             [DebuggerStepThrough]
             get
             {
-                return _beakAngle;
+                return this.BeakAngle;  //// TODO [vmcl] BeakAngle or NextBeakAngle?
             }
         }
 
@@ -232,7 +192,6 @@ namespace SharpestBeak.Model
         {
             this.IsDead = false;
             this.ShotEngineStepIndex = -1;
-            ResetMoveDirection();
         }
 
         internal bool CanSee(Point2D point)
@@ -248,6 +207,41 @@ namespace SharpestBeak.Model
                 || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
         }
 
+        internal void SetMovement(Vector2D movement, GameAngle beakMovement)
+        {
+            this.Movement = movement;
+            this.NextPosition = this.Position + this.Movement;
+
+            this.BeakMovement = beakMovement;
+            this.NextBeakAngle = this.BeakAngle + this.BeakMovement;
+
+            ResetCachedElement();
+        }
+
+        internal void ApplyMovement()
+        {
+            this.Position = this.NextPosition;
+            this.Movement = Vector2D.Zero;
+
+            this.BeakAngle = this.NextBeakAngle;
+            this.BeakMovement = GameAngle.Zero;
+
+            ResetCachedElement();
+        }
+
+        internal void ResetPosition(Point2D position, GameAngle beakAngle)
+        {
+            this.Position = position;
+            this.Movement = Vector2D.Zero;
+            this.NextPosition = this.Position;
+
+            this.BeakAngle = beakAngle;
+            this.BeakMovement = GameAngle.Zero;
+            this.NextBeakAngle = this.BeakAngle;
+
+            ResetCachedElement();
+        }
+
         #endregion
 
         #region Private Methods
@@ -255,11 +249,6 @@ namespace SharpestBeak.Model
         private void ResetCachedElement()
         {
             _cachedElement = null;
-        }
-
-        private void ResetMoveDirection()
-        {
-            _moveDirection = MoveDirection.None;
         }
 
         #endregion

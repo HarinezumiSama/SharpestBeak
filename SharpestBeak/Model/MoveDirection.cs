@@ -6,7 +6,7 @@ using SharpestBeak.Physics;
 namespace SharpestBeak.Model
 {
     /// <summary>
-    ///     Specifies the move direction relative to the beak direction.
+    ///     Specifies the move direction.
     /// </summary>
     public sealed class MoveDirection
     {

@@ -27,13 +27,13 @@ namespace SharpestBeak
 
         #region Public Properties
 
-        public double StepRatio
+        public float StepRatio
         {
             [DebuggerNonUserCode]
             get
             {
                 var ratio = _stopwatch.Elapsed.TotalMilliseconds / GameConstants.LogicPollFrequency.TotalMilliseconds;
-                return Math.Max(ratio, MaxStepRatio);
+                return (float)Math.Min(ratio, MaxStepRatio);
             }
         }
 

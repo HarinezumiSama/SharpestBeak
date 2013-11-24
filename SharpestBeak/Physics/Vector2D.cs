@@ -322,7 +322,7 @@ namespace SharpestBeak.Physics
         {
             var radianAngle = MathHelper.Atan2(target._y, target._x) - MathHelper.Atan2(_y, _x);
             var degreeAngle = radianAngle.ToDegrees();
-            return GameAngle.FromDegrees(GameAngle.NormalizeDegreeAngle(degreeAngle));
+            return GameAngle.FromDegrees(degreeAngle);
         }
 
         public float GetAngleCosine(Vector2D target)

@@ -83,74 +83,96 @@ namespace SharpestBeak
             return new Point2D(nominalPoint) * GameConstants.NominalCellSize + HalfNominalCellOffset;
         }
 
-        public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn)
+        public static GameAngle GetBeakMovement(BeakTurn beakTurn)
         {
             if (beakTurn.Value.IsZero())
             {
-                return oldBeakAngle;
+                return GameAngle.Zero;
             }
 
-            var proxyResult = GameAngle.NormalizeDegreeAngle(oldBeakAngle.DegreeValue
-                + GameConstants.StepTimeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed * beakTurn.Value);
-            return GameAngle.FromDegrees(proxyResult);
+            var degreeAngle = GameConstants.StepTimeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed
+                * beakTurn.Value;
+            return GameAngle.FromDegrees(degreeAngle);
         }
 
-        public static Point2D GetNewPosition(Point2D oldPosition, GameAngle angle, float distance)
+        public static GameAngle GetNewBeakAngle(GameAngle oldBeakAngle, BeakTurn beakTurn)
         {
-            var rad = angle.RadianValue;
-            var result = oldPosition + new Vector2D(distance * rad.Cos(), distance * rad.Sin());
+            var beakMovement = GetBeakMovement(beakTurn);
+
+            var result = oldBeakAngle + beakMovement;
             return result;
         }
 
-        public static Point2D GetNewPosition(IDirectionalPosition directionalPosition, float distance)
+        public static Tuple<GameAngle, GameAngle> GetBeakMovementAndNewAngle(
+            GameAngle oldBeakAngle,
+            BeakTurn beakTurn)
         {
-            #region Argument Check
+            var beakMovement = GetBeakMovement(beakTurn);
+            var newAngle = oldBeakAngle + beakMovement;
+            return Tuple.Create(beakMovement, newAngle);
+        }
 
-            if (directionalPosition == null)
+        public static Vector2D GetMovement(GameAngle angle, float speed)
+        {
+            var rad = angle.RadianValue;
+
+            var result = new Vector2D(speed * rad.Cos(), speed * rad.Sin());
+            return result;
+        }
+
+        public static Vector2D GetMovement(
+            GameAngle currentAngle,
+            MoveDirection direction,
+            float speed)
+        {
+            if (direction.IsNone)
             {
-                throw new ArgumentNullException("directionalPosition");
+                return Vector2D.Zero;
             }
 
-            #endregion
+            //// TODO [vmcl] Review GetMovement - can we do better?
+            //// TODO [vmcl] Use angle between direction and UnitY instead of angle between rotated and UnitX - ?!
 
-            return GetNewPosition(directionalPosition.Position, directionalPosition.Angle, distance);
+            var rotatedDirection =
+                direction.NormalizedDirection.ToPoint2D().RotateHalfRevolutionClockwise().ToVector2D();
+            var relativeAngle = Vector2D.UnitX.GetAngle(rotatedDirection);
+
+            var actualAngle = currentAngle + relativeAngle;
+            var actualSpeed = Math.Min(direction.NormalizedDirection.GetLength(), 1f) * speed;
+
+            var result = GetMovement(actualAngle, actualSpeed);
+            return result;
         }
 
         public static Point2D GetNewPosition(
             Point2D oldPosition,
             GameAngle currentAngle,
             MoveDirection direction,
-            float distance)
+            float speed)
         {
-            if (direction.IsNone)
-            {
-                return oldPosition;
-            }
+            var movement = GetMovement(currentAngle, direction, speed);
 
-            var rotated = direction.NormalizedDirection.ToPoint2D().RotateHalfRevolutionClockwise().ToVector2D();
-            var relativeAngle = Vector2D.UnitX.GetAngle(rotated);
-
-            var actualAngle = currentAngle + relativeAngle;
-
-            var result = GetNewPosition(oldPosition, actualAngle, distance);
+            var result = GetNewPositionInternal(oldPosition, movement);
             return result;
         }
 
-        public static Point2D GetNewPosition(
-            IDirectionalPosition directionalPosition,
+        public static Tuple<Vector2D, Point2D> GetMovementAndNewPosition(
+            Point2D oldPosition,
+            GameAngle currentAngle,
             MoveDirection direction,
-            float distance)
+            float speed)
         {
-            #region Argument Check
+            var movement = GetMovement(currentAngle, direction, speed);
+            var newPosition = GetNewPositionInternal(oldPosition, movement);
 
-            if (directionalPosition == null)
-            {
-                throw new ArgumentNullException("directionalPosition");
-            }
+            return Tuple.Create(movement, newPosition);
+        }
 
-            #endregion
-
-            return GetNewPosition(directionalPosition.Position, directionalPosition.Angle, direction, distance);
+        public static Point2D GetNewPosition(Point2D oldPosition, GameAngle angle, float speed)
+        {
+            var rad = angle.RadianValue;
+            var result = oldPosition + new Vector2D(speed * rad.Cos(), speed * rad.Sin());
+            return result;
         }
 
         public static Point2D GetBeakTipPosition(Point2D position, GameAngle beakAngle)
@@ -345,6 +367,12 @@ namespace SharpestBeak
         {
             var projection = pointDirection.ProjectScalar(lineDirection);
             var result = (pointDirection.GetLengthSquared() - projection.Sqr()).Sqrt();
+            return result;
+        }
+
+        private static Point2D GetNewPositionInternal(Point2D oldPosition, Vector2D movement)
+        {
+            var result = movement == Vector2D.Zero ? oldPosition : oldPosition + movement;
             return result;
         }
 

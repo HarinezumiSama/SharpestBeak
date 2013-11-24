@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -241,11 +242,6 @@ namespace SharpestBeak.UI
                 lightTeam.Type.Name,
                 darkTeam.UnitCount,
                 darkTeam.Type.Name);
-
-            ////var mb = (MeshBuilder)this.Resources["ChickenBuilder"];
-            ////mb.AddSphere(new Point3D(0d, 0d, 1d), 1d);
-            ////mb.AddCone(new Point3D(0d, 0d, 1d), new Vector3D(1, 0, 0), 0.5d, 0d, 1.5d, true, true, 20);
-            ////mb.Scale(0.5d, 0.5d, 0.5d);
         }
 
         #endregion
@@ -375,9 +371,11 @@ namespace SharpestBeak.UI
             foreach (var chicken in presentation.Chickens)
             {
                 var material = chicken.Team == GameTeam.Light ? LightTeamUnitMaterial : DarkTeamUnitMaterial;
+                var currentPosition = chicken.GetCurrentPosition();
+
                 var matrix = GetChickenTransformMatrix(chicken);
                 var transform = new MatrixTransform3D(matrix);
-                var position = ConvertEnginePosition(chicken.Element.Position);
+                var position = ConvertEnginePosition(currentPosition.Position);
 
                 var chickenVisual = new ModelVisual3D
                 {
@@ -390,7 +388,7 @@ namespace SharpestBeak.UI
                 var data = new ChickenData(
                     chicken.UniqueId,
                     position,
-                    chicken.Element.BeakAngle.DegreeValue,
+                    currentPosition.Angle.DegreeValue,
                     chickenVisual,
                     transform);
                 _chickenDatas.Add(data.Id, data);
@@ -411,9 +409,11 @@ namespace SharpestBeak.UI
         {
             var result = Matrix3D.Identity;
 
-            result.Rotate(new Quaternion(new Vector3D(0d, 0d, 1d), chicken.Element.BeakAngle.DegreeValue));
+            var currentPosition = chicken.GetCurrentPosition();
 
-            var normalizedPosition = chicken.Element.Position / (float)_nominalSizeCoefficient;
+            result.Rotate(new Quaternion(new Vector3D(0d, 0d, 1d), currentPosition.Angle.DegreeValue));
+
+            var normalizedPosition = currentPosition.Position / (float)_nominalSizeCoefficient;
             result.Translate(new Vector3D(normalizedPosition.X, normalizedPosition.Y, 0d));
 
             return result;
@@ -423,7 +423,9 @@ namespace SharpestBeak.UI
         {
             var result = Matrix3D.Identity;
 
-            var normalizedPosition = shot.Element.Position / (float)_nominalSizeCoefficient;
+            var currentPosition = shot.GetCurrentPosition();
+
+            var normalizedPosition = currentPosition / (float)_nominalSizeCoefficient;
             result.Translate(new Vector3D(normalizedPosition.X, normalizedPosition.Y, 0d));
 
             return result;
@@ -464,8 +466,9 @@ namespace SharpestBeak.UI
             foreach (var chicken in presentation.Chickens)
             {
                 var data = _chickenDatas[chicken.UniqueId];
-                data.Position = ConvertEnginePosition(chicken.Element.Position);
-                data.BeakAngle = chicken.Element.BeakAngle.DegreeValue;
+                var currentPosition = chicken.GetCurrentPosition();
+                data.Position = ConvertEnginePosition(currentPosition.Position);
+                data.BeakAngle = currentPosition.Angle.DegreeValue;
                 data.Transform.Matrix = GetChickenTransformMatrix(chicken);
 
                 deadChickenIds.Remove(data.Id);
@@ -482,13 +485,15 @@ namespace SharpestBeak.UI
             var explodedShotIds = new HashSet<GameObjectId>(_shotDatas.Keys);
             foreach (var shot in presentation.Shots)
             {
+                var currentPosition = shot.GetCurrentPosition();
+
                 var data = _shotDatas.GetValueOrDefault(shot.UniqueId);
                 if (data == null)
                 {
-                    var material = shot.Owner.Team == GameTeam.Light ? LightTeamShotMaterial : DarkTeamShotMaterial;
+                    var material = shot.OwnerTeam == GameTeam.Light ? LightTeamShotMaterial : DarkTeamShotMaterial;
                     var matrix = GetShotTransformMatrix(shot);
                     var transform = new MatrixTransform3D(matrix);
-                    var position = ConvertEnginePosition(shot.Element.Position);
+                    var position = ConvertEnginePosition(currentPosition);
 
                     var model = new GeometryModel3D(_shotGeometry, material)
                     {
@@ -501,7 +506,7 @@ namespace SharpestBeak.UI
                 }
                 else
                 {
-                    var position = ConvertEnginePosition(shot.Element.Position);
+                    var position = ConvertEnginePosition(currentPosition);
                     data.Position = position;
 
                     data.Transform.Matrix = GetShotTransformMatrix(shot);

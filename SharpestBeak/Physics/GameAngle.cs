@@ -8,6 +8,12 @@ namespace SharpestBeak.Physics
 {
     public struct GameAngle : IEquatable<GameAngle>, IFormattable
     {
+        #region Constants and Fields
+
+        public static readonly GameAngle Zero = new GameAngle();
+
+        #endregion
+
         #region Public Properties
 
         public float DegreeValue
@@ -43,27 +49,27 @@ namespace SharpestBeak.Physics
 
         public static GameAngle operator -(GameAngle value)
         {
-            return FromDegrees(NormalizeDegreeAngle(-value.DegreeValue));
+            return FromDegrees(-value.DegreeValue);
         }
 
         public static GameAngle operator +(GameAngle left, GameAngle right)
         {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue + right.DegreeValue));
+            return FromDegrees(left.DegreeValue + right.DegreeValue);
         }
 
         public static GameAngle operator -(GameAngle left, GameAngle right)
         {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue - right.DegreeValue));
+            return FromDegrees(left.DegreeValue - right.DegreeValue);
         }
 
         public static GameAngle operator *(GameAngle left, float right)
         {
-            return FromDegrees(NormalizeDegreeAngle(left.DegreeValue * right));
+            return FromDegrees(left.DegreeValue * right);
         }
 
         public static GameAngle operator *(float left, GameAngle right)
         {
-            return FromDegrees(NormalizeDegreeAngle(left * right.DegreeValue));
+            return FromDegrees(left * right.DegreeValue);
         }
 
         #endregion
@@ -72,11 +78,8 @@ namespace SharpestBeak.Physics
 
         public static GameAngle FromRadians(float radianAngle)
         {
-            return new GameAngle
-            {
-                DegreeValue = radianAngle.ToDegrees().EnsureValidDegreeAngle(),
-                RadianValue = radianAngle
-            };
+            var degrees = radianAngle.ToDegrees();
+            return FromDegrees(degrees);
         }
 
         public static GameAngle FromRadians(double radianAngle)
@@ -86,10 +89,12 @@ namespace SharpestBeak.Physics
 
         public static GameAngle FromDegrees(float degreeAngle)
         {
+            var normalizedDegreeAngle = NormalizeDegreeAngle(degreeAngle);
+
             return new GameAngle
             {
-                DegreeValue = degreeAngle.EnsureValidDegreeAngle(),
-                RadianValue = degreeAngle.ToRadians()
+                DegreeValue = normalizedDegreeAngle,
+                RadianValue = normalizedDegreeAngle.ToRadians()
             };
         }
 
@@ -121,6 +126,7 @@ namespace SharpestBeak.Physics
         public void CosSin(out float cos, out float sin)
         {
             var rad = this.RadianValue;
+
             cos = rad.Cos();
             sin = rad.Sin();
         }
@@ -189,13 +195,14 @@ namespace SharpestBeak.Physics
 
         #endregion
 
-        #region Internal Methods
+        #region Private Methods
 
-        internal static float NormalizeDegreeAngle(float value)
+        private static float NormalizeDegreeAngle(float value)
         {
             var result = value;
 
-            // TODO: [VM] Use tolerance when comparing values - (?)
+            //// TODO: [vmcl] Use tolerance when comparing values - (?)
+
             while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
             {
                 result -= MathHelper.RevolutionDegrees;
