@@ -410,6 +410,11 @@ namespace SharpestBeak
                 validateValueCallback);
         }
 
+        public static TimeSpan Multiply(this TimeSpan value, double ratio)
+        {
+            return TimeSpan.FromTicks((long)(value.Ticks * ratio));
+        }
+
         #endregion
 
         #region Private Methods

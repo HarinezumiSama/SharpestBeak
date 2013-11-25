@@ -19,7 +19,7 @@ namespace SharpestBeak
 
     //// TODO: [VM] Allow game frame snapshot as a start of a game
 
-    //// TODO: [VM] Implement single-thread feature: logics are running with engine in single thread
+    //// TODO: [VM] Implement single-thread feature: logics are running with engine in single thread - ???
 
     //// TODO: [VM] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
 
@@ -30,7 +30,7 @@ namespace SharpestBeak
         public const int InstrumentationMoveCountLimit = 500;
 
         private static readonly ThreadSafeRandom RandomGenerator = new ThreadSafeRandom();
-        private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(5d);
+        private static readonly TimeSpan StopTimeout = GameConstants.LogicPollFrequency.Multiply(5);
 
         private readonly ReaderWriterLockSlim _syncLock =
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -202,8 +202,6 @@ namespace SharpestBeak
         {
             EnsureNotDisposed();
 
-            ////Application.Idle -= this.Application_Idle;
-
             _syncLock.ExecuteInWriteLock(
                 () => _logics.DoForEach(
                     item =>
@@ -216,7 +214,7 @@ namespace SharpestBeak
                     }));
 
             _stopEvent.Set();
-            Thread.Sleep((int)(GameConstants.LogicPollFrequency.TotalMilliseconds * 5));
+
             _syncLock.ExecuteInWriteLock(
                 () =>
                 {
@@ -328,7 +326,10 @@ namespace SharpestBeak
 
         #region Private Methods
 
-        private static ChickenUnitLogic CreateLogic(GameEngine engine, ChickenTeamRecord logicRecord, GameTeam team)
+        private static ChickenUnitLogic CreateLogic(
+            GameEngine engine,
+            ChickenTeamSettings teamSettings,
+            GameTeam team)
         {
             #region Argument Check
 
@@ -337,15 +338,24 @@ namespace SharpestBeak
                 throw new ArgumentNullException("engine");
             }
 
-            if (logicRecord == null)
+            if (teamSettings == null)
             {
-                throw new ArgumentNullException("logicRecord");
+                throw new ArgumentNullException("teamSettings");
             }
 
             #endregion
 
-            var result = (ChickenUnitLogic)Activator.CreateInstance(logicRecord.Type).EnsureNotNull();
-            result.InitializeInstance(engine, logicRecord.UnitCount, team);
+            var result = (ChickenUnitLogic)Activator.CreateInstance(teamSettings.Type).EnsureNotNull();
+            try
+            {
+                result.InitializeInstance(engine, teamSettings.UnitCount, team);
+            }
+            catch (Exception)
+            {
+                result.DisposeSafely();
+                throw;
+            }
+
             return result;
         }
 
@@ -443,23 +453,23 @@ namespace SharpestBeak
         private void PositionChickens()
         {
             UpdateUnitStates(true);  // Unit states are used in positioning
-            var e = new GamePositionEventArgs(this);
+            var eventArgs = new GamePositionEventArgs(this);
 
             if (_positionCallback != null)
             {
-                _positionCallback(e);
-                if (e.Handled)
+                _positionCallback(eventArgs);
+                if (eventArgs.Handled)
                 {
-                    ValidatePositioning(e);
-                    ApplyPositioning(e);
+                    ValidatePositioning(eventArgs);
+                    ApplyPositioning(eventArgs);
                     return;
                 }
             }
 
-            e.Reset();
-            PositionChickensDefault(e);
-            ValidatePositioning(e);
-            ApplyPositioning(e);
+            eventArgs.Reset();
+            PositionChickensDefault(eventArgs);
+            ValidatePositioning(eventArgs);
+            ApplyPositioning(eventArgs);
         }
 
         private void CallPaintCallback()
@@ -472,11 +482,6 @@ namespace SharpestBeak
             var presentation = _lastGamePresentation.Value;
             _paintCallback(new GamePaintEventArgs(presentation));
         }
-
-        ////private void Application_Idle(object sender, EventArgs e)
-        ////{
-        ////    CallPaintCallback();
-        ////}
 
         private bool IsStopping()
         {
@@ -536,8 +541,6 @@ namespace SharpestBeak
             {
                 throw new GameException("The game has ended. Reset the game before starting it again.");
             }
-
-            ////Application.Idle += this.Application_Idle;
 
             _engineThread = new Thread(this.DoExecuteEngine)
             {
@@ -990,7 +993,7 @@ namespace SharpestBeak
             var logic = logicInstance as ChickenUnitLogic;
             if (logic == null)
             {
-                throw new GameException("Invalid logic passed to thread method.");
+                throw new GameException("Invalid logic passed to the thread method.");
             }
 
             while (!IsStopping())

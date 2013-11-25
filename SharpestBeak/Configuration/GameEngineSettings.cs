@@ -17,8 +17,8 @@ namespace SharpestBeak.Configuration
         /// </summary>
         public GameEngineSettings(
             Size nominalSize,
-            ChickenTeamRecord lightTeam,
-            ChickenTeamRecord darkTeam,
+            ChickenTeamSettings lightTeam,
+            ChickenTeamSettings darkTeam,
             Action<GamePaintEventArgs> paintCallback)
         {
             #region Argument Check
@@ -67,13 +67,13 @@ namespace SharpestBeak.Configuration
             private set;
         }
 
-        public ChickenTeamRecord LightTeam
+        public ChickenTeamSettings LightTeam
         {
             get;
             private set;
         }
 
-        public ChickenTeamRecord DarkTeam
+        public ChickenTeamSettings DarkTeam
         {
             get;
             private set;

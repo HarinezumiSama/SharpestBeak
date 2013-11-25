@@ -204,7 +204,7 @@ namespace SharpestBeak.Model
         internal bool CanShoot()
         {
             return this.ShotEngineStepIndex < 0
-                || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.MaximumFrequency;
+                || this.Engine.MoveCount - this.ShotEngineStepIndex >= GameConstants.ShotUnit.EngineStepsBetweenShots;
         }
 
         internal void SetMovement(Vector2D movement, GameAngle beakMovement)

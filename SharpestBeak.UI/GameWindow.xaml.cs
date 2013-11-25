@@ -226,7 +226,7 @@ namespace SharpestBeak.UI
         ///     Initializes a new instance of the <see cref="GameWindow"/> class
         ///     using the specified parameters.
         /// </summary>
-        public GameWindow(System.Drawing.Size nominalSize, ChickenTeamRecord lightTeam, ChickenTeamRecord darkTeam)
+        public GameWindow(System.Drawing.Size nominalSize, ChickenTeamSettings lightTeam, ChickenTeamSettings darkTeam)
             : this()
         {
             var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame);

@@ -65,8 +65,8 @@ namespace SharpestBeak.UI
                     return;
                 }
 
-                var lightTeamRecord = new ChickenTeamRecord(lightTeam.Logic.Type, lightTeam.PlayerCount);
-                var darkTeamRecord = new ChickenTeamRecord(darkTeam.Logic.Type, darkTeam.PlayerCount);
+                var lightTeamRecord = new ChickenTeamSettings(lightTeam.Logic.Type, lightTeam.PlayerCount);
+                var darkTeamRecord = new ChickenTeamSettings(darkTeam.Logic.Type, darkTeam.PlayerCount);
 
                 var gameWindow = new GameWindow(
                     this.CurrentGameSettings.NominalSize.ToSize(),

@@ -55,7 +55,7 @@
     </Compile>
     <Compile Include="EngineStepStopwatch.cs" />
     <Compile Include="Model\BeakTurn.cs" />
-    <Compile Include="Configuration\ChickenTeamRecord.cs" />
+    <Compile Include="Configuration\ChickenTeamSettings.cs" />
     <Compile Include="Model\ChickenUnit.cs" />
     <Compile Include="Model\ChickenUnitLogic.cs" />
     <Compile Include="Model\ChickenUnitState.cs" />

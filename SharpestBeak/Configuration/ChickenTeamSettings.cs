@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace SharpestBeak.Configuration
 {
-    public sealed class ChickenTeamRecord
+    public sealed class ChickenTeamSettings
     {
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="ChickenTeamRecord"/> class.
+        ///     Initializes a new instance of the <see cref="ChickenTeamSettings"/> class.
         /// </summary>
-        public ChickenTeamRecord(Type type, int unitCount)
+        public ChickenTeamSettings(Type type, int unitCount)
         {
             #region Argument Check
 
@@ -26,9 +26,8 @@ namespace SharpestBeak.Configuration
                     "unitCount",
                     unitCount,
                     string.Format(
-                        "The number of units must be in the range {0} to {1}.",
-                        GameConstants.TeamPlayerUnitCountRange.Min,
-                        GameConstants.TeamPlayerUnitCountRange.Max));
+                        "The number of units must be in the range {0}.",
+                        GameConstants.TeamPlayerUnitCountRange));
             }
 
             #endregion

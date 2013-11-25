@@ -101,9 +101,9 @@ namespace SharpestBeak
 
         public static class ShotUnit
         {
-            #region Fields
+            #region Constants and Fields
 
-            public static readonly double MaximumFrequencyMsec = 500d * SlowDownRatio;
+            public static readonly double MaximumFrequencyMsec = 1000d * SlowDownRatio;
 
             public static readonly float Radius = NominalCellSize / 10f;
 
@@ -113,7 +113,7 @@ namespace SharpestBeak
             public static readonly float DefaultRectilinearSpeed =
                 ChickenUnit.DefaultRectilinearSpeed * ShotToChickenRectilinearSpeedRatio;
 
-            public static readonly int MaximumFrequency = Math.Max(
+            public static readonly int EngineStepsBetweenShots = Math.Max(
                 1,
                 (int)(MaximumFrequencyMsec / LogicPollFrequencyMsec));
 
