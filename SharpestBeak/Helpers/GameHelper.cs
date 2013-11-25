@@ -130,12 +130,7 @@ namespace SharpestBeak
                 return Vector2D.Zero;
             }
 
-            //// TODO [vmcl] Review GetMovement - can we do better?
-            //// TODO [vmcl] Use angle between direction and UnitY instead of angle between rotated and UnitX - ?!
-
-            var rotatedDirection =
-                direction.NormalizedDirection.ToPoint2D().RotateHalfRevolutionClockwise().ToVector2D();
-            var relativeAngle = Vector2D.UnitX.GetAngle(rotatedDirection);
+            var relativeAngle = Vector2D.UnitY.GetAngle(direction.NormalizedDirection);
 
             var actualAngle = currentAngle + relativeAngle;
             var actualSpeed = Math.Min(direction.NormalizedDirection.GetLength(), 1f) * speed;
