@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public sealed class TeamSettings
+    public sealed class TeamSettings : INotifyPropertyChanged
     {
+        #region Constants and Fields
+
+        private LogicInfo _logic;
+        private int _playerCount;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -22,25 +32,79 @@ namespace SharpestBeak.UI
 
         #endregion
 
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+
         #region Public Properties
 
         [DisplayName(@"Logic")]
         [ItemsSource(typeof(LogicInfoItemSource))]
-        [RefreshProperties(RefreshProperties.All)]
         [PropertyOrder(1)]
         public LogicInfo Logic
         {
-            get;
-            set;
+            [DebuggerStepThrough]
+            get
+            {
+                return _logic;
+            }
+
+            set
+            {
+                if (ReferenceEquals(value, _logic))
+                {
+                    return;
+                }
+
+                _logic = value;
+                RaisePropertyChanged(obj => obj.Logic);
+                RaisePropertyChanged(obj => obj.AsString);
+            }
         }
 
         [DisplayName(@"Player count")]
-        [RefreshProperties(RefreshProperties.All)]
         [PropertyOrder(2)]
         public int PlayerCount
         {
-            get;
-            set;
+            [DebuggerStepThrough]
+            get
+            {
+                return _playerCount;
+            }
+
+            set
+            {
+                if (value == _playerCount)
+                {
+                    return;
+                }
+
+                if (!GameConstants.TeamPlayerUnitCountRange.Belongs(value))
+                {
+                    throw new ArgumentOutOfRangeException(
+                        "value",
+                        value,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            @"The value is out of the valid range {0}.",
+                            GameConstants.TeamPlayerUnitCountRange));
+                }
+
+                _playerCount = value;
+                RaisePropertyChanged(obj => obj.PlayerCount);
+                RaisePropertyChanged(obj => obj.AsString);
+            }
+        }
+
+        [Browsable(false)]
+        public string AsString
+        {
+            get
+            {
+                return ToString();
+            }
         }
 
         #endregion
@@ -87,6 +151,22 @@ namespace SharpestBeak.UI
                     .AppendFormat("{0}: player count must be positive.", prefix)
                     .AppendLine();
             }
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private void RaisePropertyChanged<TProperty>(Expression<Func<TeamSettings, TProperty>> propertyExpression)
+        {
+            var propertyChanged = this.PropertyChanged;
+            if (propertyChanged == null)
+            {
+                return;
+            }
+
+            var propertyName = Helper.GetPropertyName(propertyExpression);
+            propertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

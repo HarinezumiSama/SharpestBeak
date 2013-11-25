@@ -52,7 +52,7 @@ namespace SharpestBeak
             private set;
         }
 
-        // TODO: [VM] Allow to disable shooting in UI via editable setting
+        //// TODO: [vmcl] Allow to disable shooting in UI via editable setting
 
         public bool DebugModeDisableShooting
         {

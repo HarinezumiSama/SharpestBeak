@@ -59,6 +59,14 @@
                         </DataTemplate>
                     </xctk:EditorTemplateDefinition.EditingTemplate>
                 </xctk:EditorTemplateDefinition>
+                <xctk:EditorTemplateDefinition TargetProperties="{x:Type local:TeamSettings}">
+                    <xctk:EditorTemplateDefinition.EditingTemplate>
+                        <DataTemplate>
+                            <TextBlock d:DataContext="{d:DesignInstance Type=xctk:PropertyItem}"
+                                    Text="{Binding Path=Value.(local:TeamSettings.AsString)}" />
+                        </DataTemplate>
+                    </xctk:EditorTemplateDefinition.EditingTemplate>
+                </xctk:EditorTemplateDefinition>
             </xctk:PropertyGrid.EditorDefinitions>
         </xctk:PropertyGrid>
     </Grid>

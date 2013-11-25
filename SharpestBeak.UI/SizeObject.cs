@@ -73,6 +73,7 @@ namespace SharpestBeak.UI
             }
         }
 
+        [Browsable(false)]
         public string AsString
         {
             get

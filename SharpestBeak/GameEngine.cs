@@ -15,13 +15,13 @@ using SharpestBeak.Presentation.Elements;
 
 namespace SharpestBeak
 {
-    //// TODO: [VM] Capture the game to allow playback
+    //// TODO: [vmcl] Capture the game to allow playback
 
-    //// TODO: [VM] Allow game frame snapshot as a start of a game
+    //// TODO: [vmcl] Allow game frame snapshot as a start of a game
 
-    //// TODO: [VM] Implement single-thread feature: logics are running with engine in single thread - ???
+    //// TODO: [vmcl] Implement single-thread feature: logics are running with engine in single thread - ???
 
-    //// TODO: [VM] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
+    //// TODO: [vmcl] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
 
     public sealed class GameEngine : IDisposable
     {
@@ -870,9 +870,9 @@ namespace SharpestBeak
 
         private bool ProcessChickenUnitMoves(IList<ChickenUnit> aliveChickens)
         {
-            //// TODO: [VM] Use bisection to get conflicting units closer to each other
-            //// TODO: [VM] Optimize number of collision checks!
-            //// TODO: [VM] Divide move: eg. unit couldn't move but could turn beak or vice versa
+            //// TODO: [vmcl] Use bisection to get conflicting units closer to each other
+            //// TODO: [vmcl] Optimize number of collision checks!
+            //// TODO: [vmcl] Divide move: eg. unit couldn't move but could turn beak or vice versa
 
             _moveInfoStates.Clear();
             for (var unitIndex = 0; unitIndex < aliveChickens.Count; unitIndex++)

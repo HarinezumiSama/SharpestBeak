@@ -8,9 +8,9 @@ using SharpestBeak.View;
 
 namespace SharpestBeak.Logic.Default
 {
-    //// TODO: [VM] Implement and use logic settings instead of inheritance
-    //// [VM] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
-    //// [VM] (b) each logic may be marked with a custom attribute specifying which settings class to use.
+    //// TODO: [vmcl] Implement and use logic settings instead of inheritance
+    //// [vmcl] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
+    //// [vmcl] (b) each logic may be marked with a custom attribute specifying which settings class to use.
 
     public abstract class SmartChickenLogicBase : ChickenUnitLogic
     {

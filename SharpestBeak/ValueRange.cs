@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
 
@@ -76,6 +77,7 @@ namespace SharpestBeak
         /// <returns>
         ///     <b>true</b> if the specified value belongs to this range; otherwise, <b>false</b>.
         /// </returns>
+        [Pure]
         public bool Belongs(T value)
         {
             return value.IsInRange(this);

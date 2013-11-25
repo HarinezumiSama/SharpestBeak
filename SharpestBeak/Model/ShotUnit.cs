@@ -7,7 +7,7 @@ using SharpestBeak.Presentation.Elements;
 
 namespace SharpestBeak.Model
 {
-    internal sealed class ShotUnit : IDirectionalPosition
+    internal sealed class ShotUnit
     {
         #region Constants and Fields
 
@@ -116,28 +116,6 @@ namespace SharpestBeak.Model
             }
 
             return _cachedElement;
-        }
-
-        #endregion
-
-        #region IDirectionalPosition Members
-
-        Point2D IDirectionalPosition.Position
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return this.Position;  //// TODO [vmcl] Position or NextPosition?
-            }
-        }
-
-        GameAngle IDirectionalPosition.Angle
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return this.Angle;
-            }
         }
 
         #endregion

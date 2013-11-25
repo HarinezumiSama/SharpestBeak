@@ -201,8 +201,6 @@ namespace SharpestBeak.Physics
         {
             var result = value;
 
-            //// TODO: [vmcl] Use tolerance when comparing values - (?)
-
             while (result > MathHelper.HalfRevolutionDegrees && result > -MathHelper.HalfRevolutionDegrees)
             {
                 result -= MathHelper.RevolutionDegrees;

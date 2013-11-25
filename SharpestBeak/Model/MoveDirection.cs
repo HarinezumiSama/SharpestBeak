@@ -54,14 +54,6 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            //// TODO [vmcl] TEMP: Only no speed and full speed are supported so far
-            //// ReSharper disable CompareOfFloatsByEqualityOperator
-            if (normalizedScalarSpeed != 0f && normalizedScalarSpeed != 1f)
-            {
-                throw new NotSupportedException();
-            }
-            //// ReSharper restore CompareOfFloatsByEqualityOperator
-
             this.NormalizedDirection = GetNormalizedDirection(direction, normalizedScalarSpeed);
         }
 

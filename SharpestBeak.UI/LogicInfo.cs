@@ -8,7 +8,7 @@ namespace SharpestBeak.UI
 {
     public sealed class LogicInfo : IEquatable<LogicInfo>
     {
-        #region Fields
+        #region Constants and Fields
 
         private readonly string _asString;
 
