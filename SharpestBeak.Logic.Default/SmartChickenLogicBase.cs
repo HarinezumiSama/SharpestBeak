@@ -43,6 +43,18 @@ namespace SharpestBeak.Logic.Default
 
         #endregion
 
+        #region Features Enumeration
+
+        [Flags]
+        protected enum Features
+        {
+            Default = 0,
+            PredictiveShot = 0x00000001,
+            TurningAway = 0x00000002
+        }
+
+        #endregion
+
         #region Protected Methods
 
         protected override void OnReset(GameState gameState)
@@ -304,20 +316,6 @@ namespace SharpestBeak.Logic.Default
 
         #endregion
 
-        #region Nested Types
-
-        #region Features Enumeration
-
-        [Flags]
-        protected enum Features
-        {
-            Default = 0,
-            PredictiveShot = 0x00000001,
-            TurningAway = 0x00000002
-        }
-
-        #endregion
-
         #region PossibleActionInfo Class
 
         private sealed class PossibleActionInfo
@@ -351,8 +349,6 @@ namespace SharpestBeak.Logic.Default
 
             #endregion
         }
-
-        #endregion
 
         #endregion
     }

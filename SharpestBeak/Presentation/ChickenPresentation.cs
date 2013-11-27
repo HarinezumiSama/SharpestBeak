@@ -65,23 +65,6 @@ namespace SharpestBeak.Presentation
 
         #endregion
 
-        #region Public Methods
-
-        public DirectionalPosition GetCurrentPosition()
-        {
-            var ratio = GetCurrentRatio();
-            
-            var currentMovement = this.Movement * ratio;
-            var currentBeakMovement = this.BeakMovement * ratio;
-
-            var position = this.InitialPosition + currentMovement;
-            var angle = this.InitialBeakAngle + currentBeakMovement;
-            
-            return new DirectionalPosition(position, angle);
-        }
-
-        #endregion
-
         #region Internal Properties
 
         internal Point2D InitialPosition
@@ -106,6 +89,23 @@ namespace SharpestBeak.Presentation
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public DirectionalPosition GetCurrentPosition()
+        {
+            var ratio = GetCurrentRatio();
+
+            var currentMovement = this.Movement * ratio;
+            var currentBeakMovement = this.BeakMovement * ratio;
+
+            var position = this.InitialPosition + currentMovement;
+            var angle = this.InitialBeakAngle + currentBeakMovement;
+
+            return new DirectionalPosition(position, angle);
         }
 
         #endregion

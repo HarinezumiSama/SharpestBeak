@@ -102,22 +102,6 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Public Methods
-
-        public override string ToString()
-        {
-            return string.Format(
-                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
-                this.GetType().Name,
-                this.UniqueId,
-                this.Position,
-                this.BeakAngle,
-                this.Team,
-                this.IsDead);
-        }
-
-        #endregion
-
         #region IDirectionalPosition Members
 
         Point2D IDirectionalPosition.Position
@@ -146,6 +130,22 @@ namespace SharpestBeak.Model
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(
+                "[{0} #{1}] Position = {2}, BeakAngle = {3:D}, Team = {4}, IsDead = {5}",
+                this.GetType().Name,
+                this.UniqueId,
+                this.Position,
+                this.BeakAngle,
+                this.Team,
+                this.IsDead);
         }
 
         #endregion

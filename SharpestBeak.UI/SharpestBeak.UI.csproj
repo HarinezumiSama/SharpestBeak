@@ -6,6 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}</ProjectGuid>
+    <ProjectTypeGuids>{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SharpestBeak.UI</RootNamespace>
@@ -13,7 +14,7 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60DC8134-EBA5-43B8-BCC9-BB4BC16C2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>SharpestBeak.UI.App</StartupObject>
@@ -132,10 +133,6 @@
       <Project>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</Project>
       <Name>SharpestBeak</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SharpestBeak.Logic.Default\SharpestBeak.Logic.Default.csproj">
-      <Project>{9C7AB624-3F86-4CAF-AD13-FEFD340E813D}</Project>
-      <Name>SharpestBeak.Logic.Default</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -155,6 +152,7 @@
     </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\_Lib_\StyleCop\v4.7\StyleCop.Targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

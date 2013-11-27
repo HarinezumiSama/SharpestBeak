@@ -93,6 +93,16 @@ namespace SharpestBeak.Model
 
         #endregion
 
+        #region Internal Properties
+
+        internal DateTime CreationTime
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
         #region Public Methods
 
         public override string ToString()
@@ -116,16 +126,6 @@ namespace SharpestBeak.Model
             }
 
             return _cachedElement;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal DateTime CreationTime
-        {
-            get;
-            private set;
         }
 
         #endregion

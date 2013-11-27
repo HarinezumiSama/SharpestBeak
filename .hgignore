@@ -13,3 +13,4 @@ glob:~$*.doc
 glob:*.DotSettings.user
 glob:SolutionItems/GlobalVersion.Generated.cs
 glob:SolutionItems/Revision.Generated.txt
+glob:StyleCop.Cache

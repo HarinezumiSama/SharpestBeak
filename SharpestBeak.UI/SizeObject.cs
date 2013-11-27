@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -26,9 +27,7 @@ namespace SharpestBeak.UI
         private static readonly DependencyPropertyKey AsStringKey =
             Helper.RegisterReadOnlyDependencyProperty((SizeObject control) => control.AsString);
 
-        [SuppressMessage("StyleCop.CSharp.OrderingRules", "SA1202:ElementsMustBeOrderedByAccess",
-            Justification = "Such field order is required in this case (AsStringProperty depends on AsStringKey).")]
-        public static readonly DependencyProperty AsStringProperty = AsStringKey.DependencyProperty;
+        private static readonly DependencyProperty AsStringPropertyField = AsStringKey.DependencyProperty;
 
         private static readonly string[] VisibleNames = { WidthProperty.Name, HeightProperty.Name };
 
@@ -44,6 +43,15 @@ namespace SharpestBeak.UI
         #endregion
 
         #region Public Properties
+
+        public static DependencyProperty AsStringProperty
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return AsStringPropertyField;
+            }
+        }
 
         [PropertyOrder(1)]
         public int Width
@@ -78,7 +86,7 @@ namespace SharpestBeak.UI
         {
             get
             {
-                return (string)GetValue(AsStringProperty);
+                return (string)GetValue(AsStringPropertyField);
             }
 
             private set

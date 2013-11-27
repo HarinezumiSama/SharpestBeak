@@ -11,25 +11,6 @@ namespace SharpestBeak.Presentation.Primitives
 {
     public class PolygonPrimitive : BasePrimitive
     {
-        #region Nested Types
-
-        #region ConvexSign Enumeration
-
-        [Flags]
-        private enum ConvexSign
-        {
-            None = 0,
-
-            Positive = 0x1,
-            Negative = 0x2,
-
-            Both = Positive | Negative
-        }
-
-        #endregion
-
-        #endregion
-
         #region Constants and Fields
 
         public const int MinVertexCount = 3;
@@ -68,6 +49,21 @@ namespace SharpestBeak.Presentation.Primitives
             : this((IEnumerable<Point2D>)vertices)
         {
             // Nothing to do
+        }
+
+        #endregion
+
+        #region ConvexSign Enumeration
+
+        [Flags]
+        private enum ConvexSign
+        {
+            None = 0,
+
+            Positive = 0x1,
+            Negative = 0x2,
+
+            Both = Positive | Negative
         }
 
         #endregion

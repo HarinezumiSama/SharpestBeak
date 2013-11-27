@@ -65,6 +65,16 @@ namespace SharpestBeak.Model
 
         #endregion
 
+        #region Internal Properties
+
+        internal int Value
+        {
+            [DebuggerStepThrough]
+            get { return _value; }
+        }
+
+        #endregion
+
         #region Public Methods
 
         public override bool Equals(object obj)
@@ -89,16 +99,6 @@ namespace SharpestBeak.Model
         public bool Equals(GameObjectId other)
         {
             return _value == other._value;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal int Value
-        {
-            [DebuggerStepThrough]
-            get { return _value; }
         }
 
         #endregion

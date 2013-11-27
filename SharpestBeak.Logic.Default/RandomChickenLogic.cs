@@ -61,6 +61,7 @@ namespace SharpestBeak.Logic.Default
                     {
                         _unitIdToTargetPointMap.Remove(unitState.UniqueId);
                     }
+
                     continue;
                 }
 
@@ -101,6 +102,7 @@ namespace SharpestBeak.Logic.Default
             {
                 _unitIdToTargetPointMap[unitState.UniqueId] = result;
             }
+
             return result;
         }
 

@@ -191,6 +191,40 @@ namespace SharpestBeak
 
         #endregion
 
+        #region Internal Properties
+
+        internal ReadOnlyCollection<ChickenUnit> AllChickens
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _allChickens;
+            }
+        }
+
+        internal ReadOnlyCollection<ChickenUnit> AliveChickens
+        {
+            get;
+            private set;
+        }
+
+        internal ReadOnlyCollection<ShotUnit> ShotUnits
+        {
+            get;
+            private set;
+        }
+
+        internal ReadOnlyCollection<ChickenUnitLogic> Logics
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                return _logics;
+            }
+        }
+
+        #endregion
+
         #region Public Methods
 
         public void Start()
@@ -286,40 +320,6 @@ namespace SharpestBeak
             }
 
             _syncLock.DisposeSafely();
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal ReadOnlyCollection<ChickenUnit> AllChickens
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _allChickens;
-            }
-        }
-
-        internal ReadOnlyCollection<ChickenUnit> AliveChickens
-        {
-            get;
-            private set;
-        }
-
-        internal ReadOnlyCollection<ShotUnit> ShotUnits
-        {
-            get;
-            private set;
-        }
-
-        internal ReadOnlyCollection<ChickenUnitLogic> Logics
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _logics;
-            }
         }
 
         #endregion

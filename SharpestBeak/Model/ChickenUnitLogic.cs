@@ -48,39 +48,6 @@ namespace SharpestBeak.Model
 
         #endregion
 
-        #region Public Methods
-
-        public static string GetCaption(Type logicType)
-        {
-            #region Argument Check
-
-            if (logicType == null)
-            {
-                throw new ArgumentNullException("logicType");
-            }
-
-            if (!typeof(ChickenUnitLogic).IsAssignableFrom(logicType))
-            {
-                throw new ArgumentException("The specified type is not inherited properly.", "logicType");
-            }
-
-            #endregion
-
-            var descriptionAttribute = logicType.GetSoleAttribute<DescriptionAttribute>(false);
-            return descriptionAttribute == null ? logicType.Name : descriptionAttribute.Description;
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            this.MakeMoveEvent.DisposeSafely();
-        }
-
-        #endregion
-
         #region Internal Properties
 
         internal GameEngine Engine
@@ -144,6 +111,39 @@ namespace SharpestBeak.Model
         {
             get;
             private set;
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public static string GetCaption(Type logicType)
+        {
+            #region Argument Check
+
+            if (logicType == null)
+            {
+                throw new ArgumentNullException("logicType");
+            }
+
+            if (!typeof(ChickenUnitLogic).IsAssignableFrom(logicType))
+            {
+                throw new ArgumentException("The specified type is not inherited properly.", "logicType");
+            }
+
+            #endregion
+
+            var descriptionAttribute = logicType.GetSoleAttribute<DescriptionAttribute>(false);
+            return descriptionAttribute == null ? logicType.Name : descriptionAttribute.Description;
+        }
+
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            this.MakeMoveEvent.DisposeSafely();
         }
 
         #endregion

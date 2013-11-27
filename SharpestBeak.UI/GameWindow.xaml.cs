@@ -19,151 +19,7 @@ namespace SharpestBeak.UI
     /// </summary>
     public partial class GameWindow
     {
-        #region Nested Types
-
-        #region GameObjectData Class
-
-        private abstract class GameObjectData
-        {
-            #region Constructors
-
-            protected GameObjectData(
-                GameObjectId id,
-                Point3D position,
-                MatrixTransform3D transform)
-            {
-                #region Argument Check
-
-                if (transform == null)
-                {
-                    throw new ArgumentNullException("transform");
-                }
-
-                #endregion
-
-                this.Id = id;
-                this.Position = position;
-                this.Transform = transform;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public GameObjectId Id
-            {
-                get;
-                private set;
-            }
-
-            public Point3D Position
-            {
-                get;
-                set;
-            }
-
-            public MatrixTransform3D Transform
-            {
-                get;
-                private set;
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region ChickenData Class
-
-        private sealed class ChickenData : GameObjectData
-        {
-            #region Constructors
-
-            public ChickenData(
-                GameObjectId id,
-                Point3D position,
-                double beakAngle,
-                ModelVisual3D visual,
-                MatrixTransform3D transform)
-                : base(id, position, transform)
-            {
-                #region Argument Check
-
-                if (visual == null)
-                {
-                    throw new ArgumentNullException("visual");
-                }
-
-                #endregion
-
-                this.BeakAngle = beakAngle;
-                this.Visual = visual;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public double BeakAngle
-            {
-                get;
-                set;
-            }
-
-            public ModelVisual3D Visual
-            {
-                get;
-                private set;
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #region ShotData Class
-
-        private sealed class ShotData : GameObjectData
-        {
-            #region Constructors
-
-            public ShotData(
-                GameObjectId id,
-                Point3D position,
-                GeometryModel3D model,
-                MatrixTransform3D transform)
-                : base(id, position, transform)
-            {
-                #region Argument Check
-
-                if (model == null)
-                {
-                    throw new ArgumentNullException("model");
-                }
-
-                #endregion
-
-                this.Model = model;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public GeometryModel3D Model
-            {
-                get;
-                private set;
-            }
-
-            #endregion
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Fields
+        #region Constants and Fields
 
         private static readonly DiffuseMaterial LightTeamUnitMaterial =
             new DiffuseMaterial(new SolidColorBrush(Colors.LightGreen));
@@ -205,24 +61,6 @@ namespace SharpestBeak.UI
         #region Constructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="GameWindow"/> class.
-        /// </summary>
-        private GameWindow()
-        {
-            InitializeComponent();
-
-            _uiCellSize = 1d;
-            _nominalSizeCoefficient = GameConstants.NominalCellSize;
-
-            _chickenGeometry = CreateChickenGeometry(_nominalSizeCoefficient);
-            _shotGeometry = CreateShotGeometry(_nominalSizeCoefficient);
-
-            SaveCameraDefaults();
-
-            this.CopyrightTextVisual.Text = App.Current.FullProductDescription;
-        }
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="GameWindow"/> class
         ///     using the specified parameters.
         /// </summary>
@@ -242,6 +80,82 @@ namespace SharpestBeak.UI
                 lightTeam.Type.Name,
                 darkTeam.UnitCount,
                 darkTeam.Type.Name);
+        }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="GameWindow"/> class.
+        /// </summary>
+        private GameWindow()
+        {
+            InitializeComponent();
+
+            _uiCellSize = 1d;
+            _nominalSizeCoefficient = GameConstants.NominalCellSize;
+
+            _chickenGeometry = CreateChickenGeometry(_nominalSizeCoefficient);
+            _shotGeometry = CreateShotGeometry(_nominalSizeCoefficient);
+
+            SaveCameraDefaults();
+
+            this.CopyrightTextVisual.Text = App.Current.FullProductDescription;
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            StopGame();
+            base.OnClosing(e);
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+                    {
+                        e.Handled = true;
+                        Close();
+                    }
+                    else if (Keyboard.Modifiers == ModifierKeys.None)
+                    {
+                        e.Handled = true;
+                        StopGame();
+                    }
+
+                    break;
+
+                case Key.Space:
+                case Key.F5:
+                    {
+                        e.Handled = true;
+                        if (_gameEngine.IsRunning)
+                        {
+                            StopGame();
+                        }
+                        else
+                        {
+                            StartGame();
+                        }
+                    }
+
+                    break;
+
+                case Key.F8:
+                    e.Handled = true;
+                    ResetGame();
+                    break;
+
+                case Key.C:
+                    e.Handled = true;
+                    RestoreCameraDefaults();
+                    break;
+            }
+
+            base.OnKeyDown(e);
         }
 
         #endregion
@@ -307,7 +221,7 @@ namespace SharpestBeak.UI
         {
             const double BoardThickness = 1d / 4d;
 
-            //// TODO: [3D] Draw target points for random chickens
+            //// TODO: [3D] Draw target points for random chickens - ?
 
             try
             {
@@ -671,65 +585,7 @@ namespace SharpestBeak.UI
 
         #endregion
 
-        #region Protected Methods
-
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
-        {
-            StopGame();
-            base.OnClosing(e);
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case Key.Escape:
-                    if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
-                    {
-                        e.Handled = true;
-                        Close();
-                    }
-                    else if (Keyboard.Modifiers == ModifierKeys.None)
-                    {
-                        e.Handled = true;
-                        StopGame();
-                    }
-
-                    break;
-
-                case Key.Space:
-                case Key.F5:
-                    {
-                        e.Handled = true;
-                        if (_gameEngine.IsRunning)
-                        {
-                            StopGame();
-                        }
-                        else
-                        {
-                            StartGame();
-                        }
-                    }
-
-                    break;
-
-                case Key.F8:
-                    e.Handled = true;
-                    ResetGame();
-                    break;
-
-                case Key.C:
-                    e.Handled = true;
-                    RestoreCameraDefaults();
-                    break;
-            }
-
-            base.OnKeyDown(e);
-        }
-
-        #endregion
-
-        #region Event Handlers
+        #region Private Methods: Event Handlers
 
         private void CompositionTarget_Rendering(object sender, EventArgs e)
         {
@@ -811,6 +667,146 @@ namespace SharpestBeak.UI
 
             e.Handled = true;
             StartFollowingChicken(data.Id);
+        }
+
+        #endregion
+
+        #region GameObjectData Class
+
+        private abstract class GameObjectData
+        {
+            #region Constructors
+
+            protected GameObjectData(
+                GameObjectId id,
+                Point3D position,
+                MatrixTransform3D transform)
+            {
+                #region Argument Check
+
+                if (transform == null)
+                {
+                    throw new ArgumentNullException("transform");
+                }
+
+                #endregion
+
+                this.Id = id;
+                this.Position = position;
+                this.Transform = transform;
+            }
+
+            #endregion
+
+            #region Public Properties
+
+            public GameObjectId Id
+            {
+                get;
+                private set;
+            }
+
+            public Point3D Position
+            {
+                get;
+                set;
+            }
+
+            public MatrixTransform3D Transform
+            {
+                get;
+                private set;
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region ChickenData Class
+
+        private sealed class ChickenData : GameObjectData
+        {
+            #region Constructors
+
+            public ChickenData(
+                GameObjectId id,
+                Point3D position,
+                double beakAngle,
+                ModelVisual3D visual,
+                MatrixTransform3D transform)
+                : base(id, position, transform)
+            {
+                #region Argument Check
+
+                if (visual == null)
+                {
+                    throw new ArgumentNullException("visual");
+                }
+
+                #endregion
+
+                this.BeakAngle = beakAngle;
+                this.Visual = visual;
+            }
+
+            #endregion
+
+            #region Public Properties
+
+            public double BeakAngle
+            {
+                get;
+                set;
+            }
+
+            public ModelVisual3D Visual
+            {
+                get;
+                private set;
+            }
+
+            #endregion
+        }
+
+        #endregion
+
+        #region ShotData Class
+
+        private sealed class ShotData : GameObjectData
+        {
+            #region Constructors
+
+            public ShotData(
+                GameObjectId id,
+                Point3D position,
+                GeometryModel3D model,
+                MatrixTransform3D transform)
+                : base(id, position, transform)
+            {
+                #region Argument Check
+
+                if (model == null)
+                {
+                    throw new ArgumentNullException("model");
+                }
+
+                #endregion
+
+                this.Model = model;
+            }
+
+            #endregion
+
+            #region Public Properties
+
+            public GeometryModel3D Model
+            {
+                get;
+                private set;
+            }
+
+            #endregion
         }
 
         #endregion
