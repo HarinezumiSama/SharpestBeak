@@ -46,8 +46,6 @@ namespace SharpestBeak
 
         #endregion
 
-        #region Nested Types
-
         #region ChickenUnit Class
 
         public static class ChickenUnit
@@ -121,8 +119,6 @@ namespace SharpestBeak
 
             #endregion
         }
-
-        #endregion
 
         #endregion
     }

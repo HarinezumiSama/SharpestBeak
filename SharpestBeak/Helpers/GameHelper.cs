@@ -90,8 +90,7 @@ namespace SharpestBeak
                 return GameAngle.Zero;
             }
 
-            var degreeAngle = GameConstants.StepTimeDelta * GameConstants.ChickenUnit.DefaultAngularSpeed
-                * beakTurn.Value;
+            var degreeAngle = GameConstants.ChickenUnit.DefaultAngularStep * beakTurn.Value;
             return GameAngle.FromDegrees(degreeAngle);
         }
 
