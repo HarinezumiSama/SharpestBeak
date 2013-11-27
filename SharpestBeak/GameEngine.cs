@@ -709,7 +709,7 @@ namespace SharpestBeak
                 var movement = GameHelper.GetMovement(
                     shotUnit.Angle,
                     MoveDirection.MoveForward,
-                    GameConstants.ShotUnit.DefaultRectilinearStepDistance);
+                    GameConstants.ShotUnit.DefaultRectilinearSpeed);
 
                 shotUnit.SetMovement(movement);
                 DebugHelper.WriteLine("Shot {{{0}}} has moved.", shotUnit);
@@ -901,7 +901,7 @@ namespace SharpestBeak
                     unit.Position,
                     unit.BeakAngle,
                     moveInfo.MoveDirection,
-                    GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                    GameConstants.ChickenUnit.DefaultRectilinearSpeed);
 
                 var beakMovementAndNewAngle = GameHelper.GetBeakMovementAndNewAngle(unit.BeakAngle, moveInfo.BeakTurn);
 

@@ -14,22 +14,14 @@ namespace SharpestBeak
 
         public static readonly ValueRange<int> NominalCellCountRange = new ValueRange<int>(5, 128);
 
-        public static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(LogicPollFrequencyMsec);
-
-        public static readonly float StepTimeDelta = (float)LogicPollFrequency.TotalSeconds;
-
-        public static readonly float FullRevolutionAngle = MathHelper.RevolutionDegrees;
-
         public static readonly ValueRange<int> TeamPlayerUnitCountRange = new ValueRange<int>(1, int.MaxValue);
 
-        public static readonly ValueRange<float> NormalizedScalarSpeedRange = new ValueRange<float>(0f, 1f);
+        internal static readonly TimeSpan LogicPollFrequency = TimeSpan.FromMilliseconds(20d * GetSlowDownRatio());
 
-        internal static readonly float SlowDownRatio = GetSlowDownRatio();
+        internal static readonly ValueRange<float> NormalizedScalarSpeedRange = new ValueRange<float>(0f, 1f);
 
         private const float MinSlowDownRatio = 1f / 16f;
         private const float MaxSlowDownRatio = 16f;
-
-        private const double LogicPollFrequencyMsec = 20d;
 
         #endregion
 
@@ -69,26 +61,18 @@ namespace SharpestBeak
             /// <summary>
             ///     Standard rectilinear speed of a chicken unit, in units per second.
             /// </summary>
-            public static readonly float DefaultRectilinearSpeed =
-                NominalCellSize * InternalSpeedCoefficient / SlowDownRatio;
+            public static readonly float DefaultRectilinearSpeed = NominalCellSize / 50f;
 
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
-            public static readonly float DefaultAngularSpeed =
-                MathHelper.RevolutionDegrees * InternalSpeedCoefficient / 4f / SlowDownRatio;
+            public static readonly float DefaultAngularSpeed = MathHelper.RevolutionDegrees / 200f;
 
             /// <summary>
             ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
             ///     (the whole view angle is double this value).
             /// </summary>
             public static readonly float ViewAngle = MathHelper.RevolutionDegrees / 6f;
-
-            public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
-
-            public static readonly float DefaultAngularStep = DefaultAngularSpeed * StepTimeDelta;
-
-            private const float InternalSpeedCoefficient = 1f;
 
             #endregion
         }
@@ -101,8 +85,6 @@ namespace SharpestBeak
         {
             #region Constants and Fields
 
-            public static readonly double MaximumFrequencyMsec = 1000d * SlowDownRatio;
-
             public static readonly float Radius = NominalCellSize / 10f;
 
             /// <summary>
@@ -111,11 +93,7 @@ namespace SharpestBeak
             public static readonly float DefaultRectilinearSpeed =
                 ChickenUnit.DefaultRectilinearSpeed * ShotToChickenRectilinearSpeedRatio;
 
-            public static readonly int EngineStepsBetweenShots = Math.Max(
-                1,
-                (int)(MaximumFrequencyMsec / LogicPollFrequencyMsec));
-
-            public static readonly float DefaultRectilinearStepDistance = DefaultRectilinearSpeed * StepTimeDelta;
+            public static readonly int EngineStepsBetweenShots = 50;
 
             #endregion
         }

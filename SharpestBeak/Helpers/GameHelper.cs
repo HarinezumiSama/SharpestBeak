@@ -90,7 +90,7 @@ namespace SharpestBeak
                 return GameAngle.Zero;
             }
 
-            var degreeAngle = GameConstants.ChickenUnit.DefaultAngularStep * beakTurn.Value;
+            var degreeAngle = GameConstants.ChickenUnit.DefaultAngularSpeed * beakTurn.Value;
             return GameAngle.FromDegrees(degreeAngle);
         }
 
@@ -257,7 +257,7 @@ namespace SharpestBeak
         public static float GetBeakTurn(GameAngle currentAngle, GameAngle targetAngle)
         {
             var difference = (targetAngle - currentAngle).DegreeValue;
-            return difference / GameConstants.ChickenUnit.DefaultAngularStep;
+            return difference / GameConstants.ChickenUnit.DefaultAngularSpeed;
         }
 
         public static BeakTurn NormalizeBeakTurn(this float absoluteBeakTurn)
@@ -288,7 +288,7 @@ namespace SharpestBeak
                     position,
                     beakAngle,
                     item,
-                    GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                    GameConstants.ChickenUnit.DefaultRectilinearSpeed);
                 var distanceSquared = targetPoint.GetDistanceSquared(potentialMovePoint);
                 if (distanceSquared < resultProxy.Item2)
                 {

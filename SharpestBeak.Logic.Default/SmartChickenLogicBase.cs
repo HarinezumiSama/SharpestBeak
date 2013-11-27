@@ -237,7 +237,7 @@ namespace SharpestBeak.Logic.Default
                        unitState.Position,
                        unitState.BeakAngle,
                        moveDirection,
-                       GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                       GameConstants.ChickenUnit.DefaultRectilinearSpeed);
                     var shotToUnitVector = potentialPosition - dangerousShot.Position;
                     var shotToUnitVectorLengthSquared = shotToUnitVector.GetLengthSquared();
                     var angleCosine = shotVector.GetAngleCosine(shotToUnitVector);
@@ -310,7 +310,7 @@ namespace SharpestBeak.Logic.Default
                 ?? GameHelper.GetNewPosition(
                     enemyUnit.Position,
                     enemyUnit.BeakAngle,
-                    GameConstants.ChickenUnit.DefaultRectilinearStepDistance);
+                    GameConstants.ChickenUnit.DefaultRectilinearSpeed);
             return result;
         }
 
