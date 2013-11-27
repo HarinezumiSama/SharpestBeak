@@ -71,11 +71,6 @@ namespace SharpestBeak
             return Math.Abs(value) < tolerance;
         }
 
-        public static bool IsNotZero(this float value, float tolerance = ZeroTolerance)
-        {
-            return !IsZero(value, tolerance);
-        }
-
         public static bool IsPositive(this float value, float tolerance = ZeroTolerance)
         {
             #region Argument Check

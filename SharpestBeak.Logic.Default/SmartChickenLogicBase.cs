@@ -282,7 +282,7 @@ namespace SharpestBeak.Logic.Default
             var cosAlpha = enemyUnitVector.GetAngleCosine(enemyToMeVector);
             var distanceToEnemySqr = enemyToMeVector.GetLengthSquared();
             var distanceToEnemy = distanceToEnemySqr.Sqrt();
-            if ((cosAlpha.Abs() - 1f).IsNotZero())
+            if (!(cosAlpha.Abs() - 1f).IsZero())
             {
                 var equation = new QuadraticEquation(
                     GameConstants.ShotToChickenRectilinearSpeedRatio.Sqr() - 1f,
