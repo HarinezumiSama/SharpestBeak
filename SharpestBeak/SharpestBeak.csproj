@@ -51,6 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\SolutionItems\AssemblyInfo.Common.cs">
+      <Link>Properties\AssemblyInfo.Common.cs</Link>
+    </Compile>
     <Compile Include="..\SolutionItems\GlobalVersion.Generated.cs">
       <Link>Properties\GlobalVersion.Generated.cs</Link>
     </Compile>
