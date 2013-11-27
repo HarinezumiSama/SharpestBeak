@@ -102,13 +102,13 @@ namespace SharpestBeak
             return result;
         }
 
-        public static Tuple<GameAngle, GameAngle> GetBeakMovementAndNewAngle(
+        public static AngleMovementAndPosition GetBeakMovementAndNewAngle(
             GameAngle oldBeakAngle,
             BeakTurn beakTurn)
         {
             var beakMovement = GetBeakMovement(beakTurn);
             var newAngle = oldBeakAngle + beakMovement;
-            return Tuple.Create(beakMovement, newAngle);
+            return new AngleMovementAndPosition(beakMovement, newAngle);
         }
 
         public static Vector2D GetMovement(GameAngle angle, float speed)
@@ -150,7 +150,7 @@ namespace SharpestBeak
             return result;
         }
 
-        public static Tuple<Vector2D, Point2D> GetMovementAndNewPosition(
+        public static MovementAndPosition GetMovementAndNewPosition(
             Point2D oldPosition,
             GameAngle currentAngle,
             MoveDirection direction,
@@ -159,7 +159,7 @@ namespace SharpestBeak
             var movement = GetMovement(currentAngle, direction, speed);
             var newPosition = GetNewPositionInternal(oldPosition, movement);
 
-            return Tuple.Create(movement, newPosition);
+            return new MovementAndPosition(movement, newPosition);
         }
 
         public static Point2D GetNewPosition(Point2D oldPosition, GameAngle angle, float speed)

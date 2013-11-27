@@ -547,6 +547,7 @@ namespace SharpestBeak
                 Name = GetType().FullName,
                 IsBackground = true
             };
+
             _logics.DoForEach(
                 item =>
                 {
@@ -906,8 +907,8 @@ namespace SharpestBeak
                 var beakMovementAndNewAngle = GameHelper.GetBeakMovementAndNewAngle(unit.BeakAngle, moveInfo.BeakTurn);
 
                 var newPositionElement = new ChickenElement(
-                    movementAndNewPosition.Item2,
-                    beakMovementAndNewAngle.Item2);
+                    movementAndNewPosition.Position,
+                    beakMovementAndNewAngle.Position);
                 if (HasOutOfBoardCollision(newPositionElement))
                 {
                     _moveInfoStates[unit] = MoveInfoStates.RejectedBoardCollision;
@@ -943,7 +944,7 @@ namespace SharpestBeak
                     continue;
                 }
 
-                unit.SetMovement(movementAndNewPosition.Item1, beakMovementAndNewAngle.Item1);
+                unit.SetMovement(movementAndNewPosition.Movement, beakMovementAndNewAngle.Movement);
 
                 DebugHelper.WriteLine("Chicken {{{0}}} has moved.", unit);
             }
