@@ -27,7 +27,7 @@ namespace SharpestBeak
     {
         #region Constants and Fields
 
-        public const int InstrumentationMoveCountLimit = 500;
+        internal static readonly int InstrumentationMoveCountLimit = 500;
 
         private static readonly ThreadSafeRandom RandomGenerator = new ThreadSafeRandom();
         private static readonly TimeSpan StopTimeout = GameConstants.LogicPollFrequency.Multiply(5);
@@ -36,12 +36,13 @@ namespace SharpestBeak
             new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         private readonly ManualResetEvent _stopEvent = new ManualResetEvent(false);
+        private readonly ManualResetEventSlim _makeMoveEvent = new ManualResetEventSlim(false);
         private readonly ReadOnlyCollection<ChickenUnit> _allChickens;
         private readonly List<ChickenUnit> _aliveChickensDirect;
         private readonly List<ShotUnit> _shotUnitsDirect;
-        private readonly ReadOnlyCollection<ChickenUnitLogic> _logics;
-        private readonly ChickenUnitLogic _lightTeamLogic;
-        private readonly ChickenUnitLogic _darkTeamLogic;
+        private readonly ReadOnlyCollection<ChickenUnitLogicExecutor> _logicExecutors;
+        private readonly ChickenUnitLogicExecutor _lightTeamLogicExecutor;
+        private readonly ChickenUnitLogicExecutor _darkTeamLogicExecutor;
         private readonly Action<GamePaintEventArgs> _paintCallback;
         private readonly Action<GamePositionEventArgs> _positionCallback;
         private readonly ThreadSafeValue<long> _moveCount;
@@ -95,11 +96,11 @@ namespace SharpestBeak
             _lastGamePresentation = new ThreadSafeValue<GamePresentation>();
 
             // Post-initialized fields and properties
-            _lightTeamLogic = CreateLogic(this, settings.LightTeam, GameTeam.Light);
-            _darkTeamLogic = CreateLogic(this, settings.DarkTeam, GameTeam.Dark);
-            _logics = new[] { _lightTeamLogic, _darkTeamLogic }.ToArray().AsReadOnly();
+            _lightTeamLogicExecutor = CreateLogicExecutor(this, settings.LightTeam, GameTeam.Light);
+            _darkTeamLogicExecutor = CreateLogicExecutor(this, settings.DarkTeam, GameTeam.Dark);
+            _logicExecutors = new[] { _lightTeamLogicExecutor, _darkTeamLogicExecutor }.ToArray().AsReadOnly();
 
-            _allChickens = _logics.SelectMany(item => item.Units).ToArray().AsReadOnly();
+            _allChickens = _logicExecutors.SelectMany(item => item.Units).ToArray().AsReadOnly();
             _allChickens.DoForEach((item, index) => item.UniqueId = new GameObjectId(index + 1));
 
             _aliveChickensDirect = new List<ChickenUnit>();
@@ -150,16 +151,6 @@ namespace SharpestBeak
         {
             get;
             private set;
-        }
-
-        // TODO: [vmcl] Remove this property, or change to some GetExtraBlaBlaBla for logics
-        public ReadOnlyCollection<ChickenUnitLogic> Teams
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _logics;
-            }
         }
 
         public long MoveCount
@@ -214,12 +205,12 @@ namespace SharpestBeak
             private set;
         }
 
-        internal ReadOnlyCollection<ChickenUnitLogic> Logics
+        internal ReadOnlyCollection<ChickenUnitLogicExecutor> LogicExecutors
         {
             [DebuggerStepThrough]
             get
             {
-                return _logics;
+                return _logicExecutors;
             }
         }
 
@@ -237,15 +228,7 @@ namespace SharpestBeak
             EnsureNotDisposed();
 
             _syncLock.ExecuteInWriteLock(
-                () => _logics.DoForEach(
-                    item =>
-                    {
-                        if (item.Thread != null)
-                        {
-                            item.Thread.Abort();
-                            item.Thread = null;
-                        }
-                    }));
+                () => _logicExecutors.DoForEach(item => item.Stop()));
 
             _stopEvent.Set();
 
@@ -305,12 +288,16 @@ namespace SharpestBeak
                 return;
             }
 
+            Stop();
+
             _syncLock.EnterWriteLock();
             try
             {
                 _stopEvent.DisposeSafely();
-                _lightTeamLogic.DisposeSafely();
-                _darkTeamLogic.DisposeSafely();
+                _lightTeamLogicExecutor.DisposeSafely();
+                _darkTeamLogicExecutor.DisposeSafely();
+
+                _makeMoveEvent.DisposeSafely();
 
                 _disposed = true;
             }
@@ -326,7 +313,7 @@ namespace SharpestBeak
 
         #region Private Methods
 
-        private static ChickenUnitLogic CreateLogic(
+        private static ChickenUnitLogicExecutor CreateLogicExecutor(
             GameEngine engine,
             ChickenTeamSettings teamSettings,
             GameTeam team)
@@ -345,16 +332,14 @@ namespace SharpestBeak
 
             #endregion
 
-            var result = (ChickenUnitLogic)Activator.CreateInstance(teamSettings.Type).EnsureNotNull();
-            try
-            {
-                result.InitializeInstance(engine, teamSettings.UnitCount, team);
-            }
-            catch (Exception)
-            {
-                result.DisposeSafely();
-                throw;
-            }
+            var logic = (ChickenUnitLogic)Activator.CreateInstance(teamSettings.Type).EnsureNotNull();
+
+            var result = new ChickenUnitLogicExecutor(
+                engine,
+                teamSettings.UnitCount,
+                team,
+                engine._makeMoveEvent,
+                logic);
 
             return result;
         }
@@ -548,21 +533,11 @@ namespace SharpestBeak
                 IsBackground = true
             };
 
-            _logics.DoForEach(
-                item =>
-                {
-                    item.Thread = new Thread(this.DoExecuteLogic)
-                    {
-                        IsBackground = true,
-                        Name = string.Format("Logic '{0}'", item.GetType().FullName)
-                    };
-                });
-
             _stopEvent.Reset();
             CallPaintCallback();
             _engineThread.Start();
 
-            _logics.DoForEach(item => item.Thread.Start(item));
+            _logicExecutors.DoForEach(item => item.Start());
         }
 
         private void ResetInternal()
@@ -583,7 +558,7 @@ namespace SharpestBeak
             PositionChickens();
             UpdateUnitStates(true);
 
-            _logics.DoForEach(item => item.Reset());
+            _logicExecutors.DoForEach(item => item.Reset());
 
             UpdateLastGamePresentation();
         }
@@ -618,8 +593,7 @@ namespace SharpestBeak
                     return;
                 }
 
-                _lightTeamLogic.MakeMoveEvent.Set();
-                _darkTeamLogic.MakeMoveEvent.Set();
+                _makeMoveEvent.Set();
                 sw.Restart();
                 while (sw.Elapsed < GameConstants.LogicPollFrequency)
                 {
@@ -631,8 +605,7 @@ namespace SharpestBeak
                     Thread.Sleep(0);
                 }
 
-                _lightTeamLogic.MakeMoveEvent.Reset();
-                _darkTeamLogic.MakeMoveEvent.Reset();
+                _makeMoveEvent.Reset();
 
                 using (SettingsCache.Instance.EnableDebugOutput
                     ? new AutoStopwatch(DebugHelper.WriteLine)
@@ -675,14 +648,14 @@ namespace SharpestBeak
         private void ProcessEngineStep()
         {
             var aliveChickens = this.AliveChickens
-                .Where(item => !item.IsDead && item.Logic.Error == null)
+                .Where(item => !item.IsDead && item.LogicExecutor.Error == null)
                 .ToList();
 
             _moveInfos.Clear();
             _previousMoves.Clear();
-            for (var logicIndex = 0; logicIndex < _logics.Count; logicIndex++)
+            for (var logicIndex = 0; logicIndex < _logicExecutors.Count; logicIndex++)
             {
-                var logic = _logics[logicIndex];
+                var logic = _logicExecutors[logicIndex];
 
                 lock (logic.UnitsMovesLock)
                 {
@@ -810,11 +783,11 @@ namespace SharpestBeak
             switch (winningTeam)
             {
                 case GameTeam.Light:
-                    winningLogic = _lightTeamLogic;
+                    winningLogic = _lightTeamLogicExecutor.Logic;
                     break;
 
                 case GameTeam.Dark:
-                    winningLogic = _darkTeamLogic;
+                    winningLogic = _darkTeamLogicExecutor.Logic;
                     break;
 
                 default:
@@ -954,9 +927,9 @@ namespace SharpestBeak
 
         private bool UpdateUnitStates(bool force)
         {
-            for (var logicIndex = 0; logicIndex < _logics.Count; logicIndex++)
+            for (var logicIndex = 0; logicIndex < _logicExecutors.Count; logicIndex++)
             {
-                var logic = _logics[logicIndex];
+                var logic = _logicExecutors[logicIndex];
 
                 lock (logic.UnitsStatesLock)
                 {
@@ -987,80 +960,6 @@ namespace SharpestBeak
         {
             var lastGamePresentation = new GamePresentation(this);
             _lastGamePresentation.Value = lastGamePresentation;
-        }
-
-        private void DoExecuteLogic(object logicInstance)
-        {
-            var logic = logicInstance as ChickenUnitLogic;
-            if (logic == null)
-            {
-                throw new GameException("Invalid logic passed to the thread method.");
-            }
-
-            while (!IsStopping())
-            {
-                if (SettingsCache.Instance.InstrumentationMode && _moveCount.Value >= InstrumentationMoveCountLimit)
-                {
-                    return;
-                }
-
-                if (_disposed)
-                {
-                    return;
-                }
-
-                try
-                {
-                    while (!logic.MakeMoveEvent.WaitOne(0))
-                    {
-                        if (IsStopping())
-                        {
-                            return;
-                        }
-
-                        Thread.Yield();
-                    }
-
-                    var moveResult = logic.MakeMove();
-
-                    lock (logic.UnitsMovesLock)
-                    {
-                        logic.UnitsMoves.Clear();
-                        foreach (var movePair in moveResult.InnerMap)
-                        {
-                            DebugHelper.WriteLine(
-                                "Logic '{0}', for chicken {{{1}}}, is making move {{{2}}}.",
-                                logic.GetType().Name,
-                                movePair.Key,
-                                movePair.Value == null ? "NONE" : movePair.Value.ToString());
-
-                            logic.UnitsMoves.Add(movePair.Key, movePair.Value);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.IsThreadAbort())
-                    {
-                        throw;
-                    }
-
-                    logic.Error = ex;
-                    logic.Units.DoForEach(
-                        item =>
-                        {
-                            item.IsDead = true;
-                            DebugHelper.WriteLine(
-                                "Chicken #{0} is now dead since logic '{1}' caused an error:{2}{3}",
-                                item.UniqueId,
-                                logic.GetType().FullName,
-                                Environment.NewLine,
-                                ex.ToString());
-                        });
-
-                    return;
-                }
-            }
         }
 
         private void OnGameEnded(GameEndedEventArgs e)

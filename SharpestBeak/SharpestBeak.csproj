@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\AngleMovementAndPosition.cs" />
+    <Compile Include="Model\ChickenUnitLogicExecutor.cs" />
     <Compile Include="Model\MovementAndPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="..\SolutionItems\AssemblyInfo.Common.cs">

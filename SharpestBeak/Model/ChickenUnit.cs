@@ -21,20 +21,20 @@ namespace SharpestBeak.Model
         /// <summary>
         ///     Initializes a new instance of the <see cref="ChickenUnit"/> class.
         /// </summary>
-        internal ChickenUnit(ChickenUnitLogic logic)
+        internal ChickenUnit(ChickenUnitLogicExecutor logicExecutor)
         {
             #region Argument Check
 
-            if (logic == null)
+            if (logicExecutor == null)
             {
-                throw new ArgumentNullException("logic");
+                throw new ArgumentNullException("logicExecutor");
             }
 
             #endregion
 
-            this.Logic = logic;
-            this.Engine = logic.Engine.EnsureNotNull();
-            this.Team = logic.Team;
+            this.LogicExecutor = logicExecutor;
+            this.Engine = logicExecutor.Engine.EnsureNotNull();
+            this.Team = logicExecutor.Team;
 
             Reset();
         }
@@ -42,6 +42,18 @@ namespace SharpestBeak.Model
         #endregion
 
         #region Public Properties
+
+        public ChickenUnitLogicExecutor LogicExecutor
+        {
+            get;
+            private set;
+        }
+
+        public GameEngine Engine
+        {
+            get;
+            private set;
+        }
 
         public GameObjectId UniqueId
         {
@@ -109,23 +121,7 @@ namespace SharpestBeak.Model
             internal set;
         }
 
-        #endregion
-
-        #region Internal Properties
-
-        internal ChickenUnitLogic Logic
-        {
-            get;
-            private set;
-        }
-
-        internal GameEngine Engine
-        {
-            get;
-            private set;
-        }
-
-        internal long ShotEngineStepIndex
+        public long ShotEngineStepIndex
         {
             get;
             set;

@@ -34,7 +34,7 @@ namespace SharpestBeak.Model
 
             var unitStatesProxy = new List<ChickenUnitState>(engine.AllChickens.Count);
             this.UnitStates = unitStatesProxy.AsReadOnly();
-            foreach (var logic in engine.Logics)
+            foreach (var logic in engine.LogicExecutors)
             {
                 lock (logic.UnitsStatesLock)
                 {

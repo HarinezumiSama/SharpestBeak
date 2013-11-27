@@ -35,7 +35,7 @@ namespace SharpestBeak.View
 
             #endregion
 
-            var engine = unit.Logic.Engine;
+            var engine = unit.LogicExecutor.Engine;
             var unitTeam = unit.Team;
 
             if (unit.IsDead)

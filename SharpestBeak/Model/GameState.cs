@@ -12,7 +12,7 @@ namespace SharpestBeak.Model
         /// <summary>
         ///     Initializes a new instance of the <see cref="GameState"/> class.
         /// </summary>
-        internal GameState(GameEngine engine, ICollection<ChickenUnitState> unitStates)
+        internal GameState(GameEngine engine, GameTeam team, ICollection<ChickenUnitState> unitStates)
         {
             #region Argument Check
 
@@ -34,6 +34,7 @@ namespace SharpestBeak.Model
             #endregion
 
             this.Data = engine.Data;
+            this.Team = team;
             this.UnitStates = unitStates.ToArray().AsReadOnly();
         }
 
@@ -42,6 +43,12 @@ namespace SharpestBeak.Model
         #region Public Properties
 
         public GameEngineData Data
+        {
+            get;
+            private set;
+        }
+
+        public GameTeam Team
         {
             get;
             private set;
