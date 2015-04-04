@@ -93,6 +93,8 @@ namespace SharpestBeak.Physics
             #endregion
 
             // If a point is on a polygon's line, it is considered to be in this polygon
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var edge = polygon.Edges[index];
@@ -168,6 +170,8 @@ namespace SharpestBeak.Physics
                             element));
                 }
 
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                // ReSharper disable once ForCanBeConvertedToForeach
                 for (var index = 0; index < roughPrimitives.Count; index++)
                 {
                     var roughPrimitive = roughPrimitives[index];
@@ -193,6 +197,8 @@ namespace SharpestBeak.Physics
                         element));
             }
 
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
@@ -322,6 +328,8 @@ namespace SharpestBeak.Physics
                 return true;
             }
 
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var edge = polygon.Edges[index];
@@ -381,6 +389,7 @@ namespace SharpestBeak.Physics
 
         private static bool HasSeparatingAxis(PolygonPrimitive polygon, PolygonPrimitive otherPolygon)
         {
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < polygon.Edges.Count; index++)
             {
                 var direction = polygon.Edges[index].Direction.GetNormal();

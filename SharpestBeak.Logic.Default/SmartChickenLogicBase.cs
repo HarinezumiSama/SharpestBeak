@@ -113,6 +113,7 @@ namespace SharpestBeak.Logic.Default
                 _blockedDirectionMap.Remove(unitState.UniqueId);
 
                 var possibleActions = new List<PossibleActionInfo>(unitState.View.Chickens.Count);
+                //// ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (var enemyUnit in enemyUnits)
                 {
                     var shotTargetPosition = GetShotTargetPosition(unitState, enemyUnit);
@@ -195,6 +196,7 @@ namespace SharpestBeak.Logic.Default
         {
             var safetyCircle = new CirclePrimitive(unitState.Position, _dangerousRadius);
             var dangerousShots = new List<ShotViewData>(unitState.View.Shots.Count);
+            //// ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var shot in allShots)
             {
                 if (unitState.Position.GetDistance(shot.Position) > _tooCloseShot)

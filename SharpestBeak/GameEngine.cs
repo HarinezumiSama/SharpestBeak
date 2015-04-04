@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Omnifactotum;
 using SharpestBeak.Configuration;
 using SharpestBeak.Diagnostics;
 using SharpestBeak.Model;
@@ -139,7 +140,8 @@ namespace SharpestBeak
         #region Events
 
         /// <summary>
-        ///     Occurs when the game has ended. <b>NOTE</b>: handlers of this event are called from engine thread!
+        ///     Occurs when the game has ended.
+        ///     NOTE: handlers of this event are called from engine thread!
         /// </summary>
         public event EventHandler<GameEndedEventArgs> GameEnded;
 
@@ -487,6 +489,8 @@ namespace SharpestBeak
             var primitives = element.GetPrimitives();
 
             // First, checking just base points
+            //// ReSharper disable once LoopCanBeConvertedToQuery
+            //// ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
@@ -497,9 +501,13 @@ namespace SharpestBeak
             }
 
             // Then checking intersection of element's primitives with board borders
+            //// ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < primitives.Count; index++)
             {
                 var primitive = primitives[index];
+
+                //// ReSharper disable once LoopCanBeConvertedToQuery
+                //// ReSharper disable once ForCanBeConvertedToForeach
                 for (var edgeIndex = 0; edgeIndex < this.Data.BoardBorder.Edges.Count; edgeIndex++)
                 {
                     var edge = this.Data.BoardBorder.Edges[edgeIndex];
@@ -725,6 +733,9 @@ namespace SharpestBeak
                 var shotElement = shotUnit.GetElement();
 
                 injuredChickens.Clear();
+
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                // ReSharper disable once ForCanBeConvertedToForeach
                 for (var chickenIndex = 0; chickenIndex < aliveChickens.Count; chickenIndex++)
                 {
                     var aliveChicken = aliveChickens[chickenIndex];
@@ -805,7 +816,7 @@ namespace SharpestBeak
                 DebugHelper.WriteLine(
                     "[{0}] Skipping any new shots since {1} is on.",
                     MethodBase.GetCurrentMethod().GetQualifiedName(),
-                    Helper.GetPropertyName((SettingsCache obj) => obj.DebugModeDisableShooting));
+                    Factotum.For<SettingsCache>.GetPropertyName(obj => obj.DebugModeDisableShooting));
                 return;
             }
 
@@ -892,6 +903,9 @@ namespace SharpestBeak
                 }
 
                 ChickenUnit conflictingChicken = null;
+
+                // ReSharper disable once LoopCanBeConvertedToQuery
+                // ReSharper disable once ForCanBeConvertedToForeach
                 for (var conflictingIndex = 0; conflictingIndex < aliveChickens.Count; conflictingIndex++)
                 {
                     var aliveChicken = aliveChickens[conflictingIndex];
@@ -927,6 +941,7 @@ namespace SharpestBeak
 
         private bool UpdateUnitStates(bool force)
         {
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (var logicIndex = 0; logicIndex < _logicExecutors.Count; logicIndex++)
             {
                 var logic = _logicExecutors[logicIndex];
@@ -935,6 +950,7 @@ namespace SharpestBeak
                 {
                     logic.UnitsStates.Clear();
 
+                    // ReSharper disable once ForCanBeConvertedToForeach
                     for (var unitIndex = 0; unitIndex < logic.Units.Count; unitIndex++)
                     {
                         if (!force && IsStopping())
@@ -945,6 +961,7 @@ namespace SharpestBeak
                         var unit = logic.Units[unitIndex];
 
                         var previousMove = _previousMoves.GetValueOrDefault(unit) ?? MoveInfo.Empty;
+
                         // ReSharper disable once RedundantArgumentDefaultValue
                         var previousMoveState = _moveInfoStates.GetValueOrDefault(unit, MoveInfoStates.Handled);
                         var unitState = new ChickenUnitState(unit, previousMove, previousMoveState);

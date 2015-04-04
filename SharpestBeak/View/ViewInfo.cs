@@ -46,6 +46,7 @@ namespace SharpestBeak.View
             else
             {
                 var chickens = new List<ChickenViewData>(unit.IsDead ? 0 : engine.AliveChickens.Count);
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (var aliveChicken in engine.AliveChickens)
                 {
                     if (!aliveChicken.IsDead
@@ -59,6 +60,7 @@ namespace SharpestBeak.View
                 this.Chickens = chickens.AsReadOnly();
 
                 var shots = new List<ShotViewData>(unit.IsDead ? 0 : engine.ShotUnits.Count);
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (var shotUnit in engine.ShotUnits)
                 {
                     if (unit.CanSee(shotUnit.Position))

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using Omnifactotum;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 
@@ -32,7 +33,7 @@ namespace SharpestBeak
             BasicActiveMoveDirectionsField.Concat(MoveDirection.None.AsCollection()).ToArray().AsReadOnly();
 
         private static readonly ReadOnlyCollection<FireMode> FireModesField =
-            Helper.GetEnumValues<FireMode>().AsReadOnly();
+            EnumFactotum.GetAllValues<FireMode>().AsReadOnly();
 
         #endregion
 

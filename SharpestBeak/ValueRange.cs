@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Linq;
+using Omnifactotum.Annotations;
 
 namespace SharpestBeak
 {
@@ -75,7 +75,7 @@ namespace SharpestBeak
         ///     The value to check.
         /// </param>
         /// <returns>
-        ///     <b>true</b> if the specified value belongs to this range; otherwise, <b>false</b>.
+        ///     <c>true</c> if the specified value belongs to this range; otherwise, <c>false</c>.
         /// </returns>
         [Pure]
         public bool Belongs(T value)

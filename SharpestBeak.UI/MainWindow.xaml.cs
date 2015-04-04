@@ -80,7 +80,7 @@ namespace SharpestBeak.UI
             }
             catch (Exception ex)
             {
-                if (ex.IsThreadAbort())
+                if (ex.IsFatal())
                 {
                     throw;
                 }

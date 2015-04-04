@@ -27,7 +27,7 @@ namespace SharpestBeak.Model
                 throw new ArgumentOutOfRangeException(
                     "value",
                     value,
-                    "The ID must be positive.");
+                    @"The value cannot be negative.");
             }
 
             #endregion
@@ -42,7 +42,10 @@ namespace SharpestBeak.Model
         public static GameObjectId None
         {
             [DebuggerStepThrough]
-            get { return NoneField; }
+            get
+            {
+                return NoneField;
+            }
         }
 
         public bool IsValid
@@ -59,7 +62,7 @@ namespace SharpestBeak.Model
             [DebuggerNonUserCode]
             get
             {
-                return Equals(NoneField);
+                return _value == NoneField._value;
             }
         }
 
@@ -70,7 +73,10 @@ namespace SharpestBeak.Model
         internal int Value
         {
             [DebuggerStepThrough]
-            get { return _value; }
+            get
+            {
+                return _value;
+            }
         }
 
         #endregion
@@ -79,7 +85,7 @@ namespace SharpestBeak.Model
 
         public override bool Equals(object obj)
         {
-            return obj is GameObjectId && this.Equals((GameObjectId)obj);
+            return obj is GameObjectId && Equals((GameObjectId)obj);
         }
 
         public override int GetHashCode()
@@ -89,7 +95,7 @@ namespace SharpestBeak.Model
 
         public override string ToString()
         {
-            return string.Format("{0}. Value = {1}", GetType().Name, _value);
+            return string.Format("[{0} #{1}]", GetType().Name, _value);
         }
 
         #endregion

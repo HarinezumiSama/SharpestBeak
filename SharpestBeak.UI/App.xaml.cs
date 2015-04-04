@@ -109,9 +109,9 @@ namespace SharpestBeak.UI
 
             //// Independent properties
 
-            this.ProductName = assembly.GetSoleAttributeStrict<AssemblyProductAttribute>().Product;
+            this.ProductName = assembly.GetSingleCustomAttribute<AssemblyProductAttribute>(false).Product;
             this.ProductVersion = assembly.GetName().Version;
-            this.ProductCopyright = assembly.GetSoleAttributeStrict<AssemblyCopyrightAttribute>().Copyright;
+            this.ProductCopyright = assembly.GetSingleCustomAttribute<AssemblyCopyrightAttribute>(false).Copyright;
 
             //// Dependent properties
 

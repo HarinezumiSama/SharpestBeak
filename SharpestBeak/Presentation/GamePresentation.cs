@@ -32,7 +32,7 @@ namespace SharpestBeak.Presentation
                 .ToList()
                 .AsReadOnly();
 
-            var chickenMap = this.Chickens.ToDictionary(item => item.UniqueId);
+            ////var chickenMap = this.Chickens.ToDictionary(item => item.UniqueId);
             this.Shots = engine
                 .ShotUnits
                 .Select(item => new ShotPresentation(this, item))

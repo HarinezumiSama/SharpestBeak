@@ -1,7 +1,7 @@
 @echo off
 cls
 
-set SB_MSBUILD=C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
+set SB_MSBUILD=%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe
 set SB_CFG=%~1
 set SB_PLATFORM=%~2
 set SB_PROJECT=%~dp0\SharpestBeak.sln
@@ -51,7 +51,7 @@ echo. >>"%SB_LOG%"
 goto END
 
 :DO_BUILD
-"%SB_MSBUILD%" "%SB_PROJECT%" /t:%1 /p:Configuration="%SB_CFG%" /p:Platform="%SB_PLATFORM%" /clp:verbosity=minimal /fl /flp:verbosity=normal;LogFile="%SB_LOG%";Append;Encoding=UTF-8
+"%SB_MSBUILD%" "%SB_PROJECT%" /t:%1 /p:Configuration="%SB_CFG%" /p:Platform="%SB_PLATFORM%" /nr:false /m /clp:verbosity=minimal /fl /flp:verbosity=normal;LogFile="%SB_LOG%";Append;Encoding=UTF-8
 if errorlevel 1 exit /b 1
 goto :EOF
 

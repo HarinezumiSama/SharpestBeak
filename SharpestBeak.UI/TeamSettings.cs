@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Omnifactotum;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
@@ -165,7 +166,7 @@ namespace SharpestBeak.UI
                 return;
             }
 
-            var propertyName = Helper.GetPropertyName(propertyExpression);
+            var propertyName = Factotum.GetPropertyName(propertyExpression);
             propertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 

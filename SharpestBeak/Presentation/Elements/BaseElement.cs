@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using SharpestBeak.Physics;
-using SharpestBeak.Presentation.Primitives;
 
 namespace SharpestBeak.Presentation.Elements
 {

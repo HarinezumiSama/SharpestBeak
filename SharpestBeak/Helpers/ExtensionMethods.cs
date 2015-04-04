@@ -2,95 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using SharpestBeak.Model;
 
-// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
-// ReSharper disable once CheckNamespace
+//// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
+//// ReSharper disable once CheckNamespace
 namespace SharpestBeak
 {
     public static class ExtensionMethods
     {
         #region Public Methods
-
-        public static T EnsureNotNull<T>(this T value)
-            where T : class
-        {
-            #region Argument Check
-
-            if (value == null)
-            {
-                throw new ArgumentNullException("value");
-            }
-
-            #endregion
-
-            return value;
-        }
-
-        public static void DisposeSafely<T>(this T disposable)
-            where T : class, IDisposable
-        {
-            if (disposable != null)
-            {
-                disposable.Dispose();
-            }
-        }
-
-        [DebuggerNonUserCode]
-        public static bool IsNullOrEmpty(this string value)
-        {
-            return string.IsNullOrEmpty(value);
-        }
-
-        [DebuggerNonUserCode]
-        public static bool IsNullOrWhiteSpace(this string value)
-        {
-            return string.IsNullOrWhiteSpace(value);
-        }
-
-        [DebuggerNonUserCode]
-        public static void DoForEach<T>(this IEnumerable<T> collection, Action<T, int> action)
-        {
-            #region Argument Check
-
-            if (collection == null)
-            {
-                throw new ArgumentNullException("collection");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            var index = 0;
-            foreach (var item in collection)
-            {
-                action(item, index);
-                index++;
-            }
-        }
-
-        [DebuggerNonUserCode]
-        public static void DoForEach<T>(this IEnumerable<T> collection, Action<T> action)
-        {
-            #region Argument Check
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            DoForEach(collection, (item, index) => action(item));
-        }
 
         public static void ChangeContents<T>(this IList<T> list, IEnumerable<T> newContents)
         {
@@ -121,31 +43,6 @@ namespace SharpestBeak
             {
                 castList.AddRange(newContents);
             }
-        }
-
-        public static TValue GetValueOrDefault<TKey, TValue>(
-            this IDictionary<TKey, TValue> dictionary,
-            TKey key,
-            TValue defaultValue = default(TValue))
-        {
-            #region Argument Check
-
-            if (dictionary == null)
-            {
-                throw new ArgumentNullException("dictionary");
-            }
-
-            #endregion
-
-            TValue result;
-            return dictionary.TryGetValue(key, out result) ? result : defaultValue;
-        }
-
-        public static bool IsThreadAbort(this Exception exception)
-        {
-            return exception is ThreadAbortException
-                || exception is ThreadInterruptedException
-                || exception is OperationCanceledException;
         }
 
         public static void ExecuteInReadLock(this ReaderWriterLockSlim @lock, Action action)
@@ -312,93 +209,9 @@ namespace SharpestBeak
             }
         }
 
-        public static string GetQualifiedName(this MethodBase method)
-        {
-            #region Argument Check
-
-            if (method == null)
-            {
-                throw new ArgumentNullException("method");
-            }
-
-            #endregion
-
-            return (method.DeclaringType ?? method.ReflectedType).Name + Type.Delimiter + method.Name;
-        }
-
         public static bool IsRejected(this MoveInfoStates value)
         {
             return (value & MoveInfoStates.RejectedMask) != 0;
-        }
-
-        /// <summary>
-        ///     Determines whether the specified enumeration value contains all the specified flags set.
-        /// </summary>
-        /// <typeparam name="TEnum">
-        ///     The system type of the enumeration.
-        /// </typeparam>
-        /// <param name="enumerationValue">
-        ///     The enumeration value to check the flags in.
-        /// </param>
-        /// <param name="flags">
-        ///     The combination of the bit flags to check.
-        /// </param>
-        /// <returns>
-        ///     <b>true</b> if all bits specified in <paramref name="flags"/> are set
-        ///     in <paramref name="enumerationValue"/>; otherwise, <b>false</b>.
-        /// </returns>
-        /// <exception cref="System.ArgumentException">
-        ///     <para>
-        ///         <typeparamref name="TEnum"/> is not an enumeration type.
-        ///     </para>
-        ///     <para>
-        ///         -or-
-        ///     </para>
-        ///     <para>
-        ///         The enumeration <typeparamref name="TEnum"/> is not a flag enumeration, that is,
-        ///         <typeparamref name="TEnum"/> type is not marked by <see cref="System.FlagsAttribute"/>.
-        ///     </para>
-        /// </exception>
-        [DebuggerNonUserCode]
-        public static bool IsAllSet<TEnum>(this TEnum enumerationValue, TEnum flags)
-            where TEnum : struct
-        {
-            return IsSetInternal(enumerationValue, flags, true);
-        }
-
-        /// <summary>
-        ///     Determines whether the specified enumeration value contains any of the specified flags set.
-        /// </summary>
-        /// <typeparam name="TEnum">
-        ///     The system type of the enumeration.
-        /// </typeparam>
-        /// <param name="enumerationValue">
-        ///     The enumeration value to check the flags in.
-        /// </param>
-        /// <param name="flags">
-        ///     The combination of the bit flags to check.
-        /// </param>
-        /// <returns>
-        ///     <b>true</b> if any of flags specified by the <paramref name="flags"/> parameter is set
-        ///     in <paramref name="enumerationValue"/>; otherwise, <b>false</b>.
-        /// </returns>
-        /// <exception cref="System.ArgumentException">
-        ///     <para>
-        ///         <typeparamref name="TEnum"/> is not an enumeration type.
-        ///     </para>
-        ///     <para>
-        ///         -or-
-        ///     </para>
-        ///     <para>
-        ///         The enumeration <typeparamref name="TEnum"/> is not a flag enumeration, that is,
-        ///         <typeparamref name="TEnum"/> type is not marked by <see cref="System.FlagsAttribute"/>.
-        ///     </para>
-        /// </exception>
-        [DebuggerNonUserCode]
-        public static bool IsAnySet<TEnum>(this TEnum enumerationValue, TEnum flags)
-            where TEnum : struct
-        {
-            return IsSetInternal(enumerationValue, flags, false);
         }
 
         public static SizeF Scale(this SizeF value, float coefficient)
@@ -411,50 +224,9 @@ namespace SharpestBeak
             return new PointF(value.X * coefficient, value.Y * coefficient);
         }
 
-        #endregion
-
-        #region Private Methods
-
-        [DebuggerNonUserCode]
-        private static bool IsSetInternal<TEnum>(this TEnum enumerationValue, TEnum flags, bool all)
-            where TEnum : struct
+        public static TimeSpan Multiply(this TimeSpan value, double ratio)
         {
-            #region Argument Check
-
-            var enumType = typeof(TEnum);
-            if (!enumType.IsEnum)
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "The type must be an enumeration ({0}).",
-                        enumType.FullName));
-            }
-
-            if (!enumType.IsDefined(typeof(FlagsAttribute), true))
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "The type must be a flag enumeration ({0}).",
-                        enumType.FullName));
-            }
-
-            #endregion
-
-            var underlyingType = Enum.GetUnderlyingType(enumType);
-            if (underlyingType == typeof(ulong))
-            {
-                var castFlags = Convert.ToUInt64(flags);
-                var andedValue = Convert.ToUInt64(enumerationValue) & castFlags;
-                return all ? andedValue == castFlags : andedValue != 0;
-            }
-            else
-            {
-                var castFlags = Convert.ToInt64(flags);
-                var andedValue = Convert.ToInt64(enumerationValue) & castFlags;
-                return all ? andedValue == castFlags : andedValue != 0;
-            }
+            return TimeSpan.FromTicks((long)(value.Ticks * ratio));
         }
 
         #endregion

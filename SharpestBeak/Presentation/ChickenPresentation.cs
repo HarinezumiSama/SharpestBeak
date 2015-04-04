@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
-using SharpestBeak.Presentation.Elements;
 
 namespace SharpestBeak.Presentation
 {

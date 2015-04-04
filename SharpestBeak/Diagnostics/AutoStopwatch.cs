@@ -122,7 +122,7 @@ namespace SharpestBeak.Diagnostics
         ///         </listheader>
         ///         <item>
         ///             <term>
-        ///                 0th argument (<b>{0}</b>)
+        ///                 0th argument (<c>{0}</c>)
         ///             </term>
         ///             <description>
         ///                 A <see cref="TimeSpan"/> value specifying the time elapsed.
@@ -130,7 +130,7 @@ namespace SharpestBeak.Diagnostics
         ///         </item>
         ///         <item>
         ///             <term>
-        ///                 1st argument (<b>{1}</b>)
+        ///                 1st argument (<c>{1}</c>)
         ///             </term>
         ///             <description>
         ///                 A <see cref="Double"/> value specifying the total milliseconds
@@ -139,7 +139,7 @@ namespace SharpestBeak.Diagnostics
         ///         </item>
         ///         <item>
         ///             <term>
-        ///                 2nd argument (<b>{2}</b>)
+        ///                 2nd argument (<c>{2}</c>)
         ///             </term>
         ///             <description>
         ///                 An <see cref="Int64"/> value specifying the total ticks elapsed.

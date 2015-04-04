@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 namespace SharpestBeak.Model
 {
@@ -36,7 +37,7 @@ namespace SharpestBeak.Model
 
             #endregion
 
-            var descriptionAttribute = logicType.GetSoleAttribute<DescriptionAttribute>(false);
+            var descriptionAttribute = logicType.GetSingleOrDefaultCustomAttribute<DescriptionAttribute>(false);
             return descriptionAttribute == null ? logicType.Name : descriptionAttribute.Description;
         }
 

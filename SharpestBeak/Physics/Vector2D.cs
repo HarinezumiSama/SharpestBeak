@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Linq;
+using Omnifactotum.Annotations;
 
 namespace SharpestBeak.Physics
 {

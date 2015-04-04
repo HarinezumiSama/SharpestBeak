@@ -42,6 +42,9 @@
     <ApplicationIcon>..\Icons\SharpestBeak-32.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Omnifactotum">
+      <HintPath>..\packages\Omnifactotum.0.3.0.114\lib\net40-Client\Omnifactotum.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -65,6 +68,9 @@
       <Project>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</Project>
       <Name>SharpestBeak</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\_Lib_\StyleCop\v4.7\StyleCop.Targets" />
