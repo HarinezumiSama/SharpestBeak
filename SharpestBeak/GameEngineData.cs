@@ -32,9 +32,11 @@ namespace SharpestBeak
             #endregion
 
             this.NominalSize = nominalSize;
+
             this.RealSize = new SizeF(
                 GameConstants.NominalCellSize * nominalSize.Width,
                 GameConstants.NominalCellSize * nominalSize.Height);
+
             this.BoardBorder = new ConvexPolygonPrimitive(
                 Point2D.Zero,
                 new Point2D(this.RealSize.Width, 0f),

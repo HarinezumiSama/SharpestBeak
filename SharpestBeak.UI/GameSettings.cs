@@ -2,14 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using SharpestBeak.UI.Properties;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
 {
-    public sealed class GameSettings
+    public sealed class GameSettings : NotifyPropertyChangedBase
     {
+        #region Constants and Fields
+
+        private PositionMode _positionMode;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -18,6 +25,7 @@ namespace SharpestBeak.UI
         public GameSettings()
         {
             this.NominalSize = new SizeObject(Settings.Default.NominalSize);
+            this.PositionMode = PositionMode.Random;
 
             this.LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
             this.DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
@@ -36,9 +44,30 @@ namespace SharpestBeak.UI
             private set;
         }
 
+        [DisplayName(@"Position mode")]
+        [PropertyOrder(2)]
+        public PositionMode PositionMode
+        {
+            get
+            {
+                return _positionMode;
+            }
+
+            set
+            {
+                if (value == _positionMode)
+                {
+                    return;
+                }
+
+                _positionMode = value;
+                RaisePropertyChanged(obj => obj.PositionMode);
+            }
+        }
+
         [DisplayName(@"Light team")]
         [ExpandableObject]
-        [PropertyOrder(2)]
+        [PropertyOrder(3)]
         public TeamSettings LightTeam
         {
             get;
@@ -47,7 +76,7 @@ namespace SharpestBeak.UI
 
         [DisplayName(@"Dark team")]
         [ExpandableObject]
-        [PropertyOrder(3)]
+        [PropertyOrder(4)]
         public TeamSettings DarkTeam
         {
             get;
@@ -99,6 +128,11 @@ namespace SharpestBeak.UI
         private bool ShouldSerializeDarkTeam()
         {
             return false;
+        }
+
+        private void RaisePropertyChanged<TProperty>(Expression<Func<GameSettings, TProperty>> propertyExpression)
+        {
+            base.RaisePropertyChanged(propertyExpression);
         }
 
         #endregion

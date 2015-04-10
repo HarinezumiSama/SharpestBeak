@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using Omnifactotum;
+using Omnifactotum.Annotations;
 using SharpestBeak.Configuration;
 using SharpestBeak.Diagnostics;
 using SharpestBeak.Model;
@@ -30,7 +30,6 @@ namespace SharpestBeak
 
         internal static readonly int InstrumentationMoveCountLimit = 500;
 
-        private static readonly ThreadSafeRandom RandomGenerator = new ThreadSafeRandom();
         private static readonly TimeSpan StopTimeout = GameConstants.LogicPollFrequency.Multiply(5);
 
         private readonly ReaderWriterLockSlim _syncLock =
@@ -45,7 +44,10 @@ namespace SharpestBeak
         private readonly ChickenUnitLogicExecutor _lightTeamLogicExecutor;
         private readonly ChickenUnitLogicExecutor _darkTeamLogicExecutor;
         private readonly Action<GamePaintEventArgs> _paintCallback;
+
+        [NotNull]
         private readonly Action<GamePositionEventArgs> _positionCallback;
+
         private readonly ThreadSafeValue<long> _moveCount;
         private readonly ThreadSafeValue<GameTeam?> _winningTeam;
 
@@ -90,15 +92,15 @@ namespace SharpestBeak
 
             // Pre-initialized fields and properties
             _paintCallback = settings.PaintCallback;
-            _positionCallback = settings.PositionCallback;
+            _positionCallback = settings.PositionCallback.EnsureNotNull();
             this.Data = new GameEngineData(settings.NominalSize);
             _moveCount = new ThreadSafeValue<long>();
             _winningTeam = new ThreadSafeValue<GameTeam?>();
             _lastGamePresentation = new ThreadSafeValue<GamePresentation>();
 
             // Post-initialized fields and properties
-            _lightTeamLogicExecutor = CreateLogicExecutor(this, settings.LightTeam, GameTeam.Light);
-            _darkTeamLogicExecutor = CreateLogicExecutor(this, settings.DarkTeam, GameTeam.Dark);
+            _lightTeamLogicExecutor = CreateLogicExecutor(this, settings.LightTeamSettings, GameTeam.Light);
+            _darkTeamLogicExecutor = CreateLogicExecutor(this, settings.DarkTeamSettings, GameTeam.Dark);
             _logicExecutors = new[] { _lightTeamLogicExecutor, _darkTeamLogicExecutor }.ToArray().AsReadOnly();
 
             _allChickens = _logicExecutors.SelectMany(item => item.Units).ToArray().AsReadOnly();
@@ -384,42 +386,6 @@ namespace SharpestBeak
             }
         }
 
-        private static void PositionChickensDefault(GamePositionEventArgs e)
-        {
-            #region Argument Check
-
-            if (e == null)
-            {
-                throw new ArgumentNullException("e");
-            }
-
-            #endregion
-
-            for (var index = 0; index < e.UnitStates.Count; index++)
-            {
-                var unitState = e.UnitStates[index];
-
-                Point2D position;
-                do
-                {
-                    var nominalPosition = new Point(
-                        RandomGenerator.Next(e.Data.NominalSize.Width),
-                        RandomGenerator.Next(e.Data.NominalSize.Height));
-                    position = GameHelper.NominalToReal(nominalPosition);
-                }
-                while (e.UnitStates.Take(index).Any(
-                    item => e.GetPosition(item).Position.GetDistance(position) < GameConstants.NominalCellSize));
-
-                var plainAngle = (float)Math.Floor(
-                    MathHelper.HalfRevolutionDegrees - RandomGenerator.NextDouble() * MathHelper.RevolutionDegrees);
-                var angle = GameAngle.FromDegrees(plainAngle);
-
-                e.SetPosition(unitState, new DirectionalPosition(position, angle));
-            }
-
-            e.Handled = true;
-        }
-
         private void EnsureNotDisposed()
         {
             if (_disposed)
@@ -439,22 +405,10 @@ namespace SharpestBeak
 
         private void PositionChickens()
         {
-            UpdateUnitStates(true);  // Unit states are used in positioning
+            UpdateUnitStates(true); // Unit states are used in positioning
+
             var eventArgs = new GamePositionEventArgs(this);
-
-            if (_positionCallback != null)
-            {
-                _positionCallback(eventArgs);
-                if (eventArgs.Handled)
-                {
-                    ValidatePositioning(eventArgs);
-                    ApplyPositioning(eventArgs);
-                    return;
-                }
-            }
-
-            eventArgs.Reset();
-            PositionChickensDefault(eventArgs);
+            _positionCallback(eventArgs);
             ValidatePositioning(eventArgs);
             ApplyPositioning(eventArgs);
         }

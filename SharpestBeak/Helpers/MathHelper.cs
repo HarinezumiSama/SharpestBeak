@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 // The type is placed intentionally in the root namespace to ease access from other projects and namespaces
@@ -229,6 +230,16 @@ namespace SharpestBeak
             }
 
             return value;
+        }
+
+        public static Size MultiplyTruncated(this Size value, float ratio)
+        {
+            return new Size((int)(value.Width * ratio), (int)(value.Height * ratio));
+        }
+
+        public static Size Negate(this Size value)
+        {
+            return new Size(-value.Width, -value.Height);
         }
 
         #endregion

@@ -71,7 +71,8 @@ namespace SharpestBeak.UI
                 var gameWindow = new GameWindow(
                     this.CurrentGameSettings.NominalSize.ToSize(),
                     lightTeamRecord,
-                    darkTeamRecord)
+                    darkTeamRecord,
+                    this.CurrentGameSettings.PositionMode)
                 {
                     Owner = this
                 };

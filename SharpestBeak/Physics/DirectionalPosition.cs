@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace SharpestBeak.Physics
 {
@@ -62,6 +63,15 @@ namespace SharpestBeak.Physics
             {
                 return _angle;
             }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.InvariantCulture, "[ {0}; {1} ]", this.Position, this.Angle);
         }
 
         #endregion

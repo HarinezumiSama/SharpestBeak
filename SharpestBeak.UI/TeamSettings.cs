@@ -6,13 +6,12 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using Omnifactotum;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
 namespace SharpestBeak.UI
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public sealed class TeamSettings : INotifyPropertyChanged
+    public sealed class TeamSettings : NotifyPropertyChangedBase
     {
         #region Constants and Fields
 
@@ -30,12 +29,6 @@ namespace SharpestBeak.UI
         {
             this.Logic = LogicManager.Instance.Logics.FirstOrDefault();
         }
-
-        #endregion
-
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
 
@@ -160,14 +153,7 @@ namespace SharpestBeak.UI
 
         private void RaisePropertyChanged<TProperty>(Expression<Func<TeamSettings, TProperty>> propertyExpression)
         {
-            var propertyChanged = this.PropertyChanged;
-            if (propertyChanged == null)
-            {
-                return;
-            }
-
-            var propertyName = Factotum.GetPropertyName(propertyExpression);
-            propertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            base.RaisePropertyChanged(propertyExpression);
         }
 
         #endregion

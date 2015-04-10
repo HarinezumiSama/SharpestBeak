@@ -61,12 +61,6 @@ namespace SharpestBeak.Model
             private set;
         }
 
-        public bool Handled
-        {
-            get;
-            set;
-        }
-
         #endregion
 
         #region Public Methods

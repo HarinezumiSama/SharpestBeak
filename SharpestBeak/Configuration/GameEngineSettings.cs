@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using Omnifactotum.Annotations;
 using SharpestBeak.Model;
 using SharpestBeak.Presentation;
 
@@ -10,6 +11,13 @@ namespace SharpestBeak.Configuration
 {
     public sealed class GameEngineSettings
     {
+        #region Constants and Fields
+
+        [NotNull]
+        private Action<GamePositionEventArgs> _positionCallback;
+
+        #endregion
+
         #region Constructors
 
         /// <summary>
@@ -17,8 +25,8 @@ namespace SharpestBeak.Configuration
         /// </summary>
         public GameEngineSettings(
             Size nominalSize,
-            ChickenTeamSettings lightTeam,
-            ChickenTeamSettings darkTeam,
+            ChickenTeamSettings lightTeamSettings,
+            ChickenTeamSettings darkTeamSettings,
             Action<GamePaintEventArgs> paintCallback)
         {
             #region Argument Check
@@ -34,14 +42,14 @@ namespace SharpestBeak.Configuration
                     "nominalSize");
             }
 
-            if (lightTeam == null)
+            if (lightTeamSettings == null)
             {
-                throw new ArgumentNullException("lightTeam");
+                throw new ArgumentNullException("lightTeamSettings");
             }
 
-            if (darkTeam == null)
+            if (darkTeamSettings == null)
             {
-                throw new ArgumentNullException("darkTeam");
+                throw new ArgumentNullException("darkTeamSettings");
             }
 
             if (paintCallback == null)
@@ -52,9 +60,10 @@ namespace SharpestBeak.Configuration
             #endregion
 
             this.NominalSize = nominalSize;
-            this.LightTeam = lightTeam;
-            this.DarkTeam = darkTeam;
+            this.LightTeamSettings = lightTeamSettings;
+            this.DarkTeamSettings = darkTeamSettings;
             this.PaintCallback = paintCallback;
+            _positionCallback = UnitPositioningHelper.PositionRandomly;
         }
 
         #endregion
@@ -67,13 +76,13 @@ namespace SharpestBeak.Configuration
             private set;
         }
 
-        public ChickenTeamSettings LightTeam
+        public ChickenTeamSettings LightTeamSettings
         {
             get;
             private set;
         }
 
-        public ChickenTeamSettings DarkTeam
+        public ChickenTeamSettings DarkTeamSettings
         {
             get;
             private set;
@@ -85,11 +94,24 @@ namespace SharpestBeak.Configuration
             private set;
         }
 
-        //// TODO [vmcl] Use various positioning schemes: eg. perimeter, opposite sides etc.
+        [NotNull]
         public Action<GamePositionEventArgs> PositionCallback
         {
-            get;
-            set;
+            [DebuggerStepThrough]
+            get
+            {
+                return _positionCallback;
+            }
+
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("value");
+                }
+
+                _positionCallback = value;
+            }
         }
 
         #endregion

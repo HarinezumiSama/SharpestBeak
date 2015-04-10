@@ -132,6 +132,7 @@ namespace SharpestBeak.Logic.Default
                             unitState.Position,
                             unitState.BeakAngle,
                             shotTargetPosition);
+
                     var turn = GameHelper.GetBestBeakTurn(
                         unitState.Position,
                         unitState.BeakAngle,

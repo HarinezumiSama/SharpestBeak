@@ -102,6 +102,7 @@
     <Compile Include="Physics\QuadraticEquation.cs" />
     <Compile Include="SettingsCache.cs" />
     <Compile Include="ThreadSafeRandom.cs" />
+    <Compile Include="UnitPositioningHelper.cs" />
     <Compile Include="ValueRange.cs" />
     <Compile Include="Physics\Vector2D.cs" />
     <Compile Include="Diagnostics\DebugHelper.cs" />

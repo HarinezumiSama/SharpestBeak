@@ -79,10 +79,30 @@ namespace SharpestBeak.UI
         public GameWindow(
             Size nominalSize,
             ChickenTeamSettings lightTeam,
-            ChickenTeamSettings darkTeam)
+            ChickenTeamSettings darkTeam,
+            PositionMode positionMode)
             : this()
         {
-            var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame);
+            Action<GamePositionEventArgs> positionCallback;
+            switch (positionMode)
+            {
+                case PositionMode.Random:
+                    positionCallback = UnitPositioningHelper.PositionRandomly;
+                    break;
+
+                case PositionMode.LineFight:
+                    positionCallback = UnitPositioningHelper.PositionForLineFight;
+                    break;
+
+                default:
+                    throw positionMode.CreateEnumValueNotImplementedException();
+            }
+
+            var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame)
+            {
+                PositionCallback = positionCallback
+            };
+
             _gameEngine = new GameEngine(settings);
             _gameEngine.GameEnded += this.GameEngine_GameEnded;
 
