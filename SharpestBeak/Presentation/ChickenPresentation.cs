@@ -6,7 +6,7 @@ using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation
 {
-    public class ChickenPresentation
+    public sealed class ChickenPresentation
     {
         #region Constructors
 
@@ -32,6 +32,7 @@ namespace SharpestBeak.Presentation
             this.GamePresentation = gamePresentation;
             this.UniqueId = chickenUnit.UniqueId;
             this.Team = chickenUnit.Team;
+            this.KillCount = chickenUnit.KillCount;
 
             this.InitialPosition = chickenUnit.Position;
             this.Movement = chickenUnit.Movement;
@@ -57,6 +58,12 @@ namespace SharpestBeak.Presentation
         }
 
         public GameTeam Team
+        {
+            get;
+            private set;
+        }
+
+        public int KillCount
         {
             get;
             private set;

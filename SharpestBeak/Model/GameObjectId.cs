@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace SharpestBeak.Model
 {
@@ -96,6 +97,11 @@ namespace SharpestBeak.Model
         public override string ToString()
         {
             return string.Format("[{0} #{1}]", GetType().Name, _value);
+        }
+
+        public string GetValueAsString()
+        {
+            return _value.ToString(CultureInfo.InvariantCulture);
         }
 
         #endregion

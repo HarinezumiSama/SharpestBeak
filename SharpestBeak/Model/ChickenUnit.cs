@@ -166,6 +166,8 @@ namespace SharpestBeak.Model
         {
             this.IsDead = false;
             this.ShotEngineStepIndex = -1;
+            this.KillCount = 0;
+            this.KilledBy = null;
         }
 
         internal bool CanSee(Point2D point)
