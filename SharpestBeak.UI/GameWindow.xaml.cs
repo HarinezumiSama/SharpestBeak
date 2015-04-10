@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -10,7 +12,9 @@ using System.Windows.Threading;
 using HelixToolkit.Wpf;
 using SharpestBeak.Configuration;
 using SharpestBeak.Model;
+using SharpestBeak.Physics;
 using SharpestBeak.Presentation;
+using Size = System.Drawing.Size;
 
 namespace SharpestBeak.UI
 {
@@ -21,16 +25,24 @@ namespace SharpestBeak.UI
     {
         #region Constants and Fields
 
-        private static readonly DiffuseMaterial LightTeamUnitMaterial =
-            new DiffuseMaterial(new SolidColorBrush(Colors.LightGreen));
+        private static readonly Color LightTeamColor = Colors.Yellow;
+        private static readonly Color DarkTeamColor = Color.Multiply(LightTeamColor, 0.3f).WithAlpha(byte.MaxValue);
 
-        private static readonly DiffuseMaterial LightTeamShotMaterial =
-            new DiffuseMaterial(new SolidColorBrush(Colors.Pink));
+        private static readonly Color LightTeamCaptionColor = Colors.Lime;
 
-        private static readonly DiffuseMaterial DarkTeamUnitMaterial =
-            new DiffuseMaterial(new SolidColorBrush(Colors.DarkGreen));
+        private static readonly Color DarkTeamCaptionColor =
+            Color.Multiply(LightTeamCaptionColor, 0.5f).WithAlpha(byte.MaxValue);
 
-        private static readonly DiffuseMaterial DarkTeamShotMaterial =
+        private static readonly Brush LightTeamBrush = new SolidColorBrush(LightTeamColor);
+        private static readonly Brush DarkTeamBrush = new SolidColorBrush(DarkTeamColor);
+
+        private static readonly Material LightTeamUnitMaterial = new DiffuseMaterial(LightTeamBrush);
+        private static readonly Material DarkTeamUnitMaterial = new DiffuseMaterial(DarkTeamBrush);
+
+        private static readonly Material LightTeamShotMaterial =
+            new DiffuseMaterial(new SolidColorBrush(Colors.Red));
+
+        private static readonly Material DarkTeamShotMaterial =
             new DiffuseMaterial(new SolidColorBrush(Colors.DarkRed));
 
         private readonly double _uiCellSize;
@@ -64,7 +76,10 @@ namespace SharpestBeak.UI
         ///     Initializes a new instance of the <see cref="GameWindow"/> class
         ///     using the specified parameters.
         /// </summary>
-        public GameWindow(System.Drawing.Size nominalSize, ChickenTeamSettings lightTeam, ChickenTeamSettings darkTeam)
+        public GameWindow(
+            Size nominalSize,
+            ChickenTeamSettings lightTeam,
+            ChickenTeamSettings darkTeam)
             : this()
         {
             var settings = new GameEngineSettings(nominalSize, lightTeam, darkTeam, this.PaintGame);
@@ -104,7 +119,7 @@ namespace SharpestBeak.UI
 
         #region Protected Methods
 
-        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
             StopGame();
             base.OnClosing(e);
@@ -222,7 +237,6 @@ namespace SharpestBeak.UI
             const double BoardThickness = 1d / 4d;
 
             //// TODO: [3D] Draw target points for random chickens - ?
-
             try
             {
                 var boardSize = _gameEngine.Data.NominalSize;
@@ -261,7 +275,6 @@ namespace SharpestBeak.UI
 
                 ////ClearStatusLabels();
                 ////UpdateMoveCountStatus();
-
                 _gameEngine.CallPaint();
             }
             catch (Exception ex)
@@ -299,24 +312,39 @@ namespace SharpestBeak.UI
                     }
                 };
 
+                var billboardVisual = new BillboardTextVisual3D
+                {
+                    Text = "(ID)",
+                    FontWeight = FontWeights.ExtraBold,
+                    FontSize = 9,
+                    Foreground = new SolidColorBrush(
+                        chicken.Team == GameTeam.Light ? LightTeamCaptionColor : DarkTeamCaptionColor),
+                    Background = new SolidColorBrush(Colors.Gray.WithAlpha(128)),
+                    BorderBrush = new SolidColorBrush(Colors.Red.WithAlpha(128)),
+                    BorderThickness = new Thickness(1)
+                };
+
                 var data = new ChickenData(
                     chicken.UniqueId,
                     position,
                     currentPosition.Angle.DegreeValue,
                     chickenVisual,
-                    transform);
+                    transform,
+                    billboardVisual);
+
                 _chickenDatas.Add(data.Id, data);
                 _chickenVisualToData.Add(chickenVisual, data);
                 this.BoardVisual.Children.Add(chickenVisual);
+                this.BoardVisual.Children.Add(billboardVisual);
             }
         }
 
-        private Point3D ConvertEnginePosition(Physics.Point2D position)
+        private Point3D ConvertEnginePosition(Point2D position, double offsetZ = 0)
         {
             return new Point3D(
                 position.X / _nominalSizeCoefficient,
                 position.Y / _nominalSizeCoefficient,
-                GameConstants.ChickenUnit.BodyCircleRadius / _nominalSizeCoefficient);
+                GameConstants.ChickenUnit.BodyCircleRadius / _nominalSizeCoefficient + offsetZ);
         }
 
         private Matrix3D GetChickenTransformMatrix(ChickenPresentation chicken)
@@ -376,6 +404,10 @@ namespace SharpestBeak.UI
                 InitializeVisualData(presentation);
             }
 
+            ////var lightMaxKillCount =
+            ////    presentation.Chickens.Where(obj => obj.Team == GameTeam.Light).Max(obj => obj.KillCount);
+            ////var darkMaxKillCount =
+            ////    presentation.Chickens.Where(obj => obj.Team == GameTeam.Dark).Max(obj => obj.KillCount);
             var deadChickenIds = new HashSet<GameObjectId>(_chickenDatas.Keys);
             foreach (var chicken in presentation.Chickens)
             {
@@ -385,6 +417,16 @@ namespace SharpestBeak.UI
                 data.BeakAngle = currentPosition.Angle.DegreeValue;
                 data.Transform.Matrix = GetChickenTransformMatrix(chicken);
 
+                data.BillboardVisual.Position = ConvertEnginePosition(
+                    currentPosition.Position,
+                    GameConstants.ChickenUnit.BodyCircleRadius / _nominalSizeCoefficient * 1.5);
+                data.BillboardVisual.Text = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "#{0}: {1}",
+                    chicken.UniqueId.GetValueAsString(),
+                    chicken.KillCount);
+                data.BillboardVisual.BorderThickness = new Thickness(1, chicken.KillCount + 1, 1, 1);
+
                 deadChickenIds.Remove(data.Id);
             }
 
@@ -392,6 +434,7 @@ namespace SharpestBeak.UI
             {
                 var data = _chickenDatas[deadChickenId];
                 this.BoardVisual.Children.Remove(data.Visual);
+                this.BoardVisual.Children.Remove(data.BillboardVisual);
                 _chickenDatas.Remove(deadChickenId);
                 _chickenVisualToData.Remove(data.Visual);
             }
@@ -466,6 +509,7 @@ namespace SharpestBeak.UI
                 }
 
                 _gameEngine.Start();
+
                 ////UpdateMoveCountStatus();
             }
             catch (Exception ex)
@@ -489,6 +533,7 @@ namespace SharpestBeak.UI
                 }
 
                 _gameEngine.Stop();
+
                 ////UpdateMoveCountStatus();
             }
             catch (Exception ex)
@@ -734,7 +779,8 @@ namespace SharpestBeak.UI
                 Point3D position,
                 double beakAngle,
                 ModelVisual3D visual,
-                MatrixTransform3D transform)
+                MatrixTransform3D transform,
+                BillboardTextVisual3D billboardVisual)
                 : base(id, position, transform)
             {
                 #region Argument Check
@@ -744,10 +790,16 @@ namespace SharpestBeak.UI
                     throw new ArgumentNullException("visual");
                 }
 
+                if (billboardVisual == null)
+                {
+                    throw new ArgumentNullException("billboardVisual");
+                }
+
                 #endregion
 
                 this.BeakAngle = beakAngle;
                 this.Visual = visual;
+                this.BillboardVisual = billboardVisual;
             }
 
             #endregion
@@ -761,6 +813,12 @@ namespace SharpestBeak.UI
             }
 
             public ModelVisual3D Visual
+            {
+                get;
+                private set;
+            }
+
+            public BillboardTextVisual3D BillboardVisual
             {
                 get;
                 private set;

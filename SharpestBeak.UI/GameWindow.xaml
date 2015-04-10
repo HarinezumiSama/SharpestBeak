@@ -3,23 +3,39 @@
         Width="400" xmlns:helix="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" WindowState="Maximized" Loaded="Window_Loaded"
         Unloaded="Window_Unloaded" MouseLeftButtonDown="Window_MouseLeftButtonDown">
-    <Window.Resources>
-        <!--<helix:MeshBuilder x:Key="ChickenBuilder" />-->
-    </Window.Resources>
     <Grid>
         <helix:HelixViewport3D Name="MainViewport" ShowCameraInfo="True" ShowCameraTarget="True"
                 ShowCoordinateSystem="True" ShowFrameRate="True" ShowFieldOfView="True" ShowTriangleCountInfo="True"
                 ShowViewCube="True" RotateAroundMouseDownPoint="True"
                 MouseLeftButtonDown="MainViewport_MouseLeftButtonDown">
+
+            <!--<helix:HelixViewport3D.Triggers>
+                <EventTrigger SourceName="MainViewport" RoutedEvent="helix:HelixViewport3D.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard BeginTime="00:00:00" RepeatBehavior="Forever">
+                            <ParallelTimeline RepeatBehavior="Forever">
+                                <DoubleAnimation Storyboard.TargetName="SunLight"
+                                        Storyboard.TargetProperty="Azimuth" From="0"
+                                        To="359" IsAdditive="True" Duration="00:00:10" />
+                                <DoubleAnimation Storyboard.TargetName="SunLight"
+                                        Storyboard.TargetProperty="Altitude" From="60"
+                                        To="1" AutoReverse="True" Duration="00:00:10" />
+                            </ParallelTimeline>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </helix:HelixViewport3D.Triggers>-->
+
             <helix:HelixViewport3D.Background>
-                <SolidColorBrush Color="Black" />
+                <SolidColorBrush Color="DeepSkyBlue" />
             </helix:HelixViewport3D.Background>
+
             <helix:HelixViewport3D.Camera>
                 <PerspectiveCamera x:Name="Camera" Position="0,-16,24" LookDirection="0,16,-24" UpDirection="0,1,0"
                         FieldOfView="60" />
             </helix:HelixViewport3D.Camera>
 
-            <helix:SunLight />
+            <helix:SunLight x:Name="SunLight" />
 
             <helix:BillboardTextVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="10"
                     Foreground="Gray" Position="1 -0.25 -0.5" />
@@ -31,7 +47,7 @@
                             <GeometryModel3D.Material>
                                 <DiffuseMaterial>
                                     <DiffuseMaterial.Brush>
-                                        <SolidColorBrush Color="#A1A1A1" />
+                                        <SolidColorBrush Color="Gray" />
                                     </DiffuseMaterial.Brush>
                                 </DiffuseMaterial>
                             </GeometryModel3D.Material>
@@ -40,7 +56,7 @@
                             <GeometryModel3D.Material>
                                 <DiffuseMaterial>
                                     <DiffuseMaterial.Brush>
-                                        <SolidColorBrush Color="#FFFFFF" />
+                                        <SolidColorBrush Color="LightGray" />
                                     </DiffuseMaterial.Brush>
                                 </DiffuseMaterial>
                             </GeometryModel3D.Material>
