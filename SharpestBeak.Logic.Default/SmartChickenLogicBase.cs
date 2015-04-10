@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Omnifactotum;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Primitives;
@@ -11,7 +12,6 @@ namespace SharpestBeak.Logic.Default
     //// TODO: [vmcl] Implement and use logic settings instead of inheritance
     //// [vmcl] For instance, (a) each logic may have virtual Setup(ChickenUnitLogicSettings) method; and
     //// [vmcl] (b) each logic may be marked with a custom attribute specifying which settings class to use.
-
     public abstract class SmartChickenLogicBase : ChickenUnitLogic
     {
         #region Constants and Fields
@@ -72,11 +72,17 @@ namespace SharpestBeak.Logic.Default
 
         protected override void OnMakeMove(GameState gameState, LogicMoveResult moves)
         {
-            var allShots = gameState.UnitStates.SelectMany(item => item.View.Shots).ToList();
+            var allShots = gameState
+                .UnitStates
+                .SelectMany(item => item.View.Shots)
+                .Distinct(KeyedEqualityComparer.For<ShotViewData>.Create(state => state.UniqueId))
+                .ToArray();
+
             var enemyUnits = gameState
                 .UnitStates
                 .SelectMany(item => item.View.Chickens.Where(visibleUnit => visibleUnit.Team != this.Team))
-                .ToList();
+                .Distinct(KeyedEqualityComparer.For<ChickenViewData>.Create(data => data.UniqueId))
+                .ToArray();
 
             foreach (var unitState in gameState.UnitStates)
             {
@@ -85,9 +91,11 @@ namespace SharpestBeak.Logic.Default
                     continue;
                 }
 
-                var safestMoveDirection = _features.IsAnySet(Features.TurningAway)
-                    ? FindSafestMove(allShots, unitState)
-                    : null;
+                MoveDirection safestMoveDirection = null;
+                if (_features.IsAnySet(Features.TurningAway))
+                {
+                    safestMoveDirection = FindSafestMove(allShots, unitState);
+                }
 
                 if (unitState.PreviousMoveState.IsRejected())
                 {
@@ -113,6 +121,7 @@ namespace SharpestBeak.Logic.Default
                 _blockedDirectionMap.Remove(unitState.UniqueId);
 
                 var possibleActions = new List<PossibleActionInfo>(unitState.View.Chickens.Count);
+
                 //// ReSharper disable once LoopCanBeConvertedToQuery
                 foreach (var enemyUnit in enemyUnits)
                 {
@@ -196,6 +205,7 @@ namespace SharpestBeak.Logic.Default
         {
             var safetyCircle = new CirclePrimitive(unitState.Position, _dangerousRadius);
             var dangerousShots = new List<ShotViewData>(unitState.View.Shots.Count);
+
             //// ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var shot in allShots)
             {
@@ -236,10 +246,10 @@ namespace SharpestBeak.Logic.Default
                 foreach (var moveDirection in GameHelper.BasicMoveDirections)
                 {
                     var potentialPosition = GameHelper.GetNewPosition(
-                       unitState.Position,
-                       unitState.BeakAngle,
-                       moveDirection,
-                       GameConstants.ChickenUnit.DefaultRectilinearSpeed);
+                        unitState.Position,
+                        unitState.BeakAngle,
+                        moveDirection,
+                        GameConstants.ChickenUnit.DefaultRectilinearSpeed);
                     var shotToUnitVector = potentialPosition - dangerousShot.Position;
                     var shotToUnitVectorLengthSquared = shotToUnitVector.GetLengthSquared();
                     var angleCosine = shotVector.GetAngleCosine(shotToUnitVector);
@@ -259,12 +269,8 @@ namespace SharpestBeak.Logic.Default
                 .Where(pair => pair.Value > 0)
                 .OrderByDescending(pair => pair.Value)
                 .FirstOrDefault();
-            if (actuallySafeMovePair.Value > 0)
-            {
-                return actuallySafeMovePair.Key;
-            }
 
-            return null;
+            return actuallySafeMovePair.Value > 0 ? actuallySafeMovePair.Key : null;
         }
 
         private Point2D GetShotTargetPosition(
