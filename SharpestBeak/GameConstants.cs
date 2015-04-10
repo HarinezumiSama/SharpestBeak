@@ -66,7 +66,7 @@ namespace SharpestBeak
             /// <summary>
             ///     Standard beak angle speed of a chicken unit, in degrees per second.
             /// </summary>
-            public static readonly float DefaultAngularSpeed = MathHelper.RevolutionDegrees / 200f;
+            public static readonly float DefaultAngularSpeed = MathHelper.RevolutionDegrees / 50f;
 
             /// <summary>
             ///     The value, in degrees, specifying the angle of view of a chicken unit to left and to right
