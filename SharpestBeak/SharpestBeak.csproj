@@ -14,40 +14,47 @@
     <FileAlignment>512</FileAlignment>
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
     <TargetFrameworkProfile />
+    <MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\_Output_\Debug\</OutputPath>
+    <OutputPath>..\.bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\_Output_\Debug\SharpestBeak.xml</DocumentationFile>
+    <DocumentationFile>..\.bin\Debug\SharpestBeak.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <StyleCopEnabled>true</StyleCopEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\_Output_\Release\</OutputPath>
+    <OutputPath>..\.bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\_Output_\Release\SharpestBeak.xml</DocumentationFile>
+    <DocumentationFile>..\.bin\Release\SharpestBeak.xml</DocumentationFile>
     <NoWarn>1591</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <StyleCopEnabled>true</StyleCopEnabled>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\Icons\SharpestBeak-32.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Omnifactotum">
-      <HintPath>..\packages\Omnifactotum.0.3.0.114\lib\net40-Client\Omnifactotum.dll</HintPath>
+    <Reference Include="Omnifactotum, Version=0.3.0.119, Culture=neutral, PublicKeyToken=463364b83539fcba, processorArchitecture=MSIL">
+      <HintPath>..\packages\Omnifactotum.0.3.0.119\lib\net40-Client\Omnifactotum.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -63,8 +70,8 @@
     <Compile Include="..\SolutionItems\AssemblyInfo.Common.cs">
       <Link>Properties\AssemblyInfo.Common.cs</Link>
     </Compile>
-    <Compile Include="..\SolutionItems\GlobalVersion.Generated.cs">
-      <Link>Properties\GlobalVersion.Generated.cs</Link>
+    <Compile Include="..\SolutionItems\Generated.GlobalVersion.cs">
+      <Link>Properties\Generated.GlobalVersion.cs</Link>
     </Compile>
     <Compile Include="EngineStepStopwatch.cs" />
     <Compile Include="Model\BeakTurn.cs" />
@@ -148,7 +155,8 @@
     <Content Include="Helpers\_ReadMe.Helpers.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\_Lib_\StyleCop\v4.7\StyleCop.Targets" />
+  <Import Project="..\.lib\StyleCop\v4.7\StyleCop.Targets" />
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets" />
   <PropertyGroup>
     <CompileDependsOn>UpdateGlobalVersion;$(CompileDependsOn)</CompileDependsOn>
     <BuildDependsOn>UpdateGlobalVersion;$(BuildDependsOn)</BuildDependsOn>
@@ -156,24 +164,32 @@
   <Target Name="UpdateGlobalVersion">
     <PropertyGroup>
       <BaseVersionFile>$(ProjectDir)\..\SolutionItems\BaseVersion.txt</BaseVersionFile>
-      <RevisionFile>$(ProjectDir)\..\SolutionItems\Revision.Generated.txt</RevisionFile>
+      <RevisionFile>$(ProjectDir)\..\SolutionItems\Generated.Revision.txt</RevisionFile>
+      <RevisionIdFile>$(ProjectDir)\..\SolutionItems\Generated.RevisionId.txt</RevisionIdFile>
     </PropertyGroup>
     <Message Importance="high" Text="* Reading base version from '$(BaseVersionFile)'..." />
-    <Error Condition="!Exists('$(BaseVersionFile)')" Text="[UpdateGlobalVersion] ERROR: Base version file &quot;$(BaseVersionFile)&quot; is not found." />
     <ReadLinesFromFile File="$(BaseVersionFile)">
       <Output TaskParameter="Lines" PropertyName="BaseVersion" />
     </ReadLinesFromFile>
     <Message Importance="high" Text="* Base version: '$(BaseVersion)'" />
-    <Exec Command="hg.exe identify -n -r tip &gt;&quot;$(RevisionFile)&quot;" />
+    <Exec Command="&quot;$(ProjectDir)\..\SolutionItems\hg.cmd&quot; identify --num &gt;&quot;$(RevisionFile)&quot;" />
+    <Exec Command="&quot;$(ProjectDir)\..\SolutionItems\hg.cmd&quot; identify --id &gt;&quot;$(RevisionIdFile)&quot;" />
     <Message Importance="high" Text="* Reading HG revision number from '$(RevisionFile)'..." />
     <ReadLinesFromFile File="$(RevisionFile)">
-      <Output TaskParameter="Lines" PropertyName="Revision" />
+      <Output TaskParameter="Lines" PropertyName="RevisionRaw" />
     </ReadLinesFromFile>
-    <Message Importance="high" Text="* Revision number: '$(Revision)'" />
+    <RegexReplace Input="$(RevisionRaw)" Expression="\+" Replacement="" Count="1">
+      <Output PropertyName="Revision" TaskParameter="Output" />
+    </RegexReplace>
+    <Message Importance="high" Text="* Revision number: '$(Revision)' (raw '$(RevisionRaw)')." />
     <PropertyGroup>
       <GlobalVersion>$(BaseVersion).0.$(Revision)</GlobalVersion>
     </PropertyGroup>
-    <Message Importance="high" Text="* Global version: '$(GlobalVersion)'" />
+    <Message Importance="high" Text="* Reading HG revision ID from '$(RevisionIdFile)'..." />
+    <ReadLinesFromFile File="$(RevisionIdFile)">
+      <Output TaskParameter="Lines" PropertyName="RevisionId" />
+    </ReadLinesFromFile>
+    <Message Importance="high" Text="* Revision ID: '$(RevisionId)'" />
     <ItemGroup>
       <AssemblyVersion Include="global::System.Reflection.AssemblyVersion">
         <_Parameter1>$(GlobalVersion)</_Parameter1>
@@ -181,8 +197,11 @@
       <AssemblyFileVersion Include="global::System.Reflection.AssemblyFileVersion">
         <_Parameter1>$(GlobalVersion)</_Parameter1>
       </AssemblyFileVersion>
+      <AssemblyInformationalVersion Include="global::System.Reflection.AssemblyInformationalVersion">
+        <_Parameter1>$(GlobalVersion) (rev. $(RevisionId))</_Parameter1>
+      </AssemblyInformationalVersion>
     </ItemGroup>
-    <WriteCodeFragment Language="C#" OutputFile="..\SolutionItems\GlobalVersion.Generated.cs" AssemblyAttributes="@(AssemblyVersion);@(AssemblyFileVersion)" />
+    <WriteCodeFragment Language="C#" OutputFile="$(ProjectDir)\..\SolutionItems\Generated.GlobalVersion.cs" AssemblyAttributes="@(AssemblyVersion);@(AssemblyFileVersion);@(AssemblyInformationalVersion)" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

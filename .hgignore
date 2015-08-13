@@ -11,6 +11,6 @@ glob:*.Publish.xml
 glob:*.wbk
 glob:~$*.doc
 glob:*.DotSettings.user
-glob:SolutionItems/GlobalVersion.Generated.cs
-glob:SolutionItems/Revision.Generated.txt
+glob:Generated.*
 glob:StyleCop.Cache
+glob:.bin/*

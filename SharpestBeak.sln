@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak", "SharpestBeak\SharpestBeak.csproj", "{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpestBeak.UI", "SharpestBeak.UI\SharpestBeak.UI.csproj", "{03341E1A-23DA-4CD1-AFBC-FFEA262DF1D1}"
@@ -25,6 +27,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{1B4E8F1C
 		Icons\SharpestBeak-256.png = Icons\SharpestBeak-256.png
 		Icons\SharpestBeak-32.ico = Icons\SharpestBeak-32.ico
 		Icons\SharpestBeak-32.png = Icons\SharpestBeak-32.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{AE8E7202-A8FC-43E0-8FA5-759E15949FF4}"
+	ProjectSection(SolutionItems) = preProject
+		.build\MSBuild.Community.Tasks.dll = .build\MSBuild.Community.Tasks.dll
+		.build\MSBuild.Community.Tasks.targets = .build\MSBuild.Community.Tasks.targets
 	EndProjectSection
 EndProject
 Global
