@@ -1,11 +1,8 @@
-﻿using System;
+﻿namespace SharpestBeak.Physics;
 
-namespace SharpestBeak.Physics
+public enum LineSide
 {
-    public enum LineSide
-    {
-        Right = -1,
-        OnLine = 0,
-        Left = 1
-    }
+    Right = -1,
+    OnLine = 0,
+    Left = 1
 }

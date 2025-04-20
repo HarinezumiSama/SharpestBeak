@@ -1,111 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 
-namespace SharpestBeak.View
+namespace SharpestBeak.View;
+
+public sealed class ShotViewData : BaseViewData, IDirectionalPosition
 {
-    public sealed class ShotViewData : BaseViewData, IDirectionalPosition
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ShotViewData"/> class.
+    /// </summary>
+    internal ShotViewData(ShotUnit unit)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ShotViewData"/> class.
-        /// </summary>
-        internal ShotViewData(ShotUnit unit)
+        if (unit is null)
         {
-            #region Argument Check
-
-            if (unit == null)
-            {
-                throw new ArgumentNullException("unit");
-            }
-
-            #endregion
-
-            this.UniqueId = unit.UniqueId;
-            this.Position = unit.Position;
-            this.Angle = unit.Angle;
-            this.OwnerUniqueId = unit.Owner.UniqueId;
-            this.Team = unit.Owner.Team;
+            throw new ArgumentNullException(nameof(unit));
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public GameObjectId UniqueId
-        {
-            get;
-            private set;
-        }
-
-        public Point2D Position
-        {
-            get;
-            private set;
-        }
-
-        public GameAngle Angle
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region IDirectionalPosition Members
-
-        Point2D IDirectionalPosition.Position
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return this.Position;
-            }
-        }
-
-        GameAngle IDirectionalPosition.Angle
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return this.Angle;
-            }
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal GameObjectId OwnerUniqueId
-        {
-            get;
-            private set;
-        }
-
-        internal GameTeam Team
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override string ToString()
-        {
-            return string.Format(
-                "[{0} #{1}] Position = {2}, Angle = {3:D}",
-                this.GetType().Name,
-                this.UniqueId,
-                this.Position,
-                this.Angle);
-        }
-
-        #endregion
+        UniqueId = unit.UniqueId;
+        Position = unit.Position;
+        Angle = unit.Angle;
+        OwnerUniqueId = unit.Owner.UniqueId;
+        Team = unit.Owner.Team;
     }
+
+    public GameObjectId UniqueId { get; }
+
+    public Point2D Position { get; }
+
+    public GameAngle Angle { get; }
+
+    [DebuggerNonUserCode]
+    Point2D IDirectionalPosition.Position => Position;
+
+    [DebuggerNonUserCode]
+    GameAngle IDirectionalPosition.Angle => Angle;
+
+    internal GameObjectId OwnerUniqueId { get; }
+
+    internal GameTeam Team { get; }
+
+    public override string ToString() => $"[{GetType().Name} #{UniqueId}] Position = {Position}, Angle = {Angle:D}";
 }

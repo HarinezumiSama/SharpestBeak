@@ -1,140 +1,95 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using Omnifactotum.Annotations;
 using SharpestBeak.UI.Properties;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 
-namespace SharpestBeak.UI
+namespace SharpestBeak.UI;
+
+public sealed class GameSettings : NotifyPropertyChangedBase
 {
-    public sealed class GameSettings : NotifyPropertyChangedBase
+    private PositionMode _positionMode;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GameSettings"/> class.
+    /// </summary>
+    public GameSettings()
     {
-        #region Constants and Fields
+        NominalSize = new SizeObject(Settings.Default.NominalSize);
+        PositionMode = PositionMode.Random;
 
-        private PositionMode _positionMode;
+        LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
+        DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
+    }
 
-        #endregion
+    [DisplayName(@"Nominal board size")]
+    [ExpandableObject]
+    [PropertyOrder(1)]
+    public SizeObject NominalSize { get; }
 
-        #region Constructors
+    [DisplayName(@"Position mode")]
+    [PropertyOrder(2)]
+    public PositionMode PositionMode
+    {
+        get => _positionMode;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameSettings"/> class.
-        /// </summary>
-        public GameSettings()
+        [UsedImplicitly]
+        set
         {
-            this.NominalSize = new SizeObject(Settings.Default.NominalSize);
-            this.PositionMode = PositionMode.Random;
-
-            this.LightTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
-            this.DarkTeam = new TeamSettings { PlayerCount = Settings.Default.TeamUnitCount };
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        [DisplayName(@"Nominal board size")]
-        [ExpandableObject]
-        [PropertyOrder(1)]
-        public SizeObject NominalSize
-        {
-            get;
-            private set;
-        }
-
-        [DisplayName(@"Position mode")]
-        [PropertyOrder(2)]
-        public PositionMode PositionMode
-        {
-            get
+            if (value == _positionMode)
             {
-                return _positionMode;
+                return;
             }
 
-            set
-            {
-                if (value == _positionMode)
-                {
-                    return;
-                }
-
-                _positionMode = value;
-                RaisePropertyChanged(obj => obj.PositionMode);
-            }
+            _positionMode = value;
+            RaisePropertyChanged(obj => obj.PositionMode);
         }
+    }
 
-        [DisplayName(@"Light team")]
-        [ExpandableObject]
-        [PropertyOrder(3)]
-        public TeamSettings LightTeam
+    [DisplayName(@"Light team")]
+    [ExpandableObject]
+    [PropertyOrder(3)]
+    public TeamSettings LightTeam { get; }
+
+    [DisplayName(@"Dark team")]
+    [ExpandableObject]
+    [PropertyOrder(4)]
+    public TeamSettings DarkTeam { get; }
+
+    public string Validate()
+    {
+        var resultBuilder = new StringBuilder();
+
+        if (!NominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
+            || !NominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
         {
-            get;
-            private set;
+            resultBuilder
+                .AppendFormat(
+                    "Each nominal board size dimension must be in the range {0} to {1}.",
+                    GameConstants.NominalCellCountRange.Min,
+                    GameConstants.NominalCellCountRange.Max)
+                .AppendLine();
         }
 
-        [DisplayName(@"Dark team")]
-        [ExpandableObject]
-        [PropertyOrder(4)]
-        public TeamSettings DarkTeam
-        {
-            get;
-            private set;
-        }
+        LightTeam.ValidateInternal(resultBuilder, "Light team");
+        DarkTeam.ValidateInternal(resultBuilder, "Dark team");
 
-        #endregion
+        return resultBuilder.Length != 0 ? resultBuilder.ToString() : null;
+    }
 
-        #region Public Methods
+    // Do not delete ShouldSerializeNominalSize method - called by TypeDescriptor
+    private bool ShouldSerializeNominalSize() => false;
 
-        public string Validate()
-        {
-            var resultBuilder = new StringBuilder();
+    // Do not delete ShouldSerializeLightTeam method - called by TypeDescriptor
+    private bool ShouldSerializeLightTeam() => false;
 
-            if (!this.NominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
-                || !this.NominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
-            {
-                resultBuilder
-                    .AppendFormat(
-                        "Each nominal board size dimension must be in the range {0} to {1}.",
-                        GameConstants.NominalCellCountRange.Min,
-                        GameConstants.NominalCellCountRange.Max)
-                    .AppendLine();
-            }
+    // Do not delete ShouldSerializeDarkTeam method - called by TypeDescriptor
+    private bool ShouldSerializeDarkTeam() => false;
 
-            this.LightTeam.ValidateInternal(resultBuilder, "Light team");
-            this.DarkTeam.ValidateInternal(resultBuilder, "Dark team");
-
-            return resultBuilder.Length != 0 ? resultBuilder.ToString() : null;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        // Do not delete ShouldSerializeNominalSize method - called by TypeDescriptor
-        private bool ShouldSerializeNominalSize()
-        {
-            return false;
-        }
-
-        // Do not delete ShouldSerializeLightTeam method - called by TypeDescriptor
-        private bool ShouldSerializeLightTeam()
-        {
-            return false;
-        }
-
-        // Do not delete ShouldSerializeDarkTeam method - called by TypeDescriptor
-        private bool ShouldSerializeDarkTeam()
-        {
-            return false;
-        }
-
-        private void RaisePropertyChanged<TProperty>(Expression<Func<GameSettings, TProperty>> propertyExpression)
-        {
-            base.RaisePropertyChanged(propertyExpression);
-        }
-
-        #endregion
+    private void RaisePropertyChanged<TProperty>(Expression<Func<GameSettings, TProperty>> propertyExpression)
+    {
+        base.RaisePropertyChanged(propertyExpression);
     }
 }

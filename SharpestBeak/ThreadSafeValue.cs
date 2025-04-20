@@ -1,88 +1,52 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public sealed class ThreadSafeValue<T>
 {
-    public sealed class ThreadSafeValue<T>
+    private T _value;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ThreadSafeValue{T}"/> class.
+    /// </summary>
+    public ThreadSafeValue(object @lock, T value = default)
     {
-        #region Fields
-
-        private T _value;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
-        /// </summary>
-        public ThreadSafeValue(object @lock, T value = default(T))
-        {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            #endregion
-
-            this.Lock = @lock;
-            _value = value;
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeValue&lt;T&gt;"/> class.
-        /// </summary>
-        public ThreadSafeValue(T value = default(T))
-            : this(new object(), value)
-        {
-            // Nothing to do
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public object Lock
-        {
-            get;
-            private set;
-        }
-
-        public T Value
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                lock (this.Lock)
-                {
-                    return _value;
-                }
-            }
-
-            [DebuggerNonUserCode]
-            set
-            {
-                lock (this.Lock)
-                {
-                    _value = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override string ToString()
-        {
-            var value = this.Value;
-            return ReferenceEquals(value, null) ? string.Empty : value.ToString();
-        }
-
-        #endregion
+        Lock = @lock ?? throw new ArgumentNullException(nameof(@lock));
+        _value = value;
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ThreadSafeValue{T}"/> class.
+    /// </summary>
+    public ThreadSafeValue(T value = default)
+        : this(new object(), value)
+    {
+        // Nothing to do
+    }
+
+    public object Lock { get; }
+
+    public T Value
+    {
+        [DebuggerNonUserCode]
+        get
+        {
+            lock (Lock)
+            {
+                return _value;
+            }
+        }
+
+        [DebuggerNonUserCode]
+        set
+        {
+            lock (Lock)
+            {
+                _value = value;
+            }
+        }
+    }
+
+    public override string ToString() => Value?.ToString() ?? string.Empty;
 }

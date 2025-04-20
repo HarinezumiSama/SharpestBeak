@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Windows;
 using System.Windows.Data;
@@ -10,98 +7,62 @@ using Omnifactotum;
 
 //// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 //// ReSharper disable once CheckNamespace
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public static class Helper
 {
-    public static class Helper
+    public static readonly bool DefaultInheritAttributeParameter = true;
+
+    public static IValueConverter DebugConverterInstance { get; } = new DebugConverter();
+
+    public static DependencyProperty RegisterDependencyProperty<TObject, TProperty>(
+        Expression<Func<TObject, TProperty>> propertyGetterExpression,
+        PropertyMetadata typeMetadata = null,
+        ValidateValueCallback validateValueCallback = null)
     {
-        #region Constants and Fields
+        var propertyInfo = Factotum.GetPropertyInfo(propertyGetterExpression);
 
-        public static readonly bool DefaultInheritAttributeParameter = true;
-
-        private static readonly IValueConverter DebugConverterInstanceField = new DebugConverter();
-
-        #endregion
-
-        #region Public Properties
-
-        public static IValueConverter DebugConverterInstance
+        if (propertyInfo.DeclaringType != typeof(TObject))
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return DebugConverterInstanceField;
-            }
+            throw new ArgumentException(
+                "Inconsistency between property expression and declaring object type.",
+                nameof(propertyGetterExpression));
         }
 
-        #endregion
+        return DependencyProperty.Register(
+            propertyInfo.Name,
+            propertyInfo.PropertyType,
+            propertyInfo.DeclaringType.EnsureNotNull(),
+            typeMetadata,
+            validateValueCallback);
+    }
 
-        #region Public Methods
+    public static DependencyPropertyKey RegisterReadOnlyDependencyProperty<TObject, TProperty>(
+        Expression<Func<TObject, TProperty>> propertyGetterExpression,
+        PropertyMetadata typeMetadata = null,
+        ValidateValueCallback validateValueCallback = null)
+    {
+        var propertyInfo = Factotum.GetPropertyInfo(propertyGetterExpression);
 
-        public static DependencyProperty RegisterDependencyProperty<TObject, TProperty>(
-            Expression<Func<TObject, TProperty>> propertyGetterExpression,
-            PropertyMetadata typeMetadata = null,
-            ValidateValueCallback validateValueCallback = null)
+        if (propertyInfo.DeclaringType != typeof(TObject))
         {
-            var propertyInfo = Factotum.GetPropertyInfo(propertyGetterExpression);
-
-            if (propertyInfo.DeclaringType != typeof(TObject))
-            {
-                throw new ArgumentException(
-                    @"Inconsistency between property expression and declaring object type.",
-                    "propertyGetterExpression");
-            }
-
-            return DependencyProperty.Register(
-                propertyInfo.Name,
-                propertyInfo.PropertyType,
-                propertyInfo.DeclaringType.EnsureNotNull(),
-                typeMetadata,
-                validateValueCallback);
+            throw new ArgumentException(
+                "Inconsistency between property expression and declaring object type.",
+                nameof(propertyGetterExpression));
         }
 
-        public static DependencyPropertyKey RegisterReadOnlyDependencyProperty<TObject, TProperty>(
-            Expression<Func<TObject, TProperty>> propertyGetterExpression,
-            PropertyMetadata typeMetadata = null,
-            ValidateValueCallback validateValueCallback = null)
-        {
-            var propertyInfo = Factotum.GetPropertyInfo(propertyGetterExpression);
+        return DependencyProperty.RegisterReadOnly(
+            propertyInfo.Name,
+            propertyInfo.PropertyType,
+            propertyInfo.DeclaringType.EnsureNotNull(),
+            typeMetadata,
+            validateValueCallback);
+    }
 
-            if (propertyInfo.DeclaringType != typeof(TObject))
-            {
-                throw new ArgumentException(
-                    @"Inconsistency between property expression and declaring object type.",
-                    "propertyGetterExpression");
-            }
+    private sealed class DebugConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) => value;
 
-            return DependencyProperty.RegisterReadOnly(
-                propertyInfo.Name,
-                propertyInfo.PropertyType,
-                propertyInfo.DeclaringType.EnsureNotNull(),
-                typeMetadata,
-                validateValueCallback);
-        }
-
-        #endregion
-
-        #region DebugConverter Class
-
-        private sealed class DebugConverter : IValueConverter
-        {
-            #region IValueConverter Members
-
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return value;
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return value;
-            }
-
-            #endregion
-        }
-
-        #endregion
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => value;
     }
 }

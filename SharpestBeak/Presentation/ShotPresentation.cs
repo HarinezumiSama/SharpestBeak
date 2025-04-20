@@ -1,102 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 
-namespace SharpestBeak.Presentation
+namespace SharpestBeak.Presentation;
+
+public sealed class ShotPresentation
 {
-    public sealed class ShotPresentation
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ShotPresentation"/> class.
+    /// </summary>
+    internal ShotPresentation(GamePresentation gamePresentation, ShotUnit shotUnit)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ShotPresentation"/> class.
-        /// </summary>
-        internal ShotPresentation(GamePresentation gamePresentation, ShotUnit shotUnit)
+        if (shotUnit is null)
         {
-            #region Argument Check
-
-            if (gamePresentation == null)
-            {
-                throw new ArgumentNullException("gamePresentation");
-            }
-
-            if (shotUnit == null)
-            {
-                throw new ArgumentNullException("shotUnit");
-            }
-
-            #endregion
-
-            this.GamePresentation = gamePresentation;
-            this.UniqueId = shotUnit.UniqueId;
-            this.OwnerTeam = shotUnit.Owner.Team;
-
-            this.InitialPosition = shotUnit.Position;
-            this.Movement = shotUnit.Movement;
+            throw new ArgumentNullException(nameof(shotUnit));
         }
 
-        #endregion
+        GamePresentation = gamePresentation ?? throw new ArgumentNullException(nameof(gamePresentation));
+        UniqueId = shotUnit.UniqueId;
+        OwnerTeam = shotUnit.Owner.Team;
 
-        #region Public Properties
-
-        public GamePresentation GamePresentation
-        {
-            get;
-            private set;
-        }
-
-        public GameObjectId UniqueId
-        {
-            get;
-            private set;
-        }
-
-        public GameTeam OwnerTeam
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal Point2D InitialPosition
-        {
-            get;
-            private set;
-        }
-
-        internal Vector2D Movement
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public Point2D GetCurrentPosition()
-        {
-            var ratio = GetCurrentRatio();
-            var currentMovement = this.Movement * ratio;
-
-            var result = this.InitialPosition + currentMovement;
-            return result;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private float GetCurrentRatio()
-        {
-            return this.GamePresentation.StepStopwatch.StepRatio;
-        }
-
-        #endregion
+        InitialPosition = shotUnit.Position;
+        Movement = shotUnit.Movement;
     }
+
+    public GamePresentation GamePresentation { get; }
+
+    public GameObjectId UniqueId { get; }
+
+    public GameTeam OwnerTeam { get; }
+
+    internal Point2D InitialPosition { get; }
+
+    internal Vector2D Movement { get; }
+
+    public Point2D GetCurrentPosition()
+    {
+        var ratio = GetCurrentRatio();
+        var currentMovement = Movement * ratio;
+
+        return InitialPosition + currentMovement;
+    }
+
+    private float GetCurrentRatio() => GamePresentation.StepStopwatch.StepRatio;
 }

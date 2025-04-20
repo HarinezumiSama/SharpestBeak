@@ -1,88 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using Omnifactotum.Annotations;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public readonly struct ValueRange<T>
+    where T : struct, IComparable<T>
 {
-    public struct ValueRange<T>
-        where T : struct, IComparable<T>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ValueRange{T}"/> structure.
+    /// </summary>
+    public ValueRange(T min, T max)
     {
-        #region Constants and Fields
-
-        private readonly T _min;
-        private readonly T _max;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ValueRange&lt;T&gt;"/> structure.
-        /// </summary>
-        public ValueRange(T min, T max)
+        if (Comparer<T>.Default.Compare(min, max) > 0)
         {
-            #region Argument Check
-
-            if (Comparer<T>.Default.Compare(min, max) > 0)
-            {
-                throw new ArgumentException("The minimum is greater than maximum.");
-            }
-
-            #endregion
-
-            _min = min;
-            _max = max;
+            throw new ArgumentException($"The minimum ({min}) is greater than maximum ({max}).");
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public T Min
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _min;
-            }
-        }
-
-        public T Max
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _max;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "[{0} .. {1}]", _min, _max);
-        }
-
-        /// <summary>
-        ///     Determines whether the specified value belongs to this range.
-        /// </summary>
-        /// <param name="value">
-        ///     The value to check.
-        /// </param>
-        /// <returns>
-        ///     <c>true</c> if the specified value belongs to this range; otherwise, <c>false</c>.
-        /// </returns>
-        [Pure]
-        public bool Belongs(T value)
-        {
-            return value.IsInRange(this);
-        }
-
-        #endregion
+        Min = min;
+        Max = max;
     }
+
+    public T Min { get; }
+
+    public T Max { get; }
+
+    public override string ToString() => $"[{Min} .. {Max}]";
+
+    /// <summary>
+    ///     Determines whether this range contains the specified value.
+    /// </summary>
+    /// <param name="value">
+    ///     The value to check.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if this range contains the specified value; otherwise, <see langword="false"/>.
+    /// </returns>
+    [Pure]
+    public bool Contains(T value) => value.IsInRange(this);
 }

@@ -1,35 +1,25 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
 using Omnifactotum;
 
-namespace SharpestBeak.UI
+namespace SharpestBeak.UI;
+
+public abstract class NotifyPropertyChangedBase : INotifyPropertyChanged
 {
-    public abstract class NotifyPropertyChangedBase : INotifyPropertyChanged
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected void RaisePropertyChanged<TObject, TProperty>(
+        Expression<Func<TObject, TProperty>> propertyExpression)
+        where TObject : NotifyPropertyChangedBase
     {
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-        #region Protected Methods
-
-        protected void RaisePropertyChanged<TObject, TProperty>(
-            Expression<Func<TObject, TProperty>> propertyExpression)
-            where TObject : NotifyPropertyChangedBase
+        var propertyChanged = PropertyChanged;
+        if (propertyChanged is null)
         {
-            var propertyChanged = this.PropertyChanged;
-            if (propertyChanged == null)
-            {
-                return;
-            }
-
-            var propertyName = Factotum.For<TObject>.GetPropertyName(propertyExpression);
-            propertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            return;
         }
 
-        #endregion
+        var propertyName = Factotum.For<TObject>.GetPropertyName(propertyExpression);
+        propertyChanged(this, new PropertyChangedEventArgs(propertyName));
     }
 }

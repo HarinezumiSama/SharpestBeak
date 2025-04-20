@@ -1,210 +1,112 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Windows;
+using Omnifactotum.Annotations;
 using Xceed.Wpf.Toolkit.PropertyGrid.Attributes;
 using Size = System.Drawing.Size;
 
-namespace SharpestBeak.UI
+namespace SharpestBeak.UI;
+
+public sealed class SizeObject : DependencyObject, ICustomTypeDescriptor
 {
-    public sealed class SizeObject : DependencyObject, ICustomTypeDescriptor
+    public static readonly DependencyProperty WidthProperty =
+        Helper.RegisterDependencyProperty(
+            (SizeObject control) => control.Width,
+            new PropertyMetadata(OnWidthChanged));
+
+    public static readonly DependencyProperty HeightProperty =
+        Helper.RegisterDependencyProperty(
+            (SizeObject control) => control.Height,
+            new PropertyMetadata(OnHeightChanged));
+
+    private static readonly DependencyPropertyKey AsStringKey =
+        Helper.RegisterReadOnlyDependencyProperty((SizeObject control) => control.AsString);
+
+    private static readonly string[] VisibleNames = [WidthProperty.Name, HeightProperty.Name];
+
+    public SizeObject(Size size) => SetSize(size);
+
+    [DebuggerNonUserCode]
+    public static DependencyProperty AsStringProperty { get; } = AsStringKey.DependencyProperty;
+
+    [PropertyOrder(1)]
+    public int Width
     {
-        #region Constants and Fields
+        get => (int)GetValue(WidthProperty);
 
-        public static readonly DependencyProperty WidthProperty =
-            Helper.RegisterDependencyProperty(
-                (SizeObject control) => control.Width,
-                new PropertyMetadata(OnWidthChanged));
-
-        public static readonly DependencyProperty HeightProperty =
-            Helper.RegisterDependencyProperty(
-                (SizeObject control) => control.Height,
-                new PropertyMetadata(OnHeightChanged));
-
-        private static readonly DependencyPropertyKey AsStringKey =
-            Helper.RegisterReadOnlyDependencyProperty((SizeObject control) => control.AsString);
-
-        private static readonly DependencyProperty AsStringPropertyField = AsStringKey.DependencyProperty;
-
-        private static readonly string[] VisibleNames = { WidthProperty.Name, HeightProperty.Name };
-
-        #endregion
-
-        #region Constructors
-
-        public SizeObject(Size size)
-        {
-            SetSize(size);
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public static DependencyProperty AsStringProperty
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return AsStringPropertyField;
-            }
-        }
-
-        [PropertyOrder(1)]
-        public int Width
-        {
-            get
-            {
-                return (int)GetValue(WidthProperty);
-            }
-
-            set
-            {
-                SetValue(WidthProperty, value);
-            }
-        }
-
-        [PropertyOrder(2)]
-        public int Height
-        {
-            get
-            {
-                return (int)GetValue(HeightProperty);
-            }
-
-            set
-            {
-                SetValue(HeightProperty, value);
-            }
-        }
-
-        [Browsable(false)]
-        public string AsString
-        {
-            get
-            {
-                return (string)GetValue(AsStringPropertyField);
-            }
-
-            private set
-            {
-                SetValue(AsStringKey, value);
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override string ToString()
-        {
-            return string.Format(CultureInfo.InvariantCulture, "{0} x {1}", this.Width, this.Height);
-        }
-
-        public Size ToSize()
-        {
-            return new Size(this.Width, this.Height);
-        }
-
-        public void SetSize(Size size)
-        {
-            this.Width = size.Width;
-            this.Height = size.Height;
-        }
-
-        #endregion
-
-        #region ICustomTypeDescriptor Members
-
-        public AttributeCollection GetAttributes()
-        {
-            return TypeDescriptor.GetAttributes(this, true);
-        }
-
-        public string GetClassName()
-        {
-            return TypeDescriptor.GetClassName(this, true);
-        }
-
-        public string GetComponentName()
-        {
-            return TypeDescriptor.GetComponentName(this, true);
-        }
-
-        public TypeConverter GetConverter()
-        {
-            return TypeDescriptor.GetConverter(this, true);
-        }
-
-        public EventDescriptor GetDefaultEvent()
-        {
-            return TypeDescriptor.GetDefaultEvent(this, true);
-        }
-
-        public PropertyDescriptor GetDefaultProperty()
-        {
-            return TypeDescriptor.GetDefaultProperty(this, true);
-        }
-
-        public object GetEditor(Type editorBaseType)
-        {
-            return TypeDescriptor.GetEditor(this, editorBaseType, true);
-        }
-
-        public EventDescriptorCollection GetEvents(Attribute[] attributes)
-        {
-            return TypeDescriptor.GetEvents(this, attributes, true);
-        }
-
-        public EventDescriptorCollection GetEvents()
-        {
-            return TypeDescriptor.GetEvents(this, true);
-        }
-
-        public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
-        {
-            // Ignoring attributes
-            return GetProperties();
-        }
-
-        public PropertyDescriptorCollection GetProperties()
-        {
-            var properties = TypeDescriptor.GetProperties(this, true);
-            var filteredProperties = properties
-                .OfType<PropertyDescriptor>()
-                .Where(descriptor => VisibleNames.Contains(descriptor.Name))
-                .ToArray();
-            return new PropertyDescriptorCollection(filteredProperties);
-        }
-
-        public object GetPropertyOwner(PropertyDescriptor pd)
-        {
-            return this;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static void OnWidthChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var self = (obj as SizeObject).EnsureNotNull();
-            self.UpdateAsStringProperty();
-        }
-
-        private static void OnHeightChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
-        {
-            var self = (obj as SizeObject).EnsureNotNull();
-            self.UpdateAsStringProperty();
-        }
-
-        private void UpdateAsStringProperty()
-        {
-            this.AsString = ToString();
-        }
-
-        #endregion
+        [UsedImplicitly]
+        set => SetValue(WidthProperty, value);
     }
+
+    [PropertyOrder(2)]
+    public int Height
+    {
+        get => (int)GetValue(HeightProperty);
+
+        [UsedImplicitly]
+        set => SetValue(HeightProperty, value);
+    }
+
+    [Browsable(false)]
+    public string AsString
+    {
+        get => (string)GetValue(AsStringProperty);
+
+        private set => SetValue(AsStringKey, value);
+    }
+
+    public override string ToString() => $"{Width} x {Height}";
+
+    public Size ToSize() => new(Width, Height);
+
+    public void SetSize(Size size)
+    {
+        Width = size.Width;
+        Height = size.Height;
+    }
+
+    public AttributeCollection GetAttributes() => TypeDescriptor.GetAttributes(this, true);
+
+    public string GetClassName() => TypeDescriptor.GetClassName(this, true);
+
+    public string GetComponentName() => TypeDescriptor.GetComponentName(this, true);
+
+    public TypeConverter GetConverter() => TypeDescriptor.GetConverter(this, true);
+
+    public EventDescriptor GetDefaultEvent() => TypeDescriptor.GetDefaultEvent(this, true);
+
+    public PropertyDescriptor GetDefaultProperty() => TypeDescriptor.GetDefaultProperty(this, true);
+
+    public object GetEditor(Type editorBaseType) => TypeDescriptor.GetEditor(this, editorBaseType, true);
+
+    public EventDescriptorCollection GetEvents(Attribute[] attributes) => TypeDescriptor.GetEvents(this, attributes, true);
+
+    public EventDescriptorCollection GetEvents() => TypeDescriptor.GetEvents(this, true);
+
+    //// Ignoring attributes
+    public PropertyDescriptorCollection GetProperties(Attribute[] attributes) => GetProperties();
+
+    public PropertyDescriptorCollection GetProperties()
+    {
+        var properties = TypeDescriptor.GetProperties(this, true);
+
+        var filteredProperties = properties
+            .OfType<PropertyDescriptor>()
+            .Where(descriptor => VisibleNames.Contains(descriptor.Name))
+            .ToArray();
+
+        return new PropertyDescriptorCollection(filteredProperties);
+    }
+
+    public object GetPropertyOwner(PropertyDescriptor pd) => this;
+
+    private static void OnWidthChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        => (obj as SizeObject).EnsureNotNull().UpdateAsStringProperty();
+
+    private static void OnHeightChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        => (obj as SizeObject).EnsureNotNull().UpdateAsStringProperty();
+
+    private void UpdateAsStringProperty() => AsString = ToString();
 }

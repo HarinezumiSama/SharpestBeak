@@ -1,22 +1,16 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace SharpestBeak.Logic.Default
+namespace SharpestBeak.Logic.Default;
+
+[Description("Predictive aiming")]
+public sealed class PredictiveAimingChickenLogic : SmartChickenLogicBase
 {
-    [Description("Predictive aiming")]
-    public sealed class PredictiveAimingChickenLogic : SmartChickenLogicBase
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PredictiveAimingChickenLogic"/> class.
+    /// </summary>
+    public PredictiveAimingChickenLogic()
+        : base(Features.PredictiveShot)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="PredictiveAimingChickenLogic"/> class.
-        /// </summary>
-        public PredictiveAimingChickenLogic()
-            : base(Features.PredictiveShot)
-        {
-            // Nothing to do
-        }
-
-        #endregion
+        // Nothing to do
     }
 }

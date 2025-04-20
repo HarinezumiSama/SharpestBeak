@@ -1,15 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SharpestBeak.Presentation;
 
-namespace SharpestBeak.Presentation
+public interface ICollidable
 {
-    public interface ICollidable
-    {
-        #region Methods
-
-        bool HasCollision(ICollidable other);
-
-        #endregion
-    }
+    bool HasCollision(ICollidable other);
 }

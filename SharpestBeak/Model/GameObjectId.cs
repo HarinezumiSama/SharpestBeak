@@ -2,117 +2,42 @@
 using System.Diagnostics;
 using System.Globalization;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+public readonly struct GameObjectId : IEquatable<GameObjectId>
 {
-    public struct GameObjectId : IEquatable<GameObjectId>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GameObjectId"/> structure.
+    /// </summary>
+    internal GameObjectId(int value)
     {
-        #region Constants and Fields
-
-        private static readonly GameObjectId NoneField = new GameObjectId();
-
-        private readonly int _value;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameObjectId"/> structure.
-        /// </summary>
-        internal GameObjectId(int value)
+        if (value < 0)
         {
-            #region Argument Check
-
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "value",
-                    value,
-                    @"The value cannot be negative.");
-            }
-
-            #endregion
-
-            _value = value;
+            throw new ArgumentOutOfRangeException(nameof(value), value, "The value cannot be negative.");
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public static GameObjectId None
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return NoneField;
-            }
-        }
-
-        public bool IsValid
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _value > 0;
-            }
-        }
-
-        public bool IsNone
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _value == NoneField._value;
-            }
-        }
-
-        #endregion
-
-        #region Internal Properties
-
-        internal int Value
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _value;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override bool Equals(object obj)
-        {
-            return obj is GameObjectId && Equals((GameObjectId)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return _value.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[{0} #{1}]", GetType().Name, _value);
-        }
-
-        public string GetValueAsString()
-        {
-            return _value.ToString(CultureInfo.InvariantCulture);
-        }
-
-        #endregion
-
-        #region IEquatable<GameObjectId> Members
-
-        public bool Equals(GameObjectId other)
-        {
-            return _value == other._value;
-        }
-
-        #endregion
+        Value = value;
     }
+
+    [DebuggerNonUserCode]
+    public static GameObjectId None { get; } = new();
+
+    [DebuggerNonUserCode]
+    public bool IsValid => Value > 0;
+
+    [DebuggerNonUserCode]
+    public bool IsNone => Value == None.Value;
+
+    [DebuggerNonUserCode]
+    private int Value { get; }
+
+    public override bool Equals(object obj) => obj is GameObjectId castObj && Equals(castObj);
+
+    public override int GetHashCode() => Value.GetHashCode();
+
+    public override string ToString() => $"[{GetType().Name} #{Value}]";
+
+    public string GetValueAsString() => Value.ToString(CultureInfo.InvariantCulture);
+
+    public bool Equals(GameObjectId other) => Value == other.Value;
 }

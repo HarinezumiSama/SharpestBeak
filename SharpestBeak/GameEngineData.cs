@@ -1,71 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation.Primitives;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public sealed class GameEngineData
 {
-    public sealed class GameEngineData
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GameEngineData"/> class.
+    /// </summary>
+    internal GameEngineData(Size nominalSize)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameEngineData"/> class.
-        /// </summary>
-        internal GameEngineData(Size nominalSize)
+        if (!nominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
+            || !nominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
         {
-            #region Argument Check
-
-            if (!nominalSize.Width.IsInRange(GameConstants.NominalCellCountRange)
-                || !nominalSize.Height.IsInRange(GameConstants.NominalCellCountRange))
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        "Each nominal board size dimension must be in the range {0} to {1}.",
-                        GameConstants.NominalCellCountRange.Min,
-                        GameConstants.NominalCellCountRange.Max),
-                    "nominalSize");
-            }
-
-            #endregion
-
-            this.NominalSize = nominalSize;
-
-            this.RealSize = new SizeF(
-                GameConstants.NominalCellSize * nominalSize.Width,
-                GameConstants.NominalCellSize * nominalSize.Height);
-
-            this.BoardBorder = new ConvexPolygonPrimitive(
-                Point2D.Zero,
-                new Point2D(this.RealSize.Width, 0f),
-                new Point2D(this.RealSize),
-                new Point2D(0f, this.RealSize.Height));
+            throw new ArgumentException(
+                $"Each nominal board size dimension must be in the range {GameConstants.NominalCellCountRange.Min} to {
+                    GameConstants.NominalCellCountRange.Max}.",
+                nameof(nominalSize));
         }
 
-        #endregion
+        NominalSize = nominalSize;
 
-        #region Public Properties
+        RealSize = new SizeF(
+            GameConstants.NominalCellSize * nominalSize.Width,
+            GameConstants.NominalCellSize * nominalSize.Height);
 
-        public Size NominalSize
-        {
-            get;
-            private set;
-        }
-
-        public SizeF RealSize
-        {
-            get;
-            private set;
-        }
-
-        public ConvexPolygonPrimitive BoardBorder
-        {
-            get;
-            private set;
-        }
-
-        #endregion
+        BoardBorder = new ConvexPolygonPrimitive(
+            Point2D.Zero,
+            new Point2D(RealSize.Width, 0f),
+            new Point2D(RealSize),
+            new Point2D(0f, RealSize.Height));
     }
+
+    public Size NominalSize { get; }
+
+    public SizeF RealSize { get; }
+
+    public ConvexPolygonPrimitive BoardBorder { get; }
 }

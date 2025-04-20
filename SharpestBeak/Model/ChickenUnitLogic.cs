@@ -1,93 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
+using Omnifactotum.Annotations;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+[UsedImplicitly(ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature, ImplicitUseTargetFlags.WithInheritors)]
+public abstract class ChickenUnitLogic
 {
-    public abstract class ChickenUnitLogic
+    public GameTeam Team { get; private set; }
+
+    public static string GetCaption(Type logicType)
     {
-        #region Public Properties
-
-        public GameTeam Team
+        if (logicType is null)
         {
-            get;
-            private set;
+            throw new ArgumentNullException(nameof(logicType));
         }
 
-        #endregion
-
-        #region Public Methods
-
-        public static string GetCaption(Type logicType)
+        if (!typeof(ChickenUnitLogic).IsAssignableFrom(logicType))
         {
-            #region Argument Check
-
-            if (logicType == null)
-            {
-                throw new ArgumentNullException("logicType");
-            }
-
-            if (!typeof(ChickenUnitLogic).IsAssignableFrom(logicType))
-            {
-                throw new ArgumentException("The specified type is not inherited properly.", "logicType");
-            }
-
-            #endregion
-
-            var descriptionAttribute = logicType.GetSingleOrDefaultCustomAttribute<DescriptionAttribute>(false);
-            return descriptionAttribute == null ? logicType.Name : descriptionAttribute.Description;
+            throw new ArgumentException("The specified type is not inherited properly.", nameof(logicType));
         }
 
-        #endregion
-
-        #region Protected Internal Methods
-
-        internal void Reset(GameState gameState)
-        {
-            #region Argument Check
-
-            if (gameState == null)
-            {
-                throw new ArgumentNullException("gameState");
-            }
-
-            #endregion
-
-            this.Team = gameState.Team;
-
-            OnReset(gameState);
-        }
-
-        internal void MakeMove(GameState gameState, LogicMoveResult moves)
-        {
-            #region Argument Check
-
-            if (gameState == null)
-            {
-                throw new ArgumentNullException("gameState");
-            }
-
-            if (moves == null)
-            {
-                throw new ArgumentNullException("moves");
-            }
-
-            #endregion
-
-            OnMakeMove(gameState, moves);
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected abstract void OnReset(GameState gameState);
-
-        protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
-
-        #endregion
+        var descriptionAttribute = logicType.GetSingleOrDefaultCustomAttribute<DescriptionAttribute>(false);
+        return descriptionAttribute is null ? logicType.Name : descriptionAttribute.Description;
     }
+
+    internal void Reset(GameState gameState)
+    {
+        if (gameState is null)
+        {
+            throw new ArgumentNullException(nameof(gameState));
+        }
+
+        Team = gameState.Team;
+
+        OnReset(gameState);
+    }
+
+    internal void MakeMove(GameState gameState, LogicMoveResult moves)
+    {
+        if (gameState is null)
+        {
+            throw new ArgumentNullException(nameof(gameState));
+        }
+
+        if (moves is null)
+        {
+            throw new ArgumentNullException(nameof(moves));
+        }
+
+        OnMakeMove(gameState, moves);
+    }
+
+    protected abstract void OnReset(GameState gameState);
+
+    protected abstract void OnMakeMove(GameState gameState, LogicMoveResult moves);
 }

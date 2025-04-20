@@ -1,92 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using SharpestBeak.Model;
 
-namespace SharpestBeak.UI
+namespace SharpestBeak.UI;
+
+public sealed class LogicInfo : IEquatable<LogicInfo>
 {
-    public sealed class LogicInfo : IEquatable<LogicInfo>
+    private readonly string _asString;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="LogicInfo"/> class.
+    /// </summary>
+    internal LogicInfo(Type type)
     {
-        #region Constants and Fields
-
-        private readonly string _asString;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="LogicInfo"/> class.
-        /// </summary>
-        internal LogicInfo(Type type)
+        if (type is null)
         {
-            #region Argument Check
-
-            if (type == null)
-            {
-                throw new ArgumentNullException("type");
-            }
-
-            #endregion
-
-            var caption = ChickenUnitLogic.GetCaption(type);
-            if (caption.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentException(
-                    string.Format(CultureInfo.InvariantCulture, "Logic '{0}' has empty caption.", type.FullName),
-                    "type");
-            }
-
-            this.Type = type;
-            this.Caption = caption;
-            _asString = string.Format("{0} ({1})", caption, type.Name);
+            throw new ArgumentNullException(nameof(type));
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public Type Type
+        var caption = ChickenUnitLogic.GetCaption(type);
+        if (caption.IsNullOrWhiteSpace())
         {
-            get;
-            private set;
+            throw new ArgumentException($"Logic '{type.FullName}' has empty caption.", nameof(type));
         }
 
-        public string Caption
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override bool Equals(object obj)
-        {
-            return this.Equals(obj as LogicInfo);
-        }
-
-        public override int GetHashCode()
-        {
-            return this.Type.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return _asString;
-        }
-
-        #endregion
-
-        #region IEquatable<LogicInfo> Members
-
-        public bool Equals(LogicInfo other)
-        {
-            return !ReferenceEquals(other, null) && this.Type == other.Type;
-        }
-
-        #endregion
+        Type = type;
+        Caption = caption;
+        _asString = $"{caption} ({type.Name})";
     }
+
+    public Type Type { get; }
+
+    public string Caption { get; }
+
+    public override bool Equals(object obj) => Equals(obj as LogicInfo);
+
+    public override int GetHashCode() => Type.GetHashCode();
+
+    public override string ToString() => _asString;
+
+    public bool Equals(LogicInfo other) => other is not null && Type == other.Type;
 }

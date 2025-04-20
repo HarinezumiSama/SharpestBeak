@@ -1,112 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 
-namespace SharpestBeak.Diagnostics
+namespace SharpestBeak.Diagnostics;
+
+internal sealed class PerformanceCounterHelper
 {
-    internal sealed class PerformanceCounterHelper
+    private const string CollisionCountPerStepCounterName = "CollisionCountPerStep";
+    private const string CollisionCountPerStepBaseCounterName = "CollisionCountPerStepBase";
+
+    private static readonly string CategoryName = typeof(PerformanceCounterHelper).Assembly.GetName().Name;
+
+    private PerformanceCounterHelper()
     {
-        #region Constants and Fields
+        DebugHelper.CallAndMeasure(Setup);
 
-        public static readonly string CategoryName = typeof(PerformanceCounterHelper).Assembly.GetName().Name;
-        public static readonly string CollisionCountPerStepCounterName = "CollisionCountPerStep";
-        public static readonly string CollisionCountPerStepBaseCounterName = "CollisionCountPerStepBase";
-
-        private static readonly PerformanceCounterHelper InstanceField = new PerformanceCounterHelper();
-
-        #endregion
-
-        #region Constructors
-
-        private PerformanceCounterHelper()
+        CollisionCountPerStep = new PerformanceCounter(CategoryName, CollisionCountPerStepCounterName, false)
         {
-            DebugHelper.CallAndMeasure(this.Setup);
+            RawValue = 0
+        };
 
-            this.CollisionCountPerStep = new PerformanceCounter(
-                CategoryName,
+        CollisionCountPerStepBase = new PerformanceCounter(CategoryName, CollisionCountPerStepBaseCounterName, false)
+        {
+            RawValue = 0
+        };
+    }
+
+    public static PerformanceCounterHelper Instance { get; } = new();
+
+    public PerformanceCounter CollisionCountPerStep { get; }
+
+    public PerformanceCounter CollisionCountPerStepBase { get; }
+
+    /// <summary>
+    ///     Initializes <see cref="PerformanceCounterHelper"/>. Used to initialize <see cref="PerformanceCounterHelper"/> at a specific time.
+    /// </summary>
+    public static PerformanceCounterHelper Initialize() => Instance;
+
+    private void Setup()
+    {
+        if (PerformanceCounterCategory.Exists(CategoryName))
+        {
+            PerformanceCounterCategory.Delete(CategoryName);
+        }
+
+        var counters = new CounterCreationDataCollection
+        {
+            new CounterCreationData(
                 CollisionCountPerStepCounterName,
-                false)
-            {
-                RawValue = 0
-            };
-
-            this.CollisionCountPerStepBase = new PerformanceCounter(
-                CategoryName,
+                "The number of collision detection calls per one game engine step.",
+                PerformanceCounterType.AverageCount64),
+            new CounterCreationData(
                 CollisionCountPerStepBaseCounterName,
-                false)
-            {
-                RawValue = 0
-            };
-        }
+                $"Base counter for '{CollisionCountPerStepCounterName}'.",
+                PerformanceCounterType.AverageBase)
+        };
 
-        #endregion
+        PerformanceCounterCategory.Create(
+            CategoryName,
+            "Sharpest Beak performance counters.",
+            PerformanceCounterCategoryType.Unknown,
+            counters);
 
-        #region Public Properties
-
-        public static PerformanceCounterHelper Instance
-        {
-            [DebuggerStepThrough]
-            get { return InstanceField; }
-        }
-
-        public PerformanceCounter CollisionCountPerStep
-        {
-            get;
-            private set;
-        }
-
-        public PerformanceCounter CollisionCountPerStepBase
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        /// <summary>
-        ///     Initializes <see cref="PerformanceCounterHelper"/>. Used to initialize
-        ///     <see cref="PerformanceCounterHelper"/> at a specific time.
-        /// </summary>
-        public static PerformanceCounterHelper Initialize()
-        {
-            return Instance;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private void Setup()
-        {
-            if (PerformanceCounterCategory.Exists(CategoryName))
-            {
-                PerformanceCounterCategory.Delete(CategoryName);
-            }
-
-            var counters = new CounterCreationDataCollection
-            {
-                new CounterCreationData(
-                    CollisionCountPerStepCounterName,
-                    "The number of collision detection calls per one game engine step.",
-                    PerformanceCounterType.AverageCount64),
-                new CounterCreationData(
-                    CollisionCountPerStepBaseCounterName,
-                    string.Format("Base counter for '{0}'.", CollisionCountPerStepCounterName),
-                    PerformanceCounterType.AverageBase)
-            };
-
-            PerformanceCounterCategory.Create(
-                CategoryName,
-                "Sharpest Beak performance counters.",
-                PerformanceCounterCategoryType.Unknown,
-                counters);
-
-            Debug.WriteLine(string.Format("{0} is successfully set up.", this.GetType().FullName));
-        }
-
-        #endregion
+        Debug.WriteLine($"{GetType().FullName} is successfully set up.");
     }
 }

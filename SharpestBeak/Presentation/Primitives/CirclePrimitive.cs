@@ -1,137 +1,82 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using SharpestBeak.Physics;
 
-namespace SharpestBeak.Presentation.Primitives
+namespace SharpestBeak.Presentation.Primitives;
+
+public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
 {
-    public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
+    private float _radiusSqr = float.MinValue;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="CirclePrimitive"/> class.
+    /// </summary>
+    public CirclePrimitive(Point2D center, float radius)
     {
-        #region Constants and Fields
-
-        private float _radiusSqr = float.MinValue;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="CirclePrimitive"/> class.
-        /// </summary>
-        public CirclePrimitive(Point2D center, float radius)
+        if (radius.IsNegativeOrZero())
         {
-            #region Argument Check
+            throw new ArgumentOutOfRangeException(nameof(radius), radius, "Circle radius must be positive.");
+        }
 
-            if (radius.IsNegativeOrZero())
+        Center = center;
+        Radius = radius;
+        BasePoint = center;
+    }
+
+    public Point2D Center { get; }
+
+    public float Radius { get; }
+
+    [DebuggerNonUserCode]
+    public float RadiusSquared
+    {
+        get
+        {
+            if (_radiusSqr <= 0f)
             {
-                throw new ArgumentOutOfRangeException("radius", radius, "Circle radius must be positive.");
+                _radiusSqr = Radius.Sqr();
             }
 
-            #endregion
-
-            this.Center = center;
-            this.Radius = radius;
-            this.BasePoint = center;
+            return _radiusSqr;
         }
+    }
 
-        #endregion
+    [DebuggerNonUserCode]
+    Point2D ICollidablePrimitive.BasePoint => BasePoint;
 
-        #region Public Properties
-
-        public Point2D Center
+    public bool HasCollision(ICollidablePrimitive other)
+    {
+        if (other is null)
         {
-            get;
-            private set;
+            throw new ArgumentNullException(nameof(other));
         }
 
-        public float Radius
+        if (other is CirclePrimitive otherCircle)
         {
-            get;
-            private set;
+            return CollisionDetector.CheckCircleToCircleCollision(this, otherCircle);
         }
 
-        public float RadiusSquared
+        if (other is LinePrimitive line)
         {
-            [DebuggerNonUserCode]
-            get
-            {
-                if (_radiusSqr <= 0f)
-                {
-                    _radiusSqr = this.Radius.Sqr();
-                }
-
-                return _radiusSqr;
-            }
+            return CollisionDetector.CheckLineToCircleCollision(line, this);
         }
 
-        #endregion
-
-        #region ICollidablePrimitive Members
-
-        Point2D ICollidablePrimitive.BasePoint
+        if (other is ConvexPolygonPrimitive polygon)
         {
-            [DebuggerNonUserCode]
-            get
-            {
-                return this.BasePoint;
-            }
+            return CollisionDetector.CheckCircleToPolygonCollision(this, polygon);
         }
 
-        public bool HasCollision(ICollidablePrimitive other)
-        {
-            #region Argument Check
+        throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
+    }
 
-            if (other == null)
-            {
-                throw new ArgumentNullException("other");
-            }
+    public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 
-            #endregion
-
-            var otherCircle = other as CirclePrimitive;
-            if (otherCircle != null)
-            {
-                return CollisionDetector.CheckCircleToCircleCollision(this, otherCircle);
-            }
-
-            var line = other as LinePrimitive;
-            if (line != null)
-            {
-                return CollisionDetector.CheckLineToCircleCollision(line, this);
-            }
-
-            var polygon = other as ConvexPolygonPrimitive;
-            if (polygon != null)
-            {
-                return CollisionDetector.CheckCircleToPolygonCollision(this, polygon);
-            }
-
-            throw new NotSupportedException();
-        }
-
-        #endregion
-
-        #region ICollidable Members
-
-        public bool HasCollision(ICollidable other)
-        {
-            return CollisionDetector.CheckPrimitiveCollision(this, other);
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnDraw(Graphics graphics, DrawData data)
-        {
-            var diameter = 2f * this.Radius;
-            var location = new Point2D(this.Center.X - this.Radius, this.Center.Y - this.Radius) * data.Coefficient;
-            var size = new Vector2D(diameter, diameter) * data.Coefficient;
-            graphics.FillEllipse(data.Brush, new RectangleF(location.ToPointF(), size.ToSizeF()));
-        }
-
-        #endregion
+    protected override void OnDraw(Graphics graphics, DrawData data)
+    {
+        var diameter = 2f * Radius;
+        var location = new Point2D(Center.X - Radius, Center.Y - Radius) * data.Coefficient;
+        var size = new Vector2D(diameter, diameter) * data.Coefficient;
+        graphics.FillEllipse(data.Brush, new RectangleF(location.ToPointF(), size.ToSizeF()));
     }
 }

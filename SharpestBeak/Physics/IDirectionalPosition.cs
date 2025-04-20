@@ -1,21 +1,8 @@
-﻿using System;
+﻿namespace SharpestBeak.Physics;
 
-namespace SharpestBeak.Physics
+public interface IDirectionalPosition
 {
-    public interface IDirectionalPosition
-    {
-        #region Properties
+    Point2D Position { get; }
 
-        Point2D Position
-        {
-            get;
-        }
-
-        GameAngle Angle
-        {
-            get;
-        }
-
-        #endregion
-    }
+    GameAngle Angle { get; }
 }

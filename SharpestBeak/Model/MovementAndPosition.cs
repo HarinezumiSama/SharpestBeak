@@ -1,39 +1,19 @@
-﻿using System;
-using System.Linq;
-using SharpestBeak.Physics;
+﻿using SharpestBeak.Physics;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+public readonly struct MovementAndPosition
 {
-    public struct MovementAndPosition
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MovementAndPosition"/> class.
+    /// </summary>
+    internal MovementAndPosition(Vector2D movement, Point2D position)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MovementAndPosition"/> class.
-        /// </summary>
-        internal MovementAndPosition(Vector2D movement, Point2D position)
-            : this()
-        {
-            this.Movement = movement;
-            this.Position = position;
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public Vector2D Movement
-        {
-            get;
-            private set;
-        }
-
-        public Point2D Position
-        {
-            get;
-            private set;
-        }
-
-        #endregion
+        Movement = movement;
+        Position = position;
     }
+
+    public Vector2D Movement { get; }
+
+    public Point2D Position { get; }
 }

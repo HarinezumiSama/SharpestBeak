@@ -1,135 +1,82 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using SharpestBeak.Physics;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+public sealed class GamePositionEventArgs : EventArgs
 {
-    public sealed class GamePositionEventArgs : EventArgs
+    private readonly Dictionary<ChickenUnit, DirectionalPosition> _unitToPositionMap;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GamePositionEventArgs"/> class.
+    /// </summary>
+    internal GamePositionEventArgs(GameEngine engine)
     {
-        #region Constants and Fields
-
-        private readonly Dictionary<ChickenUnit, DirectionalPosition> _unitToPositionMap;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GamePositionEventArgs"/> class.
-        /// </summary>
-        internal GamePositionEventArgs(GameEngine engine)
+        if (engine is null)
         {
-            #region Argument Check
+            throw new ArgumentNullException(nameof(engine));
+        }
 
-            if (engine == null)
+        Data = engine.Data;
+
+        var unitStatesProxy = new List<ChickenUnitState>(engine.AllChickens.Count);
+        UnitStates = unitStatesProxy.AsReadOnly();
+        foreach (var logic in engine.LogicExecutors)
+        {
+            lock (logic.UnitsStatesLock)
             {
-                throw new ArgumentNullException("engine");
+                unitStatesProxy.AddRange(logic.UnitsStates.Values);
             }
-
-            #endregion
-
-            this.Data = engine.Data;
-
-            var unitStatesProxy = new List<ChickenUnitState>(engine.AllChickens.Count);
-            this.UnitStates = unitStatesProxy.AsReadOnly();
-            foreach (var logic in engine.LogicExecutors)
-            {
-                lock (logic.UnitsStatesLock)
-                {
-                    unitStatesProxy.AddRange(logic.UnitsStates.Values);
-                }
-            }
-
-            _unitToPositionMap = new Dictionary<ChickenUnit, DirectionalPosition>();
         }
 
-        #endregion
+        _unitToPositionMap = new Dictionary<ChickenUnit, DirectionalPosition>();
+    }
 
-        #region Public Properties
+    public GameEngineData Data { get; }
 
-        public GameEngineData Data
+    public ReadOnlyCollection<ChickenUnitState> UnitStates { get; }
+
+    public bool TryGetPosition(ChickenUnitState unitState, out DirectionalPosition position)
+    {
+        if (unitState is null)
         {
-            get;
-            private set;
+            throw new ArgumentNullException(nameof(unitState));
         }
 
-        public ReadOnlyCollection<ChickenUnitState> UnitStates
+        return _unitToPositionMap.TryGetValue(unitState.Unit, out position);
+    }
+
+    public DirectionalPosition GetPosition(ChickenUnitState unitState)
+    {
+        if (unitState is null)
         {
-            get;
-            private set;
+            throw new ArgumentNullException(nameof(unitState));
         }
 
-        #endregion
+        return _unitToPositionMap[unitState.Unit];
+    }
 
-        #region Public Methods
-
-        public bool TryGetPosition(ChickenUnitState unitState, out DirectionalPosition position)
+    public void SetPosition(ChickenUnitState unitState, DirectionalPosition position)
+    {
+        if (unitState is null)
         {
-            #region Argument Check
-
-            if (unitState == null)
-            {
-                throw new ArgumentNullException("unitState");
-            }
-
-            #endregion
-
-            return _unitToPositionMap.TryGetValue(unitState.Unit, out position);
+            throw new ArgumentNullException(nameof(unitState));
         }
 
-        public DirectionalPosition GetPosition(ChickenUnitState unitState)
+        _unitToPositionMap[unitState.Unit] = position;
+    }
+
+    internal void Reset() => _unitToPositionMap.Clear();
+
+    internal DirectionalPosition GetPosition(ChickenUnit unit)
+    {
+        if (unit is null)
         {
-            #region Argument Check
-
-            if (unitState == null)
-            {
-                throw new ArgumentNullException("unitState");
-            }
-
-            #endregion
-
-            return _unitToPositionMap[unitState.Unit];
+            throw new ArgumentNullException(nameof(unit));
         }
 
-        public void SetPosition(ChickenUnitState unitState, DirectionalPosition position)
-        {
-            #region Argument Check
-
-            if (unitState == null)
-            {
-                throw new ArgumentNullException("unitState");
-            }
-
-            #endregion
-
-            _unitToPositionMap[unitState.Unit] = position;
-        }
-
-        #endregion
-
-        #region Internal Methods
-
-        internal void Reset()
-        {
-            _unitToPositionMap.Clear();
-        }
-
-        internal DirectionalPosition GetPosition(ChickenUnit unit)
-        {
-            #region Argument Check
-
-            if (unit == null)
-            {
-                throw new ArgumentNullException("unit");
-            }
-
-            #endregion
-
-            return _unitToPositionMap[unit];
-        }
-
-        #endregion
+        return _unitToPositionMap[unit];
     }
 }

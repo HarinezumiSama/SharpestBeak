@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SharpestBeak.Presentation;
 
-namespace SharpestBeak.Presentation
+public enum ConvexState
 {
-    public enum ConvexState
-    {
-        Undefined = 0,
-        Concave,
-        ConvexCounterClockwise,
-        ConvexClockwise
-    }
+    Undefined = 0,
+    Concave,
+    ConvexCounterClockwise,
+    ConvexClockwise
 }

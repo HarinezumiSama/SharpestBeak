@@ -1,32 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SharpestBeak.Physics;
+﻿using SharpestBeak.Physics;
 
-namespace SharpestBeak.Presentation.Elements
+namespace SharpestBeak.Presentation.Elements;
+
+public abstract class BaseElement
 {
-    public abstract class BaseElement
-    {
-        #region Constructors
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="BaseElement"/> class.
+    /// </summary>
+    internal BaseElement(Point2D position) => Position = position;
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="BaseElement"/> class.
-        /// </summary>
-        internal BaseElement(Point2D position)
-        {
-            this.Position = position;
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public Point2D Position
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-    }
+    public Point2D Position { get; }
 }

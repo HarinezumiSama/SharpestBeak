@@ -1,51 +1,28 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public sealed class EngineStepStopwatch
 {
-    public sealed class EngineStepStopwatch
+    private const double MaxStepRatio = 1d;
+
+    private readonly Stopwatch _stopwatch;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="EngineStepStopwatch"/> class.
+    /// </summary>
+    internal EngineStepStopwatch() => _stopwatch = new Stopwatch();
+
+    [DebuggerNonUserCode]
+    public float StepRatio
     {
-        #region Constants and Fields
-
-        private const double MaxStepRatio = 1d;
-
-        private readonly Stopwatch _stopwatch;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="EngineStepStopwatch"/> class.
-        /// </summary>
-        internal EngineStepStopwatch()
+        get
         {
-            _stopwatch = new Stopwatch();
+            var ratio = _stopwatch.Elapsed.TotalMilliseconds / GameConstants.LogicPollFrequency.TotalMilliseconds;
+            return (float)Math.Min(ratio, MaxStepRatio);
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public float StepRatio
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                var ratio = _stopwatch.Elapsed.TotalMilliseconds / GameConstants.LogicPollFrequency.TotalMilliseconds;
-                return (float)Math.Min(ratio, MaxStepRatio);
-            }
-        }
-
-        #endregion
-
-        #region Internal Methods
-
-        internal void Start()
-        {
-            _stopwatch.Restart();
-        }
-
-        #endregion
     }
+
+    internal void Start() => _stopwatch.Restart();
 }

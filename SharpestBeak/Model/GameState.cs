@@ -3,63 +3,38 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+public sealed class GameState
 {
-    public sealed class GameState
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GameState"/> class.
+    /// </summary>
+    internal GameState(GameEngine engine, GameTeam team, ICollection<ChickenUnitState> unitStates)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameState"/> class.
-        /// </summary>
-        internal GameState(GameEngine engine, GameTeam team, ICollection<ChickenUnitState> unitStates)
+        if (engine is null)
         {
-            #region Argument Check
-
-            if (engine == null)
-            {
-                throw new ArgumentNullException("engine");
-            }
-
-            if (unitStates == null)
-            {
-                throw new ArgumentNullException("unitStates");
-            }
-
-            if (unitStates.Any(item => item == null))
-            {
-                throw new ArgumentException("The collection contains a null element.", "unitStates");
-            }
-
-            #endregion
-
-            this.Data = engine.Data;
-            this.Team = team;
-            this.UnitStates = unitStates.ToArray().AsReadOnly();
+            throw new ArgumentNullException(nameof(engine));
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public GameEngineData Data
+        if (unitStates is null)
         {
-            get;
-            private set;
+            throw new ArgumentNullException(nameof(unitStates));
         }
 
-        public GameTeam Team
+        if (unitStates.Any(item => item is null))
         {
-            get;
-            private set;
+            throw new ArgumentException("The collection contains a null element.", nameof(unitStates));
         }
 
-        public ReadOnlyCollection<ChickenUnitState> UnitStates
-        {
-            get;
-            private set;
-        }
-
-        #endregion
+        Data = engine.Data;
+        Team = team;
+        UnitStates = unitStates.ToArray().AsReadOnly();
     }
+
+    public GameEngineData Data { get; }
+
+    public GameTeam Team { get; }
+
+    public ReadOnlyCollection<ChickenUnitState> UnitStates { get; }
 }

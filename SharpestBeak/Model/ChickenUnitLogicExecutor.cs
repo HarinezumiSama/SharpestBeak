@@ -2,291 +2,197 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
+using Omnifactotum.Annotations;
 using SharpestBeak.Diagnostics;
 
-namespace SharpestBeak.Model
+namespace SharpestBeak.Model;
+
+internal sealed class ChickenUnitLogicExecutor : IDisposable
 {
-    internal sealed class ChickenUnitLogicExecutor : IDisposable
+    private readonly ManualResetEventSlim _makeMoveEvent;
+    private readonly ThreadSafeValue<Exception> _error;
+    private Thread _thread;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ChickenUnitLogicExecutor"/> class.
+    /// </summary>
+    public ChickenUnitLogicExecutor(
+        GameEngine engine,
+        int unitCount,
+        GameTeam team,
+        ManualResetEventSlim makeMoveEvent,
+        ChickenUnitLogic logic)
     {
-        #region Constants and Fields
-
-        private readonly ManualResetEventSlim _makeMoveEvent;
-        private readonly ThreadSafeValue<Exception> _error;
-        private Thread _thread;
-
-        #endregion
-
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ChickenUnitLogicExecutor"/> class.
-        /// </summary>
-        public ChickenUnitLogicExecutor(
-            GameEngine engine,
-            int unitCount,
-            GameTeam team,
-            ManualResetEventSlim makeMoveEvent,
-            ChickenUnitLogic logic)
+        if (unitCount <= 0)
         {
-            #region Argument Check
-
-            if (engine == null)
-            {
-                throw new ArgumentNullException("engine");
-            }
-
-            if (unitCount <= 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "unitCount",
-                    unitCount,
-                    @"The value must be positive.");
-            }
-
-            if (team == GameTeam.None)
-            {
-                throw new ArgumentException("The team must be specific.", "team");
-            }
-
-            if (makeMoveEvent == null)
-            {
-                throw new ArgumentNullException("makeMoveEvent");
-            }
-
-            if (logic == null)
-            {
-                throw new ArgumentNullException("logic");
-            }
-
-            #endregion
-
-            this.Engine = engine;
-            this.Team = team;
-            _makeMoveEvent = makeMoveEvent;
-            this.Logic = logic;
-
-            var unitsDirect = Enumerable.Range(1, unitCount).Select(i => new ChickenUnit(this)).ToList();
-
-            _error = new ThreadSafeValue<Exception>();
-
-            this.Units = unitsDirect.AsReadOnly();
-
-            this.UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(unitsDirect.Count);
-            this.UnitsStatesLock = new object();
-
-            this.UnitsMoves = new Dictionary<ChickenUnit, MoveInfo>(unitsDirect.Count);
-            this.UnitsMovesLock = new object();
+            throw new ArgumentOutOfRangeException(nameof(unitCount), unitCount, "The value must be positive.");
         }
 
-        #endregion
-
-        #region Public Properties
-
-        public GameEngine Engine
+        if (team == GameTeam.None)
         {
-            get;
-            private set;
+            throw new ArgumentException("The team must be specific.", nameof(team));
         }
 
-        public GameTeam Team
+        Engine = engine ?? throw new ArgumentNullException(nameof(engine));
+        Team = team;
+        _makeMoveEvent = makeMoveEvent ?? throw new ArgumentNullException(nameof(makeMoveEvent));
+        Logic = logic ?? throw new ArgumentNullException(nameof(logic));
+
+        var unitsDirect = Enumerable.Range(1, unitCount).Select(_ => new ChickenUnit(this)).ToList();
+
+        _error = new ThreadSafeValue<Exception>();
+
+        Units = unitsDirect.AsReadOnly();
+
+        UnitsStates = new Dictionary<ChickenUnit, ChickenUnitState>(unitsDirect.Count);
+        UnitsStatesLock = new object();
+
+        UnitsMoves = new Dictionary<ChickenUnit, MoveInfo>(unitsDirect.Count);
+        UnitsMovesLock = new object();
+    }
+
+    public GameEngine Engine { get; }
+
+    public GameTeam Team { get; }
+
+    public ChickenUnitLogic Logic { get; }
+
+    public Exception Error
+    {
+        [DebuggerNonUserCode]
+        get => _error.Value;
+
+        [DebuggerNonUserCode]
+        [UsedImplicitly]
+        set => _error.Value = value;
+    }
+
+    public ReadOnlyCollection<ChickenUnit> Units { get; }
+
+    public Dictionary<ChickenUnit, ChickenUnitState> UnitsStates { get; }
+
+    public object UnitsStatesLock { get; }
+
+    public Dictionary<ChickenUnit, MoveInfo> UnitsMoves { get; }
+
+    public object UnitsMovesLock { get; }
+
+    public void Start()
+    {
+        if (_thread != null)
         {
-            get;
-            private set;
+            throw new InvalidOperationException("Already started.");
         }
 
-        public ChickenUnitLogic Logic
+        _thread = new Thread(DoExecuteLogic)
         {
-            get;
-            private set;
+            IsBackground = true,
+            Name = $"{GetType().Name}: {Team} [{Logic.GetType().Name}]"
+        };
+
+        _thread.Start();
+    }
+
+    public void Stop()
+    {
+        if (_thread is null)
+        {
+            return;
         }
 
-        public Exception Error
-        {
-            [DebuggerNonUserCode]
-            get
-            {
-                return _error.Value;
-            }
+        _thread.Abort();
+        _thread.Join();
 
-            [DebuggerNonUserCode]
-            set
-            {
-                _error.Value = value;
-            }
+        _thread = null;
+    }
+
+    public void Reset()
+    {
+        Error = null;
+
+        var gameState = GetGameState();
+        Logic.Reset(gameState);
+    }
+
+    public LogicMoveResult MakeMove()
+    {
+        var gameState = GetGameState();
+        var result = new LogicMoveResult(gameState.UnitStates.Count);
+        Logic.MakeMove(gameState, result);
+        return result;
+    }
+
+    public void Dispose() => Stop();
+
+    private GameState GetGameState()
+    {
+        GameState result;
+        lock (UnitsStatesLock)
+        {
+            result = new GameState(Engine, Team, UnitsStates.Values);
         }
 
-        public ReadOnlyCollection<ChickenUnit> Units
+        return result;
+    }
+
+    private void DoExecuteLogic()
+    {
+        while (true)
         {
-            get;
-            private set;
-        }
-
-        public Dictionary<ChickenUnit, ChickenUnitState> UnitsStates
-        {
-            get;
-            private set;
-        }
-
-        public object UnitsStatesLock
-        {
-            get;
-            private set;
-        }
-
-        public Dictionary<ChickenUnit, MoveInfo> UnitsMoves
-        {
-            get;
-            private set;
-        }
-
-        public object UnitsMovesLock
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public void Start()
-        {
-            if (_thread != null)
-            {
-                throw new InvalidOperationException("Already started.");
-            }
-
-            _thread = new Thread(this.DoExecuteLogic)
-            {
-                IsBackground = true,
-                Name =
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "{0}: {1} [{2}]",
-                        GetType().Name,
-                        this.Team,
-                        this.Logic.GetType().Name)
-            };
-
-            _thread.Start();
-        }
-
-        public void Stop()
-        {
-            if (_thread == null)
+            if (SettingsCache.Instance.InstrumentationMode && Engine.MoveCount >= GameEngine.InstrumentationMoveCountLimit)
             {
                 return;
             }
 
-            _thread.Abort();
-            _thread.Join();
-
-            _thread = null;
-        }
-
-        public void Reset()
-        {
-            this.Error = null;
-
-            var gameState = GetGameState();
-            this.Logic.Reset(gameState);
-        }
-
-        public LogicMoveResult MakeMove()
-        {
-            var gameState = GetGameState();
-            var result = new LogicMoveResult(gameState.UnitStates.Count);
-            this.Logic.MakeMove(gameState, result);
-            return result;
-        }
-
-        #endregion
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            Stop();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private GameState GetGameState()
-        {
-            GameState result;
-            lock (this.UnitsStatesLock)
+            try
             {
-                result = new GameState(this.Engine, this.Team, this.UnitsStates.Values);
-            }
-
-            return result;
-        }
-
-        private void DoExecuteLogic()
-        {
-            while (true)
-            {
-                if (SettingsCache.Instance.InstrumentationMode
-                    && this.Engine.MoveCount >= GameEngine.InstrumentationMoveCountLimit)
+                while (!_makeMoveEvent.Wait(0))
                 {
-                    return;
+                    Thread.Sleep(0);
                 }
 
-                try
+                var moveResult = MakeMove();
+
+                lock (UnitsMovesLock)
                 {
-                    while (!_makeMoveEvent.Wait(0))
+                    UnitsMoves.Clear();
+                    foreach (var movePair in moveResult.InnerMap)
                     {
-                        Thread.Sleep(0);
+                        DebugHelper.WriteLine(
+                            "[Logic '{0}'] Chicken {{{1}}} is making move {{{2}}}.",
+                            Logic.GetType().Name,
+                            movePair.Key,
+                            movePair.Value is null ? "NONE" : movePair.Value.ToString());
+
+                        UnitsMoves.Add(movePair.Key, movePair.Value);
                     }
-
-                    var moveResult = MakeMove();
-
-                    lock (this.UnitsMovesLock)
-                    {
-                        this.UnitsMoves.Clear();
-                        foreach (var movePair in moveResult.InnerMap)
-                        {
-                            DebugHelper.WriteLine(
-                                "[Logic '{0}'] Chicken {{{1}}} is making move {{{2}}}.",
-                                this.Logic.GetType().Name,
-                                movePair.Key,
-                                movePair.Value == null ? "NONE" : movePair.Value.ToString());
-
-                            this.UnitsMoves.Add(movePair.Key, movePair.Value);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.IsFatal())
-                    {
-                        throw;
-                    }
-
-                    this.Error = ex;
-
-                    this.Units.DoForEach(
-                        item =>
-                        {
-                            item.IsDead = true;
-                            DebugHelper.WriteLine(
-                                "Chicken #{0} is now dead since the logic '{1}' has caused an error:{2}{3}",
-                                item.UniqueId,
-                                this.Logic.GetType().FullName,
-                                Environment.NewLine,
-                                ex.ToString());
-                        });
-
-                    return;
                 }
             }
-        }
+            catch (Exception ex)
+            {
+                if (ex.IsFatal())
+                {
+                    throw;
+                }
 
-        #endregion
+                Error = ex;
+
+                Units.DoForEach(
+                    item =>
+                    {
+                        item.IsDead = true;
+                        DebugHelper.WriteLine(
+                            "Chicken #{0} is now dead since the logic '{1}' has caused an error:{2}{3}",
+                            item.UniqueId,
+                            Logic.GetType().FullName,
+                            Environment.NewLine,
+                            ex);
+                    });
+
+                return;
+            }
+        }
     }
 }

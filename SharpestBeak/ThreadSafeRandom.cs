@@ -1,169 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using SharpestBeak.Diagnostics;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public sealed class ThreadSafeRandom : Random
 {
-    public sealed class ThreadSafeRandom : Random
+    private static readonly object InstanceCountLock = new();
+    private static ulong _instanceCount;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ThreadSafeRandom"/> class
+    ///     using the specified seed value.
+    /// </summary>
+    public ThreadSafeRandom(int seed)
+        : base(seed)
     {
-        #region Constants and Fields
+        InitialSeed = seed;
+        InstanceId = GetNextInstanceId();
 
-        private static readonly object InstanceCountLock = new object();
-        private static ulong _instanceCount;
+        DebugHelper.WriteLineForced(
+            "{0} #{1}: InitialSeed = {2}",
+            GetType().FullName,
+            InstanceId,
+            InitialSeed);
+    }
 
-        private readonly object _syncLock = new object();
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ThreadSafeRandom"/> class.
+    /// </summary>
+    public ThreadSafeRandom()
+        : this(Environment.TickCount)
+    {
+        // Nothing to do
+    }
 
-        #endregion
+    public ulong InstanceId { get; }
 
-        #region Constructors
+    public int InitialSeed { get; }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeRandom"/> class
-        ///     using the specified seed value.
-        /// </summary>
-        public ThreadSafeRandom(int seed)
-            : base(seed)
+    public object SyncLock { get; } = new();
+
+    public override int Next()
+    {
+        lock (SyncLock)
         {
-            this.InitialSeed = seed;
-            this.InstanceId = GetNextInstanceId();
+            return base.Next();
+        }
+    }
 
-            DebugHelper.WriteLineForced(
-                "{0} #{1}: InitialSeed = {2}",
-                GetType().FullName,
-                this.InstanceId,
-                this.InitialSeed);
+    public override int Next(int minValue, int maxValue)
+    {
+        lock (SyncLock)
+        {
+            return base.Next(minValue, maxValue);
+        }
+    }
+
+    public override int Next(int maxValue)
+    {
+        lock (SyncLock)
+        {
+            return base.Next(maxValue);
+        }
+    }
+
+    public override void NextBytes(byte[] buffer)
+    {
+        lock (SyncLock)
+        {
+            base.NextBytes(buffer);
+        }
+    }
+
+    public override double NextDouble()
+    {
+        lock (SyncLock)
+        {
+            return base.NextDouble();
+        }
+    }
+
+    public override string ToString() => $"{GetType().Name}. InstanceId = {InstanceId}, InitialSeed = {InitialSeed}";
+
+    public T ChooseRandomValue<T>(IList<T> list)
+    {
+        if (list is null)
+        {
+            throw new ArgumentNullException(nameof(list));
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ThreadSafeRandom"/> class.
-        /// </summary>
-        public ThreadSafeRandom()
-            : this(Environment.TickCount)
+        return list[Next(list.Count)];
+    }
+
+    protected override double Sample()
+    {
+        lock (SyncLock)
         {
-            // Nothing to do
+            return base.Sample();
         }
+    }
 
-        #endregion
-
-        #region Public Properties
-
-        public ulong InstanceId
+    private static ulong GetNextInstanceId()
+    {
+        lock (InstanceCountLock)
         {
-            get;
-            private set;
+            _instanceCount++;
+            return _instanceCount;
         }
-
-        public int InitialSeed
-        {
-            get;
-            private set;
-        }
-
-        public object SyncLock
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _syncLock;
-            }
-        }
-
-        #endregion
-
-        #region Public Methods
-
-        public override int Next()
-        {
-            lock (_syncLock)
-            {
-                return base.Next();
-            }
-        }
-
-        public override int Next(int minValue, int maxValue)
-        {
-            lock (_syncLock)
-            {
-                return base.Next(minValue, maxValue);
-            }
-        }
-
-        public override int Next(int maxValue)
-        {
-            lock (_syncLock)
-            {
-                return base.Next(maxValue);
-            }
-        }
-
-        public override void NextBytes(byte[] buffer)
-        {
-            lock (_syncLock)
-            {
-                base.NextBytes(buffer);
-            }
-        }
-
-        public override double NextDouble()
-        {
-            lock (_syncLock)
-            {
-                return base.NextDouble();
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}. InstanceId = {1}, InitialSeed = {2}",
-                GetType().Name,
-                this.InstanceId,
-                this.InitialSeed);
-        }
-
-        public T ChooseRandomValue<T>(IList<T> list)
-        {
-            #region Argument Check
-
-            if (list == null)
-            {
-                throw new ArgumentNullException("list");
-            }
-
-            #endregion
-
-            return list[Next(list.Count)];
-        }
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override double Sample()
-        {
-            lock (_syncLock)
-            {
-                return base.Sample();
-            }
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static ulong GetNextInstanceId()
-        {
-            lock (InstanceCountLock)
-            {
-                _instanceCount++;
-                return _instanceCount;
-            }
-        }
-
-        #endregion
     }
 }

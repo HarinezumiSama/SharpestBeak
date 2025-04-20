@@ -1,40 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace SharpestBeak.Presentation
+namespace SharpestBeak.Presentation;
+
+public sealed class GamePaintEventArgs : EventArgs
 {
-    public sealed class GamePaintEventArgs : EventArgs
-    {
-        #region Constructors
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GamePaintEventArgs"/> class.
+    /// </summary>
+    internal GamePaintEventArgs(GamePresentation presentation) => Presentation = presentation ?? throw new ArgumentNullException(nameof(presentation));
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GamePaintEventArgs"/> class.
-        /// </summary>
-        internal GamePaintEventArgs(GamePresentation presentation)
-        {
-            #region Argument Check
-
-            if (presentation == null)
-            {
-                throw new ArgumentNullException("presentation");
-            }
-
-            #endregion
-
-            this.Presentation = presentation;
-        }
-
-        #endregion
-
-        #region Public Properties
-
-        public GamePresentation Presentation
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-    }
+    public GamePresentation Presentation { get; }
 }

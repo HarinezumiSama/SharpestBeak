@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿namespace SharpestBeak.UI;
 
-namespace SharpestBeak.UI
+public enum PositionMode
 {
-    public enum PositionMode
-    {
-        Random,
-        LineFight
-    }
+    Random,
+    LineFight
 }

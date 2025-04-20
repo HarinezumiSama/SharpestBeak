@@ -4,129 +4,84 @@ using System.Diagnostics;
 using System.Linq;
 using SharpestBeak.Physics;
 
-namespace SharpestBeak.Presentation.Primitives
+namespace SharpestBeak.Presentation.Primitives;
+
+public sealed class ConvexPolygonPrimitive : PolygonPrimitive, ICollidablePrimitive
 {
-    public sealed class ConvexPolygonPrimitive : PolygonPrimitive, ICollidablePrimitive
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
+    /// </summary>
+    public ConvexPolygonPrimitive(ICollection<Point2D> vertices)
+        : base(AdjustPolygon(vertices))
     {
-        #region Constructors
+        // Nothing to do
+    }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
-        /// </summary>
-        public ConvexPolygonPrimitive(ICollection<Point2D> vertices)
-            : base(AdjustPolygon(vertices))
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
+    /// </summary>
+    public ConvexPolygonPrimitive(params Point2D[] vertices)
+        : this((ICollection<Point2D>)vertices)
+    {
+        // Nothing to do
+    }
+
+    [DebuggerNonUserCode]
+    Point2D ICollidablePrimitive.BasePoint => BasePoint;
+
+    public bool HasCollision(ICollidablePrimitive other)
+    {
+        if (other is null)
         {
-            // Nothing to do
+            throw new ArgumentNullException(nameof(other));
         }
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="ConvexPolygonPrimitive"/> class.
-        /// </summary>
-        public ConvexPolygonPrimitive(params Point2D[] vertices)
-            : this((ICollection<Point2D>)vertices)
+        if (other is ConvexPolygonPrimitive otherCpp)
         {
-            // Nothing to do
+            return CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp);
         }
 
-        #endregion
-
-        #region ICollidablePrimitive Members
-
-        Point2D ICollidablePrimitive.BasePoint
+        if (other is LinePrimitive line)
         {
-            [DebuggerNonUserCode]
-            get
-            {
-                return this.BasePoint;
-            }
+            return CollisionDetector.CheckLineToPolygonCollision(line, this);
         }
 
-        public bool HasCollision(ICollidablePrimitive other)
+        if (other is CirclePrimitive circle)
         {
-            #region Argument Check
-
-            if (other == null)
-            {
-                throw new ArgumentNullException("other");
-            }
-
-            #endregion
-
-            var otherCpp = other as ConvexPolygonPrimitive;
-            if (otherCpp != null)
-            {
-                return CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp);
-            }
-
-            var line = other as LinePrimitive;
-            if (line != null)
-            {
-                return CollisionDetector.CheckLineToPolygonCollision(line, this);
-            }
-
-            var circle = other as CirclePrimitive;
-            if (circle != null)
-            {
-                return CollisionDetector.CheckCircleToPolygonCollision(circle, this);
-            }
-
-            throw new NotSupportedException();
+            return CollisionDetector.CheckCircleToPolygonCollision(circle, this);
         }
 
-        #endregion
+        throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
+    }
 
-        #region ICollidable Members
+    public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 
-        public bool HasCollision(ICollidable other)
+    /// <summary>
+    ///     Checks that the polygon defined by the specified vertices is convex and adjusts the order of vertices
+    ///     so that it is counter-clockwise defined.
+    /// </summary>
+    /// <param name="vertices">
+    ///     The vertices defining the polygon.
+    /// </param>
+    /// <returns>
+    ///     The adjusted collection of vertices.
+    /// </returns>
+    private static IEnumerable<Point2D> AdjustPolygon(ICollection<Point2D> vertices)
+    {
+        if (vertices is null)
         {
-            return CollisionDetector.CheckPrimitiveCollision(this, other);
+            throw new ArgumentNullException(nameof(vertices));
         }
 
-        #endregion
+        var edges = GetEdges(vertices.ToList());
+        var convexState = GetConvexState(edges);
 
-        #region Private Methods
-
-        /// <summary>
-        ///     Checks that the polygon defined by the specified vertices is convex and adjusts the order of vertices
-        ///     so that it is counter-clockwise defined.
-        /// </summary>
-        /// <param name="vertices">
-        ///     The vertices defining the polygon.
-        /// </param>
-        /// <returns>
-        ///     The adjusted collection of vertices.
-        /// </returns>
-        private static IEnumerable<Point2D> AdjustPolygon(ICollection<Point2D> vertices)
+        return convexState switch
         {
-            #region Argument Check
-
-            if (vertices == null)
-            {
-                throw new ArgumentNullException("vertices");
-            }
-
-            #endregion
-
-            var edges = GetEdges(vertices.ToList());
-            var convexState = GetConvexState(edges);
-
-            switch (convexState)
-            {
-                case ConvexState.Undefined:
-                case ConvexState.Concave:
-                    throw new ArgumentException("The vertices must define a convex polygon", "vertices");
-
-                case ConvexState.ConvexCounterClockwise:
-                    return vertices;
-
-                case ConvexState.ConvexClockwise:
-                    return vertices.Reverse();
-
-                default:
-                    throw new NotSupportedException();
-            }
-        }
-
-        #endregion
+            ConvexState.Undefined or ConvexState.Concave => throw new ArgumentException("The vertices must define a convex polygon", nameof(vertices)),
+            ConvexState.ConvexCounterClockwise => vertices,
+            ConvexState.ConvexClockwise => vertices.Reverse(),
+            _ => throw new NotSupportedException()
+        };
     }
 }

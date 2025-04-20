@@ -1,22 +1,16 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
-namespace SharpestBeak.Logic.Default
+namespace SharpestBeak.Logic.Default;
+
+[Description("Predictive aiming and turning away")]
+public sealed class PredictiveAimingAndTurningAwayChickenLogic : SmartChickenLogicBase
 {
-    [Description("Predictive aiming and turning away")]
-    public sealed class PredictiveAimingAndTurningAwayChickenLogic : SmartChickenLogicBase
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="PredictiveAimingAndTurningAwayChickenLogic"/> class.
+    /// </summary>
+    public PredictiveAimingAndTurningAwayChickenLogic()
+        : base(Features.PredictiveShot | Features.TurningAway)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="PredictiveAimingAndTurningAwayChickenLogic"/> class.
-        /// </summary>
-        public PredictiveAimingAndTurningAwayChickenLogic()
-            : base(Features.PredictiveShot | Features.TurningAway)
-        {
-            // Nothing to do
-        }
-
-        #endregion
+        // Nothing to do
     }
 }

@@ -1,163 +1,86 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 
-namespace SharpestBeak.UI
+namespace SharpestBeak.UI;
+
+/// <summary>
+///     Interaction logic for App.xaml.
+/// </summary>
+public partial class App
 {
     /// <summary>
-    ///     Interaction logic for App.xaml.
+    ///     Initializes a new instance of the <see cref="App"/> class.
     /// </summary>
-    public partial class App
+    public App()
     {
-        #region Constructors
+        Initialize();
 
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="App"/> class.
-        /// </summary>
-        public App()
+        AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+    }
+
+    public new static App Current
+    {
+        [DebuggerNonUserCode]
+        get => (App)Application.Current;
+    }
+
+    public string FullProductName { get; private set; }
+
+    public string FullProductDescription { get; private set; }
+
+    private static void KillThisProcess()
+    {
+        Process.GetCurrentProcess().Kill();
+    }
+
+    private void Initialize()
+    {
+        try
         {
-            Initialize();
-
-            AppDomain.CurrentDomain.UnhandledException += this.CurrentDomain_UnhandledException;
+            InitializeProperties();
         }
-
-        #endregion
-
-        #region Public Properties
-
-        public static new App Current
+        catch (Exception ex)
         {
-            [DebuggerNonUserCode]
-            get
-            {
-                return (App)Application.Current;
-            }
-        }
-
-        public string ProductName
-        {
-            get;
-            private set;
-        }
-
-        public Version ProductVersion
-        {
-            get;
-            private set;
-        }
-
-        public string ProductCopyright
-        {
-            get;
-            private set;
-        }
-
-        public string FullProductName
-        {
-            get;
-            private set;
-        }
-
-        public string FullProductDescription
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static void KillThisProcess()
-        {
-            Process.GetCurrentProcess().Kill();
-        }
-
-        private void Initialize()
-        {
-            try
-            {
-                InitializeProperties();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(
-                    string.Format(
-                        "The application has failed to initialize properly:{0}"
-                            + "{0}"
-                            + "[{1}] {2}{0}"
-                            + "{0}"
-                            + "The application will now terminate.",
-                        Environment.NewLine,
-                        ex.GetType().FullName,
-                        ex.Message),
-                    typeof(App).Namespace,
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-
-                KillThisProcess();
-            }
-        }
-
-        private void InitializeProperties()
-        {
-            var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
-
-            //// Independent properties
-
-            this.ProductName = assembly.GetSingleCustomAttribute<AssemblyProductAttribute>(false).Product;
-            this.ProductVersion = assembly.GetName().Version;
-            this.ProductCopyright = assembly.GetSingleCustomAttribute<AssemblyCopyrightAttribute>(false).Copyright;
-
-            //// Dependent properties
-
-            var versionString = string.Format(
-                CultureInfo.InvariantCulture,
-                "v{0} rev. {1}",
-                this.ProductVersion.ToString(2),
-                this.ProductVersion.Revision);
-
-            this.FullProductName = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0} ({1})",
-                this.ProductName,
-                versionString);
-
-            this.FullProductDescription = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0} ({1}) {2}",
-                this.ProductName,
-                versionString,
-                this.ProductCopyright);
-        }
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            var exception = e.ExceptionObject as Exception;
-            var typeName = exception == null ? "<UnknownException>" : exception.GetType().FullName;
-            var message = exception == null ? "(Unknown error)" : exception.Message;
-
             MessageBox.Show(
-                string.Format(
-                    "Unhandled exception has occurred:{0}"
-                        + "{0}"
-                        + "[{1}] {2}{0}"
-                        + "{0}"
-                        + "The application will now terminate.",
-                    Environment.NewLine,
-                    typeName,
-                    message),
-                this.ProductName,
+                $"The application has failed to initialize properly:{Environment.NewLine}{Environment.NewLine}[{ex.GetType().FullName}] {ex.Message}{
+                    Environment.NewLine}{Environment.NewLine}The application will now terminate.",
+                typeof(App).Namespace,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
 
             KillThisProcess();
         }
+    }
 
-        #endregion
+    private void InitializeProperties()
+    {
+        var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+
+        var productName = assembly.GetSingleCustomAttribute<AssemblyProductAttribute>(false).Product;
+        var productCopyright = assembly.GetSingleCustomAttribute<AssemblyCopyrightAttribute>(false).Copyright;
+
+        var productVersion = assembly.GetSingleOrDefaultCustomAttribute<AssemblyInformationalVersionAttribute>(false)?.InformationalVersion
+            ?? assembly.GetName().Version.ToString();
+
+        FullProductName = $"{productName} ({productVersion})";
+        FullProductDescription = $"{productName} ({productVersion}) {productCopyright}";
+    }
+
+    private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        var exception = e.ExceptionObject as Exception;
+        var typeName = exception is null ? "<UnknownException>" : exception.GetType().FullName;
+        var message = exception is null ? "(Unknown error)" : exception.Message;
+
+        MessageBox.Show(
+            $"Unhandled exception has occurred:{Environment.NewLine}{Environment.NewLine}[{typeName}] {message}{Environment.NewLine}{
+                Environment.NewLine}The application will now terminate.",
+            FullProductName,
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+
+        KillThisProcess();
     }
 }

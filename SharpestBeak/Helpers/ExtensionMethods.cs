@@ -1,234 +1,186 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using SharpestBeak.Model;
 
 //// The type is placed intentionally in the root namespace to ease access from other projects and namespaces
 //// ReSharper disable once CheckNamespace
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public static class ExtensionMethods
 {
-    public static class ExtensionMethods
+    public static void ChangeContents<T>(this IList<T> list, IEnumerable<T> newContents)
     {
-        #region Public Methods
-
-        public static void ChangeContents<T>(this IList<T> list, IEnumerable<T> newContents)
+        if (list is null)
         {
-            #region Argument Check
-
-            if (list == null)
-            {
-                throw new ArgumentNullException("list");
-            }
-
-            if (newContents == null)
-            {
-                throw new ArgumentNullException("newContents");
-            }
-
-            #endregion
-
-            list.Clear();
-            var castList = list as List<T>;
-            if (castList == null)
-            {
-                foreach (var item in newContents)
-                {
-                    list.Add(item);
-                }
-            }
-            else
-            {
-                castList.AddRange(newContents);
-            }
+            throw new ArgumentNullException(nameof(list));
         }
 
-        public static void ExecuteInReadLock(this ReaderWriterLockSlim @lock, Action action)
+        if (newContents is null)
         {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterReadLock();
-            try
-            {
-                action();
-            }
-            finally
-            {
-                @lock.ExitReadLock();
-            }
+            throw new ArgumentNullException(nameof(newContents));
         }
 
-        public static TResult ExecuteInReadLock<TResult>(this ReaderWriterLockSlim @lock, Func<TResult> action)
+        list.Clear();
+        if (list is List<T> castList)
         {
-            #region Argument Check
-
-            if (@lock == null)
+            castList.AddRange(newContents);
+        }
+        else
+        {
+            foreach (var item in newContents)
             {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterReadLock();
-            try
-            {
-                return action();
-            }
-            finally
-            {
-                @lock.ExitReadLock();
+                list.Add(item);
             }
         }
-
-        public static void ExecuteInUpgradeableReadLock(this ReaderWriterLockSlim @lock, Action action)
-        {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterUpgradeableReadLock();
-            try
-            {
-                action();
-            }
-            finally
-            {
-                @lock.ExitUpgradeableReadLock();
-            }
-        }
-
-        public static TResult ExecuteInUpgradeableReadLock<TResult>(
-            this ReaderWriterLockSlim @lock,
-            Func<TResult> action)
-        {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterUpgradeableReadLock();
-            try
-            {
-                return action();
-            }
-            finally
-            {
-                @lock.ExitUpgradeableReadLock();
-            }
-        }
-
-        public static void ExecuteInWriteLock(this ReaderWriterLockSlim @lock, Action action)
-        {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterWriteLock();
-            try
-            {
-                action();
-            }
-            finally
-            {
-                @lock.ExitWriteLock();
-            }
-        }
-
-        public static TResult ExecuteInWriteLock<TResult>(this ReaderWriterLockSlim @lock, Func<TResult> action)
-        {
-            #region Argument Check
-
-            if (@lock == null)
-            {
-                throw new ArgumentNullException("lock");
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            #endregion
-
-            @lock.EnterWriteLock();
-            try
-            {
-                return action();
-            }
-            finally
-            {
-                @lock.ExitWriteLock();
-            }
-        }
-
-        public static bool IsRejected(this MoveInfoStates value)
-        {
-            return (value & MoveInfoStates.RejectedMask) != 0;
-        }
-
-        public static SizeF Scale(this SizeF value, float coefficient)
-        {
-            return new SizeF(value.Width * coefficient, value.Height * coefficient);
-        }
-
-        public static PointF Scale(this PointF value, float coefficient)
-        {
-            return new PointF(value.X * coefficient, value.Y * coefficient);
-        }
-
-        public static TimeSpan Multiply(this TimeSpan value, double ratio)
-        {
-            return TimeSpan.FromTicks((long)(value.Ticks * ratio));
-        }
-
-        #endregion
     }
+
+    public static void ExecuteInReadLock(this ReaderWriterLockSlim @lock, Action action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterReadLock();
+        try
+        {
+            action();
+        }
+        finally
+        {
+            @lock.ExitReadLock();
+        }
+    }
+
+    public static TResult ExecuteInReadLock<TResult>(this ReaderWriterLockSlim @lock, Func<TResult> action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterReadLock();
+        try
+        {
+            return action();
+        }
+        finally
+        {
+            @lock.ExitReadLock();
+        }
+    }
+
+    public static void ExecuteInUpgradeableReadLock(this ReaderWriterLockSlim @lock, Action action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterUpgradeableReadLock();
+        try
+        {
+            action();
+        }
+        finally
+        {
+            @lock.ExitUpgradeableReadLock();
+        }
+    }
+
+    public static TResult ExecuteInUpgradeableReadLock<TResult>(
+        this ReaderWriterLockSlim @lock,
+        Func<TResult> action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterUpgradeableReadLock();
+        try
+        {
+            return action();
+        }
+        finally
+        {
+            @lock.ExitUpgradeableReadLock();
+        }
+    }
+
+    public static void ExecuteInWriteLock(this ReaderWriterLockSlim @lock, Action action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterWriteLock();
+        try
+        {
+            action();
+        }
+        finally
+        {
+            @lock.ExitWriteLock();
+        }
+    }
+
+    public static TResult ExecuteInWriteLock<TResult>(this ReaderWriterLockSlim @lock, Func<TResult> action)
+    {
+        if (@lock is null)
+        {
+            throw new ArgumentNullException(nameof(@lock));
+        }
+
+        if (action is null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
+
+        @lock.EnterWriteLock();
+        try
+        {
+            return action();
+        }
+        finally
+        {
+            @lock.ExitWriteLock();
+        }
+    }
+
+    public static bool IsRejected(this MoveInfoStates value) => (value & MoveInfoStates.RejectedMask) != 0;
+
+    public static SizeF Scale(this SizeF value, float coefficient) => new(value.Width * coefficient, value.Height * coefficient);
+
+    public static PointF Scale(this PointF value, float coefficient) => new(value.X * coefficient, value.Y * coefficient);
+
+    public static TimeSpan Multiply(this TimeSpan value, double ratio) => TimeSpan.FromTicks((long)(value.Ticks * ratio));
 }

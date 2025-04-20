@@ -1,52 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using SharpestBeak.Model;
 
-namespace SharpestBeak
+namespace SharpestBeak;
+
+public sealed class GameEndedEventArgs : EventArgs
 {
-    public sealed class GameEndedEventArgs : EventArgs
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GameEndedEventArgs"/> class.
+    /// </summary>
+    internal GameEndedEventArgs(GameTeam winningTeam, ChickenUnitLogic winningLogic)
     {
-        #region Constructors
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="GameEndedEventArgs"/> class.
-        /// </summary>
-        internal GameEndedEventArgs(GameTeam winningTeam, ChickenUnitLogic winningLogic)
+        if (winningLogic is null ^ winningTeam == GameTeam.None)
         {
-            #region Argument Check
-
-            if (winningLogic == null ^ winningTeam == GameTeam.None)
-            {
-                throw new ArgumentException("Invalid combination of argument values.");
-            }
-
-            #endregion
-
-            this.WinningTeam = winningTeam;
-            this.WinningLogic = winningLogic;
+            throw new ArgumentException("Invalid combination of argument values.");
         }
 
-        #endregion
-
-        #region Public Properties
-
-        /// <summary>
-        ///     Gets the team that has won the game or <see cref="GameTeam.None"/>, if there is a draw,
-        ///     that is, both team units got killed.
-        /// </summary>
-        public GameTeam WinningTeam
-        {
-            get;
-            private set;
-        }
-
-        public ChickenUnitLogic WinningLogic
-        {
-            get;
-            private set;
-        }
-
-        #endregion
+        WinningTeam = winningTeam;
+        WinningLogic = winningLogic;
     }
+
+    /// <summary>
+    ///     Gets the team that has won the game or <see cref="GameTeam.None"/>, if there is a draw,
+    ///     that is, both team units got killed.
+    /// </summary>
+    public GameTeam WinningTeam { get; }
+
+    public ChickenUnitLogic WinningLogic { get; }
 }

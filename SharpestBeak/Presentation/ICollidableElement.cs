@@ -1,27 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 
-namespace SharpestBeak.Presentation
+namespace SharpestBeak.Presentation;
+
+public interface ICollidableElement : ICollidable
 {
-    public interface ICollidableElement : ICollidable
-    {
-        #region Properties
+    bool HasRoughPrimitives { get; }
 
-        bool HasRoughPrimitives
-        {
-            get;
-        }
+    ReadOnlyCollection<ICollidablePrimitive> GetRoughPrimitives();
 
-        #endregion
-
-        #region Methods
-
-        ReadOnlyCollection<ICollidablePrimitive> GetRoughPrimitives();
-
-        ReadOnlyCollection<ICollidablePrimitive> GetPrimitives();
-
-        #endregion
-    }
+    ReadOnlyCollection<ICollidablePrimitive> GetPrimitives();
 }
