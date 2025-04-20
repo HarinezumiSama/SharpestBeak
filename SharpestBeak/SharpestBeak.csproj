@@ -1,213 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CBBABFA5-F286-4B57-A726-9E5CC427D1E5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SharpestBeak</RootNamespace>
-    <AssemblyName>SharpestBeak</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
-    <TargetFrameworkProfile />
-    <MSBuildCommunityTasksPath>$(SolutionDir)\.build</MSBuildCommunityTasksPath>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\.bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\.bin\Debug\SharpestBeak.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <Prefer32Bit>false</Prefer32Bit>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <StyleCopEnabled>true</StyleCopEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\.bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <DocumentationFile>..\.bin\Release\SharpestBeak.xml</DocumentationFile>
-    <NoWarn>1591</NoWarn>
-    <Prefer32Bit>false</Prefer32Bit>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <StyleCopEnabled>true</StyleCopEnabled>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>..\Icons\SharpestBeak-32.ico</ApplicationIcon>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Omnifactotum, Version=0.3.0.119, Culture=neutral, PublicKeyToken=463364b83539fcba, processorArchitecture=MSIL">
-      <HintPath>..\packages\Omnifactotum.0.3.0.119\lib\net40-Client\Omnifactotum.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Model\AngleMovementAndPosition.cs" />
-    <Compile Include="Model\ChickenUnitLogicExecutor.cs" />
-    <Compile Include="Model\MovementAndPosition.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="..\SolutionItems\AssemblyInfo.Common.cs">
-      <Link>Properties\AssemblyInfo.Common.cs</Link>
-    </Compile>
-    <Compile Include="..\SolutionItems\Generated.GlobalVersion.cs">
-      <Link>Properties\Generated.GlobalVersion.cs</Link>
-    </Compile>
-    <Compile Include="EngineStepStopwatch.cs" />
-    <Compile Include="Model\BeakTurn.cs" />
-    <Compile Include="Configuration\ChickenTeamSettings.cs" />
-    <Compile Include="Model\ChickenUnit.cs" />
-    <Compile Include="Model\ChickenUnitLogic.cs" />
-    <Compile Include="Model\ChickenUnitState.cs" />
-    <Compile Include="Physics\CollisionDetector.cs" />
-    <Compile Include="Diagnostics\AutoStopwatch.cs" />
-    <Compile Include="Diagnostics\PerformanceCounterHelper.cs" />
-    <Compile Include="Physics\DirectionalPosition.cs" />
-    <Compile Include="Configuration\GameEngineSettings.cs" />
-    <Compile Include="GameException.cs" />
-    <Compile Include="Model\GameObjectId.cs" />
-    <Compile Include="Model\GamePositionEventArgs.cs" />
-    <Compile Include="Physics\IDirectionalPosition.cs" />
-    <Compile Include="Model\LogicMoveResult.cs" />
-    <Compile Include="Helpers\MathHelper.cs" />
-    <Compile Include="Presentation\ChickenPresentation.cs" />
-    <Compile Include="Presentation\Elements\BaseElement.cs" />
-    <Compile Include="Presentation\Primitives\BasePrimitive.cs" />
-    <Compile Include="Presentation\ConvexState.cs" />
-    <Compile Include="Presentation\Primitives\ConvexPolygonPrimitive.cs" />
-    <Compile Include="Presentation\DrawData.cs" />
-    <Compile Include="GameEndedEventArgs.cs" />
-    <Compile Include="Model\GameTeam.cs" />
-    <Compile Include="Physics\LineSide.cs" />
-    <Compile Include="Model\MoveInfoStates.cs" />
-    <Compile Include="Presentation\ShotPresentation.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="Physics\QuadraticEquation.cs" />
-    <Compile Include="SettingsCache.cs" />
-    <Compile Include="ThreadSafeRandom.cs" />
-    <Compile Include="UnitPositioningHelper.cs" />
-    <Compile Include="ValueRange.cs" />
-    <Compile Include="Physics\Vector2D.cs" />
-    <Compile Include="Diagnostics\DebugHelper.cs" />
-    <Compile Include="Presentation\Elements\ChickenElement.cs" />
-    <Compile Include="Presentation\Primitives\CirclePrimitive.cs" />
-    <Compile Include="Presentation\Elements\ShotElement.cs" />
-    <Compile Include="Presentation\Primitives\PolygonPrimitive.cs" />
-    <Compile Include="Presentation\Primitives\LinePrimitive.cs" />
-    <Compile Include="Helpers\ExtensionMethods.cs" />
-    <Compile Include="Model\FireMode.cs" />
-    <Compile Include="Physics\GameAngle.cs" />
-    <Compile Include="GameEngineData.cs" />
-    <Compile Include="GameConstants.cs" />
-    <Compile Include="GameEngine.cs" />
-    <Compile Include="Helpers\GameHelper.cs" />
-    <Compile Include="Presentation\GamePaintEventArgs.cs" />
-    <Compile Include="Presentation\GamePresentation.cs" />
-    <Compile Include="Model\GameState.cs" />
-    <Compile Include="Helpers\Helper.cs" />
-    <Compile Include="Presentation\ICollidable.cs" />
-    <Compile Include="Presentation\ICollidableElement.cs" />
-    <Compile Include="Presentation\ICollidablePrimitive.cs" />
-    <Compile Include="Physics\Point2D.cs" />
-    <Compile Include="Model\MoveInfo.cs" />
-    <Compile Include="Model\MoveDirection.cs" />
-    <Compile Include="Model\ShotUnit.cs" />
-    <Compile Include="ThreadSafeValue.cs" />
-    <Compile Include="View\ChickenViewData.cs" />
-    <Compile Include="View\ShotViewData.cs" />
-    <Compile Include="View\ViewInfo.cs" />
-    <Compile Include="View\BaseViewData.cs" />
-    <Compile Include="WinApi.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Helpers\_ReadMe.Helpers.txt" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\.lib\StyleCop\v4.7\StyleCop.Targets" />
-  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets" />
-  <PropertyGroup>
-    <CompileDependsOn>UpdateGlobalVersion;$(CompileDependsOn)</CompileDependsOn>
-    <BuildDependsOn>UpdateGlobalVersion;$(BuildDependsOn)</BuildDependsOn>
-  </PropertyGroup>
-  <Target Name="UpdateGlobalVersion">
+
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
-      <BaseVersionFile>$(ProjectDir)\..\SolutionItems\BaseVersion.txt</BaseVersionFile>
-      <RevisionFile>$(ProjectDir)\..\SolutionItems\Generated.Revision.txt</RevisionFile>
-      <RevisionIdFile>$(ProjectDir)\..\SolutionItems\Generated.RevisionId.txt</RevisionIdFile>
+        <TargetFramework>net48</TargetFramework>
+        <OutputPath>..\.bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
-    <Message Importance="high" Text="* Reading base version from '$(BaseVersionFile)'..." />
-    <ReadLinesFromFile File="$(BaseVersionFile)">
-      <Output TaskParameter="Lines" PropertyName="BaseVersion" />
-    </ReadLinesFromFile>
-    <Message Importance="high" Text="* Base version: '$(BaseVersion)'" />
-    <Exec Command="&quot;$(ProjectDir)\..\SolutionItems\hg.cmd&quot; identify --num &gt;&quot;$(RevisionFile)&quot;" />
-    <Exec Command="&quot;$(ProjectDir)\..\SolutionItems\hg.cmd&quot; identify --id &gt;&quot;$(RevisionIdFile)&quot;" />
-    <Message Importance="high" Text="* Reading HG revision number from '$(RevisionFile)'..." />
-    <ReadLinesFromFile File="$(RevisionFile)">
-      <Output TaskParameter="Lines" PropertyName="RevisionRaw" />
-    </ReadLinesFromFile>
-    <RegexReplace Input="$(RevisionRaw)" Expression="\+" Replacement="" Count="1">
-      <Output PropertyName="Revision" TaskParameter="Output" />
-    </RegexReplace>
-    <Message Importance="high" Text="* Revision number: '$(Revision)' (raw '$(RevisionRaw)')." />
+
     <PropertyGroup>
-      <GlobalVersion>$(BaseVersion).0.$(Revision)</GlobalVersion>
+        <UseWPF>true</UseWPF>
     </PropertyGroup>
-    <Message Importance="high" Text="* Reading HG revision ID from '$(RevisionIdFile)'..." />
-    <ReadLinesFromFile File="$(RevisionIdFile)">
-      <Output TaskParameter="Lines" PropertyName="RevisionId" />
-    </ReadLinesFromFile>
-    <Message Importance="high" Text="* Revision ID: '$(RevisionId)'" />
+
     <ItemGroup>
-      <AssemblyVersion Include="global::System.Reflection.AssemblyVersion">
-        <_Parameter1>$(GlobalVersion)</_Parameter1>
-      </AssemblyVersion>
-      <AssemblyFileVersion Include="global::System.Reflection.AssemblyFileVersion">
-        <_Parameter1>$(GlobalVersion)</_Parameter1>
-      </AssemblyFileVersion>
-      <AssemblyInformationalVersion Include="global::System.Reflection.AssemblyInformationalVersion">
-        <_Parameter1>$(GlobalVersion) (rev. $(RevisionId))</_Parameter1>
-      </AssemblyInformationalVersion>
+        <PackageReference Include="Omnifactotum"/>
     </ItemGroup>
-    <WriteCodeFragment Language="C#" OutputFile="$(ProjectDir)\..\SolutionItems\Generated.GlobalVersion.cs" AssemblyAttributes="@(AssemblyVersion);@(AssemblyFileVersion);@(AssemblyInformationalVersion)" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+    <ItemGroup>
+        <None Include="Properties\Settings.settings">
+            <Generator>SettingsSingleFileGenerator</Generator>
+            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
+        <Compile Update="Properties\Settings.Designer.cs">
+            <AutoGen>True</AutoGen>
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+            <DependentUpon>Settings.settings</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Helpers\_ReadMe.Helpers.txt"/>
+    </ItemGroup>
 </Project>

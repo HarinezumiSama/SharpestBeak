@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+        <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="Extended.Wpf.Toolkit" Version="[3.6.0]"/>
+        <PackageVersion Include="HelixToolkit" Version="[2.27.0]"/>
+        <PackageVersion Include="HelixToolkit.Wpf" Version="[2.27.0]"/>
+        <PackageVersion Include="Omnifactotum" Version="[0.13.0]"/>
+    </ItemGroup>
+</Project>
