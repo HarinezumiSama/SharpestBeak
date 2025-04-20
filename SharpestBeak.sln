@@ -21,6 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{FBD30A
 		nuget.config = nuget.config
 		Directory.Packages.props = Directory.Packages.props
 		SharpestBeak.sln.DotSettings = SharpestBeak.sln.DotSettings
+		appveyor.yml = appveyor.yml
+		build.cmd = build.cmd
+		build.ps1 = build.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Icons", "Icons", "{C8A1C4E5-E540-4D5A-A988-EE5E4C429BBE}"

@@ -1,0 +1,63 @@
+version: 'Build #{build} [{branch}]'
+pull_requests:
+  do_not_increment_build_number: false
+skip_branch_with_pr: true
+skip_tags: true
+branches:
+  only:
+  - master
+  - develop
+image: Visual Studio 2022
+configuration: Release
+platform: Any CPU
+shallow_clone: true
+nuget:
+  disable_publish_on_pr: true
+matrix:
+  fast_finish: true
+environment:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+  DOTNET_NOLOGO: 'true'
+  CI_ARG_PRERELEASE_SUFFIX: '-internal'
+for:
+  -
+    branches:
+      only:
+        - develop
+    environment:
+      CI_ARG_PRERELEASE_SUFFIX: '-prerelease'
+    deploy: off
+  -
+    branches:
+      only:
+        - master
+    environment:
+      CI_ARG_PRERELEASE_SUFFIX: ''
+build_script:
+- ps: |
+    $Script:ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop;
+    Microsoft.PowerShell.Core\Set-StrictMode -Version 1;
+    $ProgressPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue;
+
+    & ./build.ps1 `
+        -Verbose `
+        -BuildConfiguration $env:Configuration `
+        -BuildPlatform $env:Platform `
+        -PrereleaseSuffix $env:CI_ARG_PRERELEASE_SUFFIX `
+        -AppveyorBuild `
+        -AppveyorSourceCodeRevisionId $env:APPVEYOR_REPO_COMMIT `
+        -AppveyorSourceCodeBranch $env:APPVEYOR_REPO_BRANCH `
+        -AppveyorBuildNumber $env:APPVEYOR_BUILD_NUMBER
+test: off
+artifacts:
+- path: .artifacts/**/*
+  name: Artifacts
+deploy: off
+notifications:
+- provider: Email
+  to:
+  - '{{commitAuthorEmail}}'
+  subject: '[AppVeyor] {{projectName}} {{buildVersion}}: Build {{status}} ({{branch}} @ {{commitId}})'
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
