@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using SharpestBeak.Physics;
 
@@ -126,14 +124,6 @@ public class PolygonPrimitive : BasePrimitive
             ConvexSign.Negative => ConvexState.ConvexClockwise,
             _ => throw new InvalidOperationException($"Unexpected convex computation state: {sign}.")
         };
-    }
-
-    protected override void OnDraw(Graphics graphics, DrawData data)
-    {
-        graphics.FillPolygon(
-            data.Brush,
-            Vertices.Select(v => v * data.Coefficient).ToPointF(),
-            FillMode.Winding);
     }
 
     [Flags]

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
@@ -71,12 +70,4 @@ public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
     }
 
     public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
-
-    protected override void OnDraw(Graphics graphics, DrawData data)
-    {
-        var diameter = 2f * Radius;
-        var location = new Point2D(Center.X - Radius, Center.Y - Radius) * data.Coefficient;
-        var size = new Vector2D(diameter, diameter) * data.Coefficient;
-        graphics.FillEllipse(data.Brush, new RectangleF(location.ToPointF(), size.ToSizeF()));
-    }
 }

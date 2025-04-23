@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
@@ -62,10 +61,4 @@ public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
     }
 
     public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
-
-    protected override void OnDraw(Graphics graphics, DrawData data)
-        => graphics.DrawLine(
-            data.Pen,
-            (Start * data.Coefficient).ToPointF(),
-            (End * data.Coefficient).ToPointF());
 }
