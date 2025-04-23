@@ -4,7 +4,7 @@ using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
 
-public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
+public sealed class CirclePrimitive : BasePrimitive
 {
     private float _radiusSqr = float.MinValue;
 
@@ -41,10 +41,7 @@ public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
         }
     }
 
-    [DebuggerNonUserCode]
-    Point2D ICollidablePrimitive.BasePoint => BasePoint;
-
-    public bool HasCollision(ICollidablePrimitive other)
+    public override bool HasCollision(ICollidablePrimitive other)
     {
         if (other is null)
         {
@@ -69,5 +66,5 @@ public sealed class CirclePrimitive : BasePrimitive, ICollidablePrimitive
         throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
     }
 
-    public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
+    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 }

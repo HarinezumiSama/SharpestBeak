@@ -4,7 +4,7 @@ using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
 
-public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
+public sealed class LinePrimitive : BasePrimitive
 {
     private Vector2D? _direction;
 
@@ -32,10 +32,7 @@ public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
 
     public LineSide GetLineSide(Point2D point) => CollisionDetector.GetLineSide(this, point);
 
-    [DebuggerNonUserCode]
-    Point2D ICollidablePrimitive.BasePoint => BasePoint;
-
-    public bool HasCollision(ICollidablePrimitive other)
+    public override bool HasCollision(ICollidablePrimitive other)
     {
         if (other is null)
         {
@@ -60,5 +57,5 @@ public sealed class LinePrimitive : BasePrimitive, ICollidablePrimitive
         throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
     }
 
-    public bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
+    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 }

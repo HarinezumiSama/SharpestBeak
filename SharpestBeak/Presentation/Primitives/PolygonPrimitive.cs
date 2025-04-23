@@ -6,7 +6,7 @@ using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
 
-public class PolygonPrimitive : BasePrimitive
+public abstract class PolygonPrimitive : BasePrimitive
 {
     public const int MinVertexCount = 3;
 
@@ -15,26 +15,17 @@ public class PolygonPrimitive : BasePrimitive
     /// <summary>
     ///     Initializes a new instance of the <see cref="PolygonPrimitive"/> class.
     /// </summary>
-    public PolygonPrimitive(IEnumerable<Point2D> vertices)
+    protected PolygonPrimitive(params Point2D[] vertices)
     {
         if (vertices is null)
         {
             throw new ArgumentNullException(nameof(vertices));
         }
 
-        Vertices = vertices.ToArray().AsReadOnly();
+        Vertices = vertices.AsReadOnly();
         Edges = GetEdges(Vertices);
         Count = Vertices.Count;
         BasePoint = Vertices.First();
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="PolygonPrimitive"/> class.
-    /// </summary>
-    public PolygonPrimitive(params Point2D[] vertices)
-        : this((IEnumerable<Point2D>)vertices)
-    {
-        // Nothing to do
     }
 
     public ReadOnlyCollection<Point2D> Vertices { get; }
