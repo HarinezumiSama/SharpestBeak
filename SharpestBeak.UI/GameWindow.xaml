@@ -31,14 +31,12 @@
             </helix:HelixViewport3D.Background>
 
             <helix:HelixViewport3D.Camera>
-                <PerspectiveCamera x:Name="Camera" Position="0,-16,24" LookDirection="0,16,-24" UpDirection="0,1,0"
-                        FieldOfView="60" />
+                <PerspectiveCamera x:Name="Camera" Position="0,-16,24" LookDirection="0,16,-24" UpDirection="0,1,0" FieldOfView="60" />
             </helix:HelixViewport3D.Camera>
 
             <helix:SunLight x:Name="SunLight" />
 
-            <helix:BillboardTextVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="10"
-                    Foreground="Gray" Position="1 -0.25 -0.5" />
+            <helix:BillboardTextVisual3D x:Name="CopyrightTextVisual" Text="(Copyright)" FontSize="16" Foreground="Gray" Position="1 -0.25 -0.5" />
 
             <ModelVisual3D x:Name="BoardVisual">
                 <ModelVisual3D.Content>

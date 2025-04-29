@@ -215,7 +215,7 @@ public partial class GameWindow
         //// TODO: [3D] Draw target points for random chickens - ?
         try
         {
-            var boardSize = _gameEngine.Data.NominalSize;
+            var boardSize = _gameEngine?.Data.NominalSize ?? new Size(32, 32);
             var evenCellsMeshBuilder = new MeshBuilder();
             var oddCellsMeshBuilder = new MeshBuilder();
 
@@ -250,9 +250,11 @@ public partial class GameWindow
             _followedChickenId = null;
             SaveCameraDefaults();
 
+            CopyrightTextVisual.Position = new Point3D(boardSize.Width / 2d, -0.25, -0.5);
+
             ////ClearStatusLabels();
             ////UpdateMoveCountStatus();
-            _gameEngine.CallPaint();
+            _gameEngine?.CallPaint();
         }
         catch (Exception ex)
         {
