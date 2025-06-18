@@ -8,9 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageVersion Include="BenchmarkDotNet" Version="[0.14.0]"/>
         <PackageVersion Include="Extended.Wpf.Toolkit" Version="[3.6.0]"/>
         <PackageVersion Include="HelixToolkit" Version="[2.27.0]"/>
         <PackageVersion Include="HelixToolkit.Wpf" Version="[2.27.0]"/>
+        <PackageVersion Include="Newtonsoft.Json" Version="[13.0.3]"/>
         <PackageVersion Include="Omnifactotum" Version="[0.13.0]"/>
+        <PackageVersion Include="Omnifactotum.Wpf" Version="[0.2.0]"/>
+        <PackageVersion Include="PolySharp" Version="1.15.0"/>
+        <PackageVersion Include="System.IO.Compression" Version="[4.3.0]"/>
     </ItemGroup>
 </Project>

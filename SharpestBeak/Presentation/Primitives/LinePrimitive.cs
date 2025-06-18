@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using Newtonsoft.Json;
 using SharpestBeak.Physics;
+using SharpestBeak.Recording;
 
 namespace SharpestBeak.Presentation.Primitives;
 
@@ -28,9 +30,12 @@ public sealed class LinePrimitive : BasePrimitive
     public Point2D End { get; }
 
     [DebuggerNonUserCode]
+    [JsonIgnore]
     public Vector2D Direction => _direction ??= End - Start;
 
     public LineSide GetLineSide(Point2D point) => CollisionDetector.GetLineSide(this, point);
+
+    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 
     public override bool HasCollision(ICollidablePrimitive other)
     {
@@ -39,23 +44,15 @@ public sealed class LinePrimitive : BasePrimitive
             throw new ArgumentNullException(nameof(other));
         }
 
-        if (other is LinePrimitive otherLine)
+        var result = other switch
         {
-            return CollisionDetector.CheckLineToLineCollision(this, otherLine);
-        }
+            LinePrimitive line => CollisionDetector.CheckLineToLineCollision(this, line),
+            CirclePrimitive circle => CollisionDetector.CheckLineToCircleCollision(this, circle),
+            ConvexPolygonPrimitive polygon => CollisionDetector.CheckLineToPolygonCollision(this, polygon),
+            _ => throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other))
+        };
 
-        if (other is CirclePrimitive circle)
-        {
-            return CollisionDetector.CheckLineToCircleCollision(this, circle);
-        }
-
-        if (other is ConvexPolygonPrimitive polygon)
-        {
-            return CollisionDetector.CheckLineToPolygonCollision(this, polygon);
-        }
-
-        throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
+        CollisionCheckRecorder.RecordCollisionCheck(this, other, result);
+        return result;
     }
-
-    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 }

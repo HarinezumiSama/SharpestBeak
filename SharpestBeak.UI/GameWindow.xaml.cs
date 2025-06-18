@@ -474,11 +474,7 @@ public partial class GameWindow
             if (winningTeam.HasValue)
             {
                 var mbr = this.ShowQuestion(
-                    string.Format(
-                        "The game has ended. Winning team: {0}.{1}{1}"
-                        + "Do you wish to reset the game?",
-                        winningTeam.Value,
-                        Environment.NewLine));
+                    $"The game has ended. Winning team: {winningTeam.Value}.{Environment.NewLine}{Environment.NewLine}Do you wish to reset the game?");
 
                 if (mbr != MessageBoxResult.Yes)
                 {

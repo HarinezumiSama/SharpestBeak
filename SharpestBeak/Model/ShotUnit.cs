@@ -55,7 +55,7 @@ internal sealed class ShotUnit
 
     internal void SetMovement(Vector2D movement)
     {
-        //// TODO [vmcl] Temporary argument check
+        //// TODO [VM] Temporary argument check
         if (movement.GetLength().IsZero())
         {
             throw new ArgumentException("Shot must always move until exploded.", nameof(movement));

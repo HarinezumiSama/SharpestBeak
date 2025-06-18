@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using SharpestBeak.Physics;
+using SharpestBeak.Recording;
 
 namespace SharpestBeak.Presentation.Primitives;
 
@@ -15,6 +16,8 @@ public sealed class ConvexPolygonPrimitive : PolygonPrimitive
         // Nothing to do
     }
 
+    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
+
     public override bool HasCollision(ICollidablePrimitive other)
     {
         if (other is null)
@@ -22,25 +25,17 @@ public sealed class ConvexPolygonPrimitive : PolygonPrimitive
             throw new ArgumentNullException(nameof(other));
         }
 
-        if (other is ConvexPolygonPrimitive otherCpp)
+        var result = other switch
         {
-            return CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp);
-        }
+            ConvexPolygonPrimitive otherCpp => CollisionDetector.CheckPolygonToPolygonCollision(this, otherCpp),
+            LinePrimitive line => CollisionDetector.CheckLineToPolygonCollision(line, this),
+            CirclePrimitive circle => CollisionDetector.CheckCircleToPolygonCollision(circle, this),
+            _ => throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other))
+        };
 
-        if (other is LinePrimitive line)
-        {
-            return CollisionDetector.CheckLineToPolygonCollision(line, this);
-        }
-
-        if (other is CirclePrimitive circle)
-        {
-            return CollisionDetector.CheckCircleToPolygonCollision(circle, this);
-        }
-
-        throw new ArgumentException($"Unexpected object type {other.GetType().GetFullName().ToUIString()}.", nameof(other));
+        CollisionCheckRecorder.RecordCollisionCheck(this, other, result);
+        return result;
     }
-
-    public override bool HasCollision(ICollidable other) => CollisionDetector.CheckPrimitiveCollision(this, other);
 
     /// <summary>
     ///     Checks that the polygon defined by the specified vertices is convex and adjusts the order of vertices

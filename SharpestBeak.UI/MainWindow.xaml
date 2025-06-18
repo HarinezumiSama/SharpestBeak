@@ -5,7 +5,7 @@
         xmlns:cmd="clr-namespace:SharpestBeak.UI.Commands" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:SharpestBeak.UI" mc:Ignorable="d" Title="MainWindow" MinWidth="600"
         MinHeight="400" FontFamily="{StaticResource DefaultFontFamily}" FontSize="{StaticResource DefaultFontSize}"
-        WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded">
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" Loaded="MainWindow_OnLoaded">
     <Window.CommandBindings>
         <CommandBinding Command="cmd:AppCommands.Play" CanExecute="CanExecutePlay" Executed="ExecutePlay" />
         <CommandBinding Command="cmd:AppCommands.Exit" CanExecute="CanExecuteExit" Executed="ExecuteExit" />

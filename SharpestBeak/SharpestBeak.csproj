@@ -12,6 +12,8 @@
 
     <ItemGroup>
         <PackageReference Include="Omnifactotum"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="System.IO.Compression" />
     </ItemGroup>
 
     <ItemGroup>

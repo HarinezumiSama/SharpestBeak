@@ -215,7 +215,7 @@ public static class GameHelper
             return MoveDirection.None;
         }
 
-        //// TODO [vmcl] Use computed MoveDirection instead of one of predefined ones
+        //// TODO [VM] Use computed MoveDirection instead of one of predefined ones
 
         var resultProxy = Tuple.Create(MoveDirection.None, float.MaxValue);
         foreach (var item in BasicMoveDirectionsField)

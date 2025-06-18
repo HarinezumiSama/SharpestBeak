@@ -13,15 +13,17 @@ using SharpestBeak.Model;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation;
 using SharpestBeak.Presentation.Elements;
+using SharpestBeak.Recording;
 
 namespace SharpestBeak;
-//// TODO: [vmcl] Capture the game to allow playback
 
-//// TODO: [vmcl] Allow game frame snapshot as a start of a game
+//// TODO: [VM] Capture the game to allow playback
 
-//// TODO: [vmcl] Implement single-thread feature: logics are running with engine in single thread - ???
+//// TODO: [VM] Allow game frame snapshot as a start of a game
 
-//// TODO: [vmcl] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
+//// TODO: [VM] Implement single-thread feature: logics are running with engine in single thread - ???
+
+//// TODO: [VM] Seems that in some cases collisions are detected incorrectly (mostly chicken/chicken)
 
 public sealed class GameEngine : IDisposable
 {
@@ -178,6 +180,8 @@ public sealed class GameEngine : IDisposable
                     _engineThread = null;
                 }
             });
+
+        CollisionCheckRecorder.DumpCollisionChecks(true);
     }
 
     public void Reset()
@@ -383,6 +387,8 @@ public sealed class GameEngine : IDisposable
         {
             throw new GameException("The game has ended. Reset the game before starting it again.");
         }
+
+        CollisionCheckRecorder.ResetCollisionChecks();
 
         _engineThread = new Thread(DoExecuteEngine)
         {
@@ -596,7 +602,7 @@ public sealed class GameEngine : IDisposable
 
             foreach (var injuredChicken in injuredChickens)
             {
-                shotUnit.Exploded = true; //// TODO [vmcl] Move out of loop
+                shotUnit.Exploded = true; //// TODO [VM] Move out of loop
 
                 injuredChicken.IsDead = true;
                 injuredChicken.KilledBy = shotUnit.Owner;
@@ -694,9 +700,9 @@ public sealed class GameEngine : IDisposable
 
     private bool ProcessChickenUnitMoves(IList<ChickenUnit> aliveChickens)
     {
-        //// TODO: [vmcl] Use bisection to get conflicting units closer to each other
-        //// TODO: [vmcl] Optimize number of collision checks!
-        //// TODO: [vmcl] Divide move: eg. unit couldn't move but could turn beak or vice versa
+        //// TODO: [VM] Use bisection to get conflicting units closer to each other
+        //// TODO: [VM] Optimize number of collision checks!
+        //// TODO: [VM] Divide move: eg. unit couldn't move but could turn beak or vice versa
 
         _moveInfoStates.Clear();
         for (var unitIndex = 0; unitIndex < aliveChickens.Count; unitIndex++)

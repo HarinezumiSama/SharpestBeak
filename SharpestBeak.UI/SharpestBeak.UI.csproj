@@ -24,6 +24,7 @@
         <PackageReference Include="HelixToolkit"/>
         <PackageReference Include="HelixToolkit.Wpf"/>
         <PackageReference Include="Omnifactotum"/>
+        <PackageReference Include="Omnifactotum.Wpf"/>
     </ItemGroup>
 
     <ItemGroup>

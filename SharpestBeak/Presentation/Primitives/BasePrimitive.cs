@@ -1,4 +1,7 @@
-﻿using SharpestBeak.Physics;
+﻿#nullable enable
+
+using Newtonsoft.Json;
+using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
 
@@ -12,6 +15,7 @@ public abstract class BasePrimitive : ICollidablePrimitive
         // Nothing to do
     }
 
+    [JsonIgnore]
     public Point2D BasePoint { get; protected set; }
 
     public abstract bool HasCollision(ICollidable other);
