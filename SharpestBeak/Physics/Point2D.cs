@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace SharpestBeak.Physics;
 
@@ -13,6 +14,7 @@ public readonly struct Point2D : IEquatable<Point2D>
     /// <summary>
     ///     Initializes a new instance of the <see cref="Point2D"/> class.
     /// </summary>
+    [JsonConstructor]
     public Point2D(float x, float y)
     {
         X = x;
@@ -111,7 +113,7 @@ public readonly struct Point2D : IEquatable<Point2D>
 
     public override bool Equals(object obj) => obj is Point2D castObj && Equals(castObj);
 
-    public override string ToString() => $"{{{GetType().Name}: X = {X}, Y = {Y}}}";
+    public override string ToString() => $"({X}, {Y})";
 
     public PointF ToPointF() => new(X, Y);
 

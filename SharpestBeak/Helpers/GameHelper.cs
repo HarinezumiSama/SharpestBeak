@@ -215,7 +215,7 @@ public static class GameHelper
             return MoveDirection.None;
         }
 
-        //// TODO [vmcl] Use computed MoveDirection instead of one of predefined ones
+        //// TODO [VM] Use computed MoveDirection instead of one of predefined ones
 
         var resultProxy = Tuple.Create(MoveDirection.None, float.MaxValue);
         foreach (var item in BasicMoveDirectionsField)
@@ -284,6 +284,18 @@ public static class GameHelper
 
         return GetBestBeakTurnNormalized(directionalPosition.Position, directionalPosition.Angle, targetPoint);
     }
+
+    public static int GetMaxChickenCount(Size nominalBoardSize)
+    {
+        Factotum.Assert(nominalBoardSize.Width > 0);
+        Factotum.Assert(nominalBoardSize.Height > 0);
+
+        var maxChickenCount1 = nominalBoardSize.Width * nominalBoardSize.Height / 2;
+        var maxChickenCount2 = (int)Math.Truncate(Math.Pow(nominalBoardSize.Width * nominalBoardSize.Height, 2d / 3d));
+        return Math.Min(maxChickenCount1, maxChickenCount2);
+    }
+
+    //// Private methods
 
     private static float GetDistanceToLineInternal(Vector2D pointDirection, Vector2D lineDirection)
     {

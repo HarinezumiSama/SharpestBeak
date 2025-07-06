@@ -2,9 +2,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
         <OutputType>WinExe</OutputType>
-        <OutputPath>..\.bin\$(Configuration)\</OutputPath>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     </PropertyGroup>
 
@@ -24,10 +22,27 @@
         <PackageReference Include="HelixToolkit"/>
         <PackageReference Include="HelixToolkit.Wpf"/>
         <PackageReference Include="Omnifactotum"/>
+        <PackageReference Include="Omnifactotum.Wpf"/>
+        <PackageReference Include="PolySharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\SharpestBeak\SharpestBeak.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Properties\Settings.settings">
+            <Generator>SettingsSingleFileGenerator</Generator>
+            <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
+        <Compile Update="Properties\Settings.Designer.cs">
+            <AutoGen>True</AutoGen>
+            <DesignTimeSharedInput>True</DesignTimeSharedInput>
+            <DependentUpon>Settings.settings</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>

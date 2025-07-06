@@ -9,31 +9,17 @@ internal sealed class SettingsCache
 
     public static SettingsCache Instance { get; } = new();
 
-    public bool UsePerformanceCounters
-    {
-        get;
-        private set;
-    }
+    public bool UsePerformanceCounters { get; private set; }
 
-    public bool EnableDebugOutput
-    {
-        get;
-        private set;
-    }
+    public bool EnableDebugOutput { get; private set; }
 
-    public bool InstrumentationMode
-    {
-        get;
-        private set;
-    }
+    public bool InstrumentationMode { get; private set; }
 
-    //// TODO: [vmcl] Allow to disable shooting in UI via editable setting
+    //// TODO: [VM] Allow to disable shooting in UI via editable setting
 
-    public bool DebugModeDisableShooting
-    {
-        get;
-        private set;
-    }
+    public bool DebugModeDisableShooting { get; private set; }
+
+    public bool EnableCollisionCheckRecording { get; private set; }
 
     public void Reload() => ReadSettings();
 
@@ -45,5 +31,6 @@ internal sealed class SettingsCache
         EnableDebugOutput = settings.EnableDebugOutput;
         InstrumentationMode = settings.InstrumentationMode;
         DebugModeDisableShooting = settings.DebugModeDisableShooting;
+        EnableCollisionCheckRecording = settings.EnableCollisionCheckRecording;
     }
 }

@@ -5,20 +5,16 @@
         xmlns:cmd="clr-namespace:SharpestBeak.UI.Commands" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:SharpestBeak.UI" mc:Ignorable="d" Title="MainWindow" MinWidth="600"
         MinHeight="400" FontFamily="{StaticResource DefaultFontFamily}" FontSize="{StaticResource DefaultFontSize}"
-        WindowStartupLocation="CenterScreen" Loaded="MainWindow_OnLoaded">
+        WindowStartupLocation="CenterScreen" WindowState="Maximized" Loaded="MainWindow_OnLoaded">
     <Window.CommandBindings>
         <CommandBinding Command="cmd:AppCommands.Play" CanExecute="CanExecutePlay" Executed="ExecutePlay" />
         <CommandBinding Command="cmd:AppCommands.Exit" CanExecute="CanExecuteExit" Executed="ExecuteExit" />
-        <CommandBinding Command="cmd:AppCommands.DefaultPreset" CanExecute="CanExecuteDefaultPreset"
-                Executed="ExecuteDefaultPreset" />
-        <CommandBinding Command="cmd:AppCommands.SmallPreset" CanExecute="CanExecuteSmallPreset"
-                Executed="ExecuteSmallPreset" />
-        <CommandBinding Command="cmd:AppCommands.MediumPreset" CanExecute="CanExecuteMediumPreset"
-                Executed="ExecuteMediumPreset" />
-        <CommandBinding Command="cmd:AppCommands.LargePreset" CanExecute="CanExecuteLargePreset"
-                Executed="ExecuteLargePreset" />
-        <CommandBinding Command="cmd:AppCommands.ExtraLargePreset" CanExecute="CanExecuteExtraLargePreset"
-                Executed="ExecuteExtraLargePreset" />
+        <CommandBinding Command="cmd:AppCommands.DefaultPreset" CanExecute="CanExecuteDefaultPreset" Executed="ExecuteDefaultPreset" />
+        <CommandBinding Command="cmd:AppCommands.SmallPreset" CanExecute="CanExecuteSmallPreset" Executed="ExecuteSmallPreset" />
+        <CommandBinding Command="cmd:AppCommands.MediumPreset" CanExecute="CanExecuteMediumPreset" Executed="ExecuteMediumPreset" />
+        <CommandBinding Command="cmd:AppCommands.LargePreset" CanExecute="CanExecuteLargePreset" Executed="ExecuteLargePreset" />
+        <CommandBinding Command="cmd:AppCommands.ExtraLargePreset" CanExecute="CanExecuteExtraLargePreset" Executed="ExecuteExtraLargePreset" />
+        <CommandBinding Command="cmd:AppCommands.MaximumPreset" CanExecute="CanExecuteMaximumPreset" Executed="ExecuteMaximumPreset" />
     </Window.CommandBindings>
 
     <Grid>
@@ -41,6 +37,7 @@
                 <MenuItem Name="MediumPresetMenuItem" Command="{x:Static cmd:AppCommands.MediumPreset}" />
                 <MenuItem Name="LargePresetMenuItem" Command="{x:Static cmd:AppCommands.LargePreset}" />
                 <MenuItem Name="ExtraLargePresetMenuItem" Command="{x:Static cmd:AppCommands.ExtraLargePreset}" />
+                <MenuItem Name="MaximumPresetMenuItem" Command="{x:Static cmd:AppCommands.MaximumPreset}" />
             </MenuItem>
         </Menu>
 

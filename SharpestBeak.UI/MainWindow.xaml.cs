@@ -79,16 +79,19 @@ public partial class MainWindow
         }
     }
 
-    private void SetPreset(Size nominalSize, int playerCount)
+    private void SetPreset(Size nominalSize, int? eachTeamPlayerCount)
     {
+        var resolvedEachTeamPlayerCount = eachTeamPlayerCount is { } count ? count : GameHelper.GetMaxChickenCount(nominalSize) / 2;
+
         CurrentGameSettings.NominalSize.SetSize(nominalSize);
-        CurrentGameSettings.DarkTeam.PlayerCount = playerCount;
-        CurrentGameSettings.LightTeam.PlayerCount = playerCount;
+        CurrentGameSettings.DarkTeam.PlayerCount = resolvedEachTeamPlayerCount;
+        CurrentGameSettings.LightTeam.PlayerCount = resolvedEachTeamPlayerCount;
 
         GameSettingPropertyGrid.Update();
     }
 
-    private void SetPreset(int nominalSizeDimension, int playerCount) => SetPreset(new Size(nominalSizeDimension, nominalSizeDimension), playerCount);
+    private void SetPreset(int nominalSizeDimension, int? eachTeamPlayerCount)
+        => SetPreset(new Size(nominalSizeDimension, nominalSizeDimension), eachTeamPlayerCount);
 
     private void CanExecuteDefaultPreset(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
@@ -113,6 +116,10 @@ public partial class MainWindow
     private void CanExecuteExtraLargePreset(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 
     private void ExecuteExtraLargePreset(object sender, ExecutedRoutedEventArgs e) => SetPreset(new Size(48, 24), 32);
+
+    private void CanExecuteMaximumPreset(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
+
+    private void ExecuteMaximumPreset(object sender, ExecutedRoutedEventArgs e) => SetPreset(GameConstants.NominalCellCountRange.Max, null);
 
     private void CanExecutePlay(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = true;
 

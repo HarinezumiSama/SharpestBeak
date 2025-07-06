@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Newtonsoft.Json;
 using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation.Primitives;
@@ -30,8 +31,10 @@ public abstract class PolygonPrimitive : BasePrimitive
 
     public ReadOnlyCollection<Point2D> Vertices { get; }
 
+    [JsonIgnore]
     public ReadOnlyCollection<LinePrimitive> Edges { get; }
 
+    [JsonIgnore]
     public int Count { get; }
 
     public ConvexState GetConvexState() => _convexState ??= GetConvexState(Edges);

@@ -9,10 +9,12 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Threading;
 using HelixToolkit.Wpf;
+using Omnifactotum.Annotations;
 using SharpestBeak.Configuration;
 using SharpestBeak.Model;
 using SharpestBeak.Physics;
 using SharpestBeak.Presentation;
+using SharpestBeak.Recording;
 using Size = System.Drawing.Size;
 
 namespace SharpestBeak.UI;
@@ -53,12 +55,17 @@ public partial class GameWindow
     private readonly Dictionary<ModelVisual3D, ChickenData> _chickenVisualToData = new();
     private readonly Dictionary<GameObjectId, ShotData> _shotDatas = new();
 
+    private readonly string _baseTitle;
+
     private Point3D _defaultCameraPosition;
     private Vector3D _defaultCameraLookDirection;
     private Vector3D _defaultCameraUpDirection;
     private double _defaultCameraFieldOfView;
 
     private GameObjectId? _followedChickenId;
+
+    private int _lastLightAliveChickenCount;
+    private int _lastDarkAliveChickenCount;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GameWindow"/> class
@@ -86,8 +93,11 @@ public partial class GameWindow
         _gameEngine = new GameEngine(settings);
         _gameEngine.GameEnded += GameEngine_GameEnded;
 
-        Title = $"{Title} [{nominalSize.Width}x{nominalSize.Height}] [L: {lightTeam.UnitCount}x {lightTeam.Type.Name}  -vs-  D: {
+        _baseTitle = $"{Title} [{nominalSize.Width}x{nominalSize.Height}] [L: {lightTeam.UnitCount}x {lightTeam.Type.Name} -vs- D: {
             darkTeam.UnitCount}x {darkTeam.Type.Name}]";
+
+        UpdateAliveChickenCounts();
+        UpdateTitle();
     }
 
     /// <summary>
@@ -206,6 +216,17 @@ public partial class GameWindow
             shotRadius);
 
         return meshBuilder.ToMesh(true);
+    }
+
+    private static void GetAliveChickenCounts([NotNull] GamePresentation presentation, out int lightAliveChickenCount, out int darkAliveChickenCount)
+    {
+        if (presentation is null)
+        {
+            throw new ArgumentNullException(nameof(presentation));
+        }
+
+        lightAliveChickenCount = presentation.Chickens.Count(c => c.Team == GameTeam.Light);
+        darkAliveChickenCount = presentation.Chickens.Count(c => c.Team == GameTeam.Dark);
     }
 
     private bool InitializeGameUI()
@@ -358,7 +379,19 @@ public partial class GameWindow
         _chickenDatas.Clear();
         _chickenVisualToData.Clear();
         _shotDatas.Clear();
+
+        UpdateAliveChickenCounts();
     }
+
+    private void UpdateAliveChickenCounts()
+    {
+        GetAliveChickenCounts(out var lightAliveChickenCount, out var darkAliveChickenCount);
+        _lastLightAliveChickenCount = lightAliveChickenCount;
+        _lastDarkAliveChickenCount = darkAliveChickenCount;
+    }
+
+    private void UpdateTitle()
+        => Title = $"{_baseTitle} :: {(_gameEngine.IsRunning ? "Running" : "Stopped")} [L: {_lastLightAliveChickenCount} -vs- D: {_lastDarkAliveChickenCount}]";
 
     private void PaintGame(GamePaintEventArgs e)
     {
@@ -458,8 +491,21 @@ public partial class GameWindow
             _shotDatas.Remove(explodedShotId);
         }
 
+        GetAliveChickenCounts(presentation, out var lightAliveChickenCount, out var darkAliveChickenCount);
+
+        if (_lastLightAliveChickenCount != lightAliveChickenCount || _lastDarkAliveChickenCount != darkAliveChickenCount)
+        {
+            _lastLightAliveChickenCount = lightAliveChickenCount;
+            _lastDarkAliveChickenCount = darkAliveChickenCount;
+
+            UpdateTitle();
+        }
+
         FollowChicken();
     }
+
+    private void GetAliveChickenCounts(out int lightAliveChickenCount, out int darkAliveChickenCount)
+        => GetAliveChickenCounts(_gameEngine.GetPresentation(), out lightAliveChickenCount, out darkAliveChickenCount);
 
     private void StartGame()
     {
@@ -474,11 +520,7 @@ public partial class GameWindow
             if (winningTeam.HasValue)
             {
                 var mbr = this.ShowQuestion(
-                    string.Format(
-                        "The game has ended. Winning team: {0}.{1}{1}"
-                        + "Do you wish to reset the game?",
-                        winningTeam.Value,
-                        Environment.NewLine));
+                    $"The game has ended. Winning team: {winningTeam.Value}.{Environment.NewLine}{Environment.NewLine}Do you wish to reset the game?");
 
                 if (mbr != MessageBoxResult.Yes)
                 {
@@ -491,6 +533,8 @@ public partial class GameWindow
 
             _gameEngine.Start();
 
+            UpdateAliveChickenCounts();
+            UpdateTitle();
             ////UpdateMoveCountStatus();
         }
         catch (Exception ex)
@@ -515,6 +559,8 @@ public partial class GameWindow
 
             _gameEngine.Stop();
 
+            UpdateAliveChickenCounts();
+            UpdateTitle();
             ////UpdateMoveCountStatus();
         }
         catch (Exception ex)
@@ -531,12 +577,13 @@ public partial class GameWindow
     private void ResetGame()
     {
         StopGame();
-
         RestoreCameraDefaults();
-
         ClearData();
 
         _gameEngine.Reset();
+
+        UpdateAliveChickenCounts();
+        UpdateTitle();
     }
 
     private void SaveCameraDefaults()
@@ -631,6 +678,9 @@ public partial class GameWindow
         _gameEngine.Stop();
         _gameEngine.CallPaint();
 
+        UpdateAliveChickenCounts();
+        UpdateTitle();
+
         var winningLogicName = e.WinningLogic is null ? "None" : e.WinningLogic.GetType().Name;
 
         this.ShowInfoMessage($"Winning team: {e.WinningTeam} ({winningLogicName}).", "Game Ended");
@@ -649,6 +699,8 @@ public partial class GameWindow
     private void Window_Unloaded(object sender, RoutedEventArgs e)
     {
         CompositionTarget.Rendering -= CompositionTarget_Rendering;
+
+        CollisionCheckRecorder.ResetCollisionChecks(true);
     }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

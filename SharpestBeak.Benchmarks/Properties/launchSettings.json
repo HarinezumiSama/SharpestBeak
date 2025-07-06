@@ -1,0 +1,10 @@
+﻿{
+    "$schema": "https://www.schemastore.org/launchsettings.json",
+    "profiles": {
+        "SharpestBeak.Benchmarks": {
+            "commandName": "Project",
+            "environmentVariables": {
+            }
+        }
+    }
+}

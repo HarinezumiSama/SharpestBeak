@@ -1,6 +1,7 @@
 **/.out/*
 **/.bin/*
 **/.temp/*
+**/.benchmarks/*
 **/obj/*
 **/packages/*
 **/.vs/*

@@ -1,4 +1,6 @@
-﻿using SharpestBeak.Physics;
+﻿#nullable enable
+
+using SharpestBeak.Physics;
 
 namespace SharpestBeak.Presentation;
 

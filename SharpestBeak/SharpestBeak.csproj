@@ -2,16 +2,17 @@
 
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
-        <OutputPath>..\.bin\$(Configuration)\</OutputPath>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <UseWPF>true</UseWPF>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Omnifactotum"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+        <PackageReference Include="PolySharp">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.IO.Compression" />
     </ItemGroup>
 
     <ItemGroup>

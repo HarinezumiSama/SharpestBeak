@@ -139,7 +139,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
 
     public override bool Equals(object obj) => obj is Vector2D castObj && Equals(castObj);
 
-    public override string ToString() => $"{{{GetType().Name}: X = {X}, Y = {Y}}}";
+    public override string ToString() => $"{nameof(Vector2D)}({X}, {Y})";
 
     public PointF ToPointF() => new(X, Y);
 
